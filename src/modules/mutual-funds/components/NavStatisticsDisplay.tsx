@@ -46,46 +46,105 @@ export default function NavStatisticsDisplay({ navData }: ChartStatisticsDisplay
     if (!stats) return null;
 
     return (
-        <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-purple-500/30 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-purple-300 mb-4">{stats.periodLabel}</h3>
+        <div
+          className="rounded-lg p-4"
+          style={{
+            backgroundColor: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {stats.periodLabel}
+            </h3>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {/* Highest NAV */}
-                <div className="bg-slate-700/30 rounded-lg p-4 border border-purple-500/20">
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border-light)',
+                  }}
+                >
+                    <p
+                      className="text-xs font-medium uppercase tracking-wider mb-1"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         Highest NAV
                     </p>
-                    <p className="text-xl font-semibold text-purple-300">
+                    <p
+                      className="text-xl font-semibold"
+                      style={{ color: 'var(--color-primary-main)' }}
+                    >
                         ₹{stats.maxNav.toFixed(2)}
                     </p>
                 </div>
 
                 {/* Lowest NAV */}
-                <div className="bg-slate-700/30 rounded-lg p-4 border border-purple-500/20">
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border-light)',
+                  }}
+                >
+                    <p
+                      className="text-xs font-medium uppercase tracking-wider mb-1"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         Lowest NAV
                     </p>
-                    <p className="text-xl font-semibold text-purple-300">
+                    <p
+                      className="text-xl font-semibold"
+                      style={{ color: 'var(--color-primary-main)' }}
+                    >
                         ₹{stats.minNav.toFixed(2)}
                     </p>
                 </div>
 
                 {/* Average NAV */}
-                <div className="bg-slate-700/30 rounded-lg p-4 border border-purple-500/20">
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border-light)',
+                  }}
+                >
+                    <p
+                      className="text-xs font-medium uppercase tracking-wider mb-1"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         Average NAV
                     </p>
-                    <p className="text-xl font-semibold text-purple-300">
+                    <p
+                      className="text-xl font-semibold"
+                      style={{ color: 'var(--color-primary-main)' }}
+                    >
                         ₹{stats.avgNav.toFixed(2)}
                     </p>
                 </div>
 
                 {/* Change Percentage */}
-                <div className="bg-slate-700/30 rounded-lg p-4 border border-purple-500/20">
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border-light)',
+                  }}
+                >
+                    <p
+                      className="text-xs font-medium uppercase tracking-wider mb-1"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                    >
                         Change
                     </p>
-                    <p className={`text-xl font-semibold ${stats.changePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    <p
+                      className="text-xl font-semibold"
+                      style={{ color: stats.changePercent >= 0 ? 'var(--color-status-success)' : 'var(--color-error)' }}
+                    >
                         {stats.changePercent >= 0 ? '+' : ''}{stats.changePercent.toFixed(2)}%
                     </p>
                 </div>

@@ -13,21 +13,47 @@ export default function FeatureTile({
   onClick,
   gradient,
 }: FeatureTileProps) {
+  const outerGradient = gradient;
+
   return (
     <button
       onClick={onClick}
-      className={`w-full h-full text-left bg-gradient-to-br ${gradient} p-0.5 rounded-lg hover:shadow-lg transition transform hover:scale-105 group`}
+      className={`w-full h-full text-left bg-gradient-to-br ${outerGradient} p-0.5 rounded-lg hover:shadow-lg transition transform hover:scale-105 group`}
     >
-      <div className="bg-slate-900 rounded-lg p-8 h-full flex flex-col justify-between group-hover:bg-slate-800 transition">
+      <div
+        className="rounded-lg p-8 h-full flex flex-col justify-between transition"
+        style={{
+          backgroundColor: 'var(--color-bg-primary)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-primary)';
+        }}
+      >
         <div>
           <div className="text-5xl mb-4">{icon}</div>
-          <h3 className="text-2xl font-bold text-white mb-3">{title}</h3>
-          <p className="text-purple-200 leading-relaxed">{description}</p>
+          <h3 
+            className="text-2xl font-bold mb-3"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            {title}
+          </h3>
+          <p 
+            className="leading-relaxed"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
+            {description}
+          </p>
         </div>
-        <div className="inline-flex items-center text-purple-400 group-hover:text-purple-300 transition">
+        <div 
+          className="inline-flex items-center group-hover:translate-x-2 transition"
+          style={{ color: 'var(--color-primary-main)' }}
+        >
           <span className="pr-2">Explore</span>
           <svg
-            className="w-5 h-5 transform group-hover:translate-x-2 transition"
+            className="w-5 h-5 transform transition"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

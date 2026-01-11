@@ -38,30 +38,50 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
 
     const getTimeFrameClassname = (label: string, metric: ReturnsMetrics) => {
         if (selectedTimeframe === label) {
-            return 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none bg-slate-700 text-purple-300 border-2 border-white';
+            return 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none border-2';
         }
         return metric.isAvailable
-            ? 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none bg-slate-700 text-purple-200 hover:bg-slate-600 border-2 border-transparent'
-            : 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none bg-slate-800 text-slate-500 cursor-not-allowed opacity-50 border-2 border-transparent';
+            ? 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none border-2 hover:opacity-80'
+            : 'px-4 py-2 rounded-lg font-semibold transition whitespace-nowrap text-sm focus:outline-none border-2 cursor-not-allowed opacity-50';
     };
 
     return (
         <div className="space-y-6">
             {/* Timeframe Selector */}
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-purple-500/30 rounded-lg p-4">
+            <div
+              className="rounded-lg p-4"
+              style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                border: `1px solid var(--color-border-light)`,
+              }}
+            >
                 <div className="flex flex-wrap gap-2 md:gap-3">
                     {TIMEFRAMES.map(({ label }) => {
                         const metric = returnsMetrics[label];
-                        return metric.isAvailable ?
+                        const isSelected = selectedTimeframe === label;
+                        return metric.isAvailable ? (
                             <button
                                 key={label}
                                 onClick={() => setSelectedTimeframe(label)}
                                 disabled={!metric.isAvailable}
                                 className={getTimeFrameClassname(label, metric)}
+                                style={
+                                  isSelected
+                                    ? {
+                                        backgroundColor: 'var(--color-primary-main)',
+                                        color: 'var(--color-text-inverse)',
+                                        borderColor: 'var(--color-primary-main)',
+                                      }
+                                    : {
+                                        backgroundColor: 'transparent',
+                                        color: 'var(--color-text-secondary)',
+                                        borderColor: 'var(--color-border-light)',
+                                      }
+                                }
                             >
                                 {label}
                             </button>
-                            : null
+                        ) : null;
                     })}
                 </div>
             </div>
@@ -73,24 +93,50 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
 
             {/* Chart Type Selector and Chart */}
             {selectedMetric.isAvailable && filteredNavData.length > 0 && (
-                <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-purple-500/30 rounded-lg p-4 space-y-4">
+                <div
+                  className="rounded-lg p-4 space-y-4"
+                  style={{
+                    backgroundColor: "var(--color-bg-secondary)",
+                    border: `1px solid var(--color-border-lighter)`,
+                  }}
+                >
                     {/* Chart Type Selector */}
                     <div className="flex gap-2">
                         <button
                             onClick={() => setChartType('line')}
-                            className={`px-4 py-2 rounded-lg transition font-medium text-sm ${chartType === 'line'
-                                ? 'bg-purple-600 text-white border border-purple-400'
-                                : 'bg-slate-700/50 text-slate-300 border border-slate-600 hover:bg-slate-600/50'
-                                }`}
+                            className="px-4 py-2 rounded-lg transition font-medium text-sm border"
+                            style={
+                              chartType === 'line'
+                                ? {
+                                    backgroundColor: 'var(--color-primary-main)',
+                                    color: "var(--color-text-inverse)",
+                                    borderColor: "var(--color-primary-lighter)",
+                                  }
+                                : {
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--color-text-secondary)',
+                                    borderColor: 'var(--color-border-light)',
+                                  }
+                            }
                         >
                             Line Chart
                         </button>
                         <button
                             onClick={() => setChartType('histogram')}
-                            className={`px-4 py-2 rounded-lg transition font-medium text-sm ${chartType === 'histogram'
-                                ? 'bg-purple-600 text-white border border-purple-400'
-                                : 'bg-slate-700/50 text-slate-300 border border-slate-600 hover:bg-slate-600/50'
-                                }`}
+                            className="px-4 py-2 rounded-lg transition font-medium text-sm border"
+                            style={
+                              chartType === 'histogram'
+                                ? {
+                                    backgroundColor: 'var(--color-primary-main)',
+                                    color: 'var(--color-text-inverse)',
+                                    borderColor: 'var(--color-primary-lighter)',
+                                  }
+                                : {
+                                    backgroundColor: 'transparent',
+                                    color: 'var(--color-text-secondary)',
+                                    borderColor: 'var(--color-border-light)',
+                                  }
+                            }
                         >
                             Histogram
                         </button>
@@ -116,9 +162,15 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
             )}
 
             {!selectedMetric.isAvailable && (
-                <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-purple-500/30 rounded-lg p-6">
+                <div
+                  className="rounded-lg p-6"
+                  style={{
+                    backgroundColor: "var(--color-bg-secondary)",
+                    border: `1px solid var(--color-border-light)`,
+                  }}
+                >
                     <div className="text-center py-8">
-                        <p className="text-purple-200">
+                        <p style={{ color: "var(--color-text-secondary)" }}>
                             Insufficient data available for returns calculation
                         </p>
                     </div>

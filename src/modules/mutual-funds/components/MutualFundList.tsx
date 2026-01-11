@@ -48,10 +48,11 @@ export default function MutualFundList() {
       <div className="mb-8">
         <div className="relative">
           <svg
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            style={{ color: 'var(--color-primary-main)' }}
           >
             <path
               strokeLinecap="round"
@@ -65,14 +66,35 @@ export default function MutualFundList() {
             placeholder="Search mutual funds by name (e.g., HDFC, ICICI)..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full bg-slate-800 border border-purple-500/30 rounded-lg pl-12 pr-4 py-3 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+            className="w-full rounded-lg pl-12 pr-4 py-3 transition border focus:outline-none"
+            style={{
+              backgroundColor: "var(--color-bg-secondary)",
+              borderColor: "var(--color-border-main)",
+              color: "var(--color-text-primary)",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${'var(--color-primary-main)'}20`;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "var(--color-border-main)";
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-8 text-red-200">
+        <div
+          className="rounded-lg p-4 mb-8"
+          style={{
+            backgroundColor: `${"var(--color-error)"}20`,
+            borderColor: "var(--color-error)",
+            color: "var(--color-error)",
+            border: `1px solid ${"var(--color-error)"}`,
+          }}
+        >
           <p className="font-semibold">Error: {error}</p>
         </div>
       )}
@@ -81,16 +103,21 @@ export default function MutualFundList() {
       {isLoading && (
         <div className="text-center py-12">
           <div className="inline-block">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+            <div
+              className="animate-spin rounded-full h-12 w-12 border-b-2"
+              style={{ borderColor: 'var(--color-primary-main)' }}
+            />
           </div>
-          <p className="text-purple-200 mt-4">Loading mutual funds...</p>
+          <p className="mt-4" style={{ color: "var(--color-text-secondary)" }}>
+            Loading mutual funds...
+          </p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && filteredSchemes.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-purple-200 text-lg">
+          <p className="text-lg" style={{ color: "var(--color-text-secondary)" }}>
             {searchQuery ? 'No mutual funds found matching your search.' : 'No mutual funds available.'}
           </p>
         </div>

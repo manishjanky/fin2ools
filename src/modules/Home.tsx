@@ -2,22 +2,29 @@ import { useNavigate } from 'react-router';
 import FeatureTile from '../components/common/FeatureTile';
 import Header from '../components/common/Header';
 
-
 export default function Home() {
   const navigate = useNavigate();
 
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <Header />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
         <section className="mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
             Choose Your Tool
           </h2>
-          <p className="text-xl text-purple-200 max-w-2xl">
+          <p 
+            className="text-xl max-w-2xl"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             Select which financial tool you'd like to explore today.
           </p>
         </section>

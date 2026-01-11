@@ -8,54 +8,161 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-button {
-  border-radius: 8px;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
+/* Light Theme (Default) - prefers-color-scheme: light */
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    /* Primary Colors */
+    --color-primary-main: #6366F1;
+    --color-primary-light: #818CF8;
+    --color-primary-lighter: #C7D2FE;
+    --color-primary-dark: #4F46E5;
+    --color-primary-darker: #312E81;
+
+    /* Secondary Colors */
+    --color-secondary-main: #0891B2;
+    --color-secondary-light: #06B6D4;
+    --color-secondary-lighter: #CFFAFE;
+    --color-secondary-dark: #0E7490;
+
+    /* Accent Colors */
+    --color-accent-blue: #3B82F6;
+    --color-accent-cyan: #06B6D4;
+    --color-accent-purple: #A855F7;
+    --color-accent-green: #10B981;
+    --color-accent-red: #EF4444;
+    --color-accent-orange: #F97316;
+    --color-accent-yellow: #EAB308;
+
+    /* Background Colors */
+    --color-bg-primary: #FFFFFF;
+    --color-bg-secondary: #F9FAFB;
+    --color-bg-tertiary: #F3F4F6;
+    --color-bg-surface: #E5E7EB;
+
+    /* Text Colors */
+    --color-text-primary: #111827;
+    --color-text-secondary: #374151;
+    --color-text-tertiary: #6B7280;
+    --color-text-inverse: #FFFFFF;
+
+    /* Border Colors */
+    --color-border-light: #F3F4F6;
+    --color-border-main: #E5E7EB;
+    --color-border-dark: #D1D5DB;
+
+    /* Status Colors */
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #3B82F6;
   }
+
+  body {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+
+  a {
+    color: #646cff;
+    font-weight: 500;
+    text-decoration: inherit;
+  }
+
   a:hover {
-    color: #747bff;
+    color: #535bf2;
   }
+
   button {
     background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.25s;
+  }
+}
+
+/* Dark Theme - prefers-color-scheme: dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Primary Colors */
+    --color-primary-main: #818CF8;
+    --color-primary-light: #A5B4FC;
+    --color-primary-lighter: #C7D2FE;
+    --color-primary-dark: #6366F1;
+    --color-primary-darker: #4F46E5;
+
+    /* Secondary Colors */
+    --color-secondary-main: #06B6D4;
+    --color-secondary-light: #22D3EE;
+    --color-secondary-lighter: #CFFAFE;
+    --color-secondary-dark: #0891B2;
+
+    /* Accent Colors */
+    --color-accent-blue: #60A5FA;
+    --color-accent-cyan: #22D3EE;
+    --color-accent-purple: #C084FC;
+    --color-accent-green: #34D399;
+    --color-accent-red: #F87171;
+    --color-accent-orange: #FB923C;
+    --color-accent-yellow: #FBBF24;
+
+    /* Background Colors */
+    --color-bg-primary: #0F172A;
+    --color-bg-secondary: #1E293B;
+    --color-bg-tertiary: #334155;
+    --color-bg-surface: #475569;
+
+    /* Text Colors */
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #CBD5E1;
+    --color-text-tertiary: #94A3B8;
+    --color-text-inverse: #0F172A;
+
+    /* Border Colors */
+    --color-border-light: #334155;
+    --color-border-main: #475569;
+    --color-border-dark: #64748B;
+
+    /* Status Colors */
+    --color-success: #34D399;
+    --color-error: #F87171;
+    --color-warning: #FBBF24;
+    --color-info: #60A5FA;
+  }
+
+  body {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.87);
+    font-weight: 500;
+    text-decoration: inherit;
+  }
+
+  a:hover {
+    color: #535bf2;
+  }
+
+  button {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.25s;
   }
 }

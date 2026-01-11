@@ -45,13 +45,27 @@ const PPFForm = () => {
     // const { report, totalContrib, interestEarned, maturityAmount } = calculatePPF();
 
     return (
-        <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-white mb-6">PPF Calculator</h2>
+        <div
+          className="rounded-lg p-8"
+          style={{
+            backgroundColor: 'var(--color-bg-primary)',
+            border: '1px solid var(--color-primary-lighter)',
+          }}
+        >
+            <h2 
+              className="text-2xl font-bold mb-6"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              PPF Calculator
+            </h2>
             <form className="space-y-6">
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Start Year */}
                     <div>
-                        <label className="block text-purple-200 font-medium mb-2">
+                        <label
+                          className="block font-medium mb-2"
+                          style={{ color: 'var(--color-text-secondary)' }}
+                        >
                             Start Year
                         </label>
                         <input
@@ -60,13 +74,27 @@ const PPFForm = () => {
                             onChange={(e) => setStartYear(parseInt(e.target.value))}
                             min="1900"
                             max={new Date().getFullYear()}
-                            className="w-full bg-slate-800 border border-purple-500/30 rounded-lg px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+                            className="w-full rounded-lg px-4 py-2 transition border"
+                            style={{
+                              backgroundColor: 'var(--color-bg-secondary)',
+                              borderColor: 'var(--color-border-main)',
+                              color: 'var(--color-text-primary)',
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--color-border-main)';
+                            }}
                         />
                     </div>
 
                     {/* Interest Rate */}
                     <div>
-                        <label className="block text-purple-200 font-medium mb-2">
+                        <label
+                          className="block font-medium mb-2"
+                          style={{ color: 'var(--color-text-secondary)' }}
+                        >
                             Interest Rate (% per annum)
                         </label>
                         <input
@@ -75,13 +103,27 @@ const PPFForm = () => {
                             onChange={(e) => setInterestRate(parseFloat(e.target.value))}
                             min="0"
                             step="0.01"
-                            className="w-full bg-slate-800 border border-purple-500/30 rounded-lg px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+                            className="w-full rounded-lg px-4 py-2 transition border"
+                            style={{
+                              backgroundColor: 'var(--color-bg-secondary)',
+                              borderColor: 'var(--color-border-main)',
+                              color: 'var(--color-text-primary)',
+                            }}
+                            onFocus={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+                            }}
+                            onBlur={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--color-border-main)';
+                            }}
                         />
                     </div>
 
                     {
                         !variablePastContributions && <div>
-                            <label className="block text-purple-200 font-medium mb-2">
+                            <label
+                              className="block font-medium mb-2"
+                              style={{ color: 'var(--color-text-secondary)' }}
+                            >
                                 Yearly Contribution
                             </label>
                             <input
@@ -91,7 +133,18 @@ const PPFForm = () => {
                                 min="0"
                                 step="0.01"
                                 placeholder="Yearly Contribution Amount (₹)"
-                                className="w-full bg-slate-800 border border-purple-500/30 rounded-lg px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+                                className="w-full rounded-lg px-4 py-2 transition border"
+                                style={{
+                                  backgroundColor: 'var(--color-bg-secondary)',
+                                  borderColor: 'var(--color-border-main)',
+                                  color: 'var(--color-text-primary)',
+                                }}
+                                onFocus={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+                                }}
+                                onBlur={(e) => {
+                                  e.currentTarget.style.borderColor = 'var(--color-border-main)';
+                                }}
                             />
                         </div>
                     }
@@ -101,13 +154,19 @@ const PPFForm = () => {
                 {
                     variablePastContributions && (
                         <Fragment>
-                            <h3 className="block text-purple-200 font-bold text-xl mb-2" >
+                            <h3
+                              className="font-bold text-xl mb-2"
+                              style={{ color: 'var(--color-text-secondary)' }}
+                            >
                                 Annual Contributions
                             </h3>
 
                             <div className='grid md:grid-cols-2 gap-6'>
                                 <div>
-                                    <label className="block text-purple-200 font-medium mb-2">
+                                    <label
+                                      className="block font-medium mb-2"
+                                      style={{ color: 'var(--color-text-secondary)' }}
+                                    >
                                         Year
                                     </label>
                                     <input
@@ -117,11 +176,25 @@ const PPFForm = () => {
                                         min="0"
                                         step="0.01"
                                         placeholder="Year"
-                                        className="w-full bg-slate-800 border border-purple-500/30 rounded-lg px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+                                        className="w-full rounded-lg px-4 py-2 transition border"
+                                        style={{
+                                          backgroundColor: 'var(--color-bg-secondary)',
+                                          borderColor: 'var(--color-border-main)',
+                                          color: 'var(--color-text-primary)',
+                                        }}
+                                        onFocus={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+                                        }}
+                                        onBlur={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--color-border-main)';
+                                        }}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-purple-200 font-medium mb-2">
+                                    <label
+                                      className="block font-medium mb-2"
+                                      style={{ color: 'var(--color-text-secondary)' }}
+                                    >
                                         Contribution Amount (₹)
                                     </label>
                                     <input
@@ -131,7 +204,18 @@ const PPFForm = () => {
                                         min="0"
                                         step="0.01"
                                         placeholder="Contribution Amount (₹)"
-                                        className="w-full bg-slate-800 border border-purple-500/30 rounded-lg px-4 py-2 text-white placeholder-purple-300 focus:outline-none focus:border-purple-500 transition"
+                                        className="w-full rounded-lg px-4 py-2 transition border"
+                                        style={{
+                                          backgroundColor: 'var(--color-bg-secondary)',
+                                          borderColor: 'var(--color-border-main)',
+                                          color: 'var(--color-text-primary)',
+                                        }}
+                                        onFocus={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--color-primary-main)';
+                                        }}
+                                        onBlur={(e) => {
+                                          e.currentTarget.style.borderColor = 'var(--color-border-main)';
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -143,14 +227,22 @@ const PPFForm = () => {
                     <button
                         type="button"
                         onClick={() => setVariablePastContributions(!variablePastContributions)}
-                        className="my-2 mr-2 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg"
+                        className="my-2 mr-2 font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg"
+                        style={{
+                          background: 'linear-gradient(to right, var(--color-primary-main), var(--color-secondary-main))',
+                          color: 'var(--color-text-inverse)',
+                        }}
                     >
                         Amount contributed not same every year
                     </button>
 
                     <button
                         type="button"
-                        className="my-2 ml-2 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg"
+                        className="my-2 ml-2 font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg"
+                        style={{
+                          background: 'linear-gradient(to right, var(--color-primary-main), var(--color-secondary-main))',
+                          color: 'var(--color-text-inverse)',
+                        }}
                     >
                         Calculate
                     </button>

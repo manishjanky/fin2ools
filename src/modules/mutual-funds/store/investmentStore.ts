@@ -6,6 +6,7 @@ interface InvestmentStore {
   investments: UserInvestmentData[];
   hasInvestments: boolean;
   loadInvestments: () => void;
+  getAllInvestments: () => UserInvestmentData[];
   addInvestment: (schemeCode: number, investment: any) => void;
   removeInvestment: (schemeCode: number, investmentIndex: number) => void;
   getSchemeInvestments: (schemeCode: number) => UserInvestmentData | null;
@@ -21,6 +22,10 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
       investments,
       hasInvestments: investments.length > 0 
     });
+  },
+
+  getAllInvestments: () => {
+    return get().investments;
   },
 
   addInvestment: (schemeCode: number, investment: any) => {
