@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import moment from 'moment';
 import type { UserInvestment } from '../types/mutual-funds';
 import Modal from '../../../components/common/Modal';
+import { useAlert } from '../../../context/AlertContext';
 
 /**
  * Convert HTML date input format (YYYY-MM-DD) to DD-MM-YYYY format
@@ -42,11 +43,13 @@ export default function AddInvestmentModal({
   editingInvestment,
   mode = 'add',
 }: AddInvestmentModalProps) {
+  const { showAlert } = useAlert();
   const [investmentType, setInvestmentType] = useState<'lumpsum' | 'sip'>('lumpsum');
   // Store as YYYY-MM-DD for HTML input element, will convert to DD-MM-YYYY on submit
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'));
   const [amount, setAmount] = useState('');
   const [sipAmount, setSipAmount] = useState('');
+
   const [sipMonthlyDate, setSipMonthlyDate] = useState('1');
   const [sipCancelled, setSipCancelled] = useState(false);
   const [sipEndDate, setSipEndDate] = useState('');
@@ -76,18 +79,18 @@ export default function AddInvestmentModal({
     e.preventDefault();
 
     if ((investmentType === 'sip' && !sipAmount) || (investmentType === 'lumpsum' && !amount)) {
-      alert('Please fill in all required fields');
+      showAlert('Please fill in all required fields', 'alert');
       return;
     }
 
     if (investmentType === 'sip' && sipCancelled && !sipEndDate) {
-      alert('Please provide SIP end date if SIP is cancelled');
+      showAlert('Please provide SIP end date if SIP is cancelled', 'alert');
       return;
     }
 
     // For edit mode with SIP amount change, validate effective date
     if (isEditMode && investmentType === 'sip' && isChangingAmount && !sipAmountChangeDate) {
-      alert('Please provide effective date for SIP amount change');
+      showAlert('Please provide effective date for SIP amount change', 'alert');
       return;
     }
 
@@ -111,7 +114,7 @@ export default function AddInvestmentModal({
       const sipStartDate = moment(editingInvestment.startDate, 'DD-MM-YYYY');
 
       if (effectiveDate.isBefore(sipStartDate)) {
-        alert(`Effective date cannot be before SIP start date (${sipStartDate.format('DD-MMM-YYYY')})`);
+        showAlert(`Effective date cannot be before SIP start date (${sipStartDate.format('DD-MMM-YYYY')})`, 'warning');
         return;
       }
 

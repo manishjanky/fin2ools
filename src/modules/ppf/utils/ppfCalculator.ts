@@ -11,6 +11,28 @@ const getDefaultContributionDate = (year: number): string => {
   return `${year}-04-01`;
 };
 
+/**
+ * Get the correct financial year start year from a contribution date
+ * Indian Financial Year: April 1 to March 31
+ * E.g., Jan 10, 2019 falls in FY 2018-2019, so returns 2018
+ *       April 15, 2019 falls in FY 2019-2020, so returns 2019
+ */
+const getFiscalYearFromDate = (dateString: string): number => {
+  try {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed, so April = 3
+
+    // If date is before April (month < 3), it belongs to previous FY
+    if (month < 3) {
+      return year - 1;
+    }
+    return year;
+  } catch {
+    return 0;
+  }
+};
+
 const getEffectiveDate = (date: string | undefined, year: number): string => {
   // If no date provided, use April 1st of FY
   if (!date) {
@@ -70,21 +92,29 @@ export const calculatePPF = (
     const yearContributions = yearContribution?.contributions || [];
     const effectiveRate = yearContribution?.interestRate || defaultInterestRate;
 
-    // Add all contributions for this year to balance
+    let yearlyInterest = 0;
+
+    // Step 1: Calculate interest on opening balance (full year interest)
+    if (openingBalance > 0) {
+      const openingBalanceInterest = openingBalance * (effectiveRate / 100);
+      yearlyInterest += openingBalanceInterest;
+    }
+
+    // Step 2: Add all contributions for this year
     let yearlyContributionAmount = 0;
     yearContributions.forEach(contrib => {
       yearlyContributionAmount += contrib.amount;
     });
     balance += yearlyContributionAmount;
 
-    // Calculate total interest for this year based on each contribution's pro-rata amount
-    let yearlyInterest = 0;
+    // Step 3: Calculate pro-rata interest on new contributions for this year
     yearContributions.forEach(contrib => {
       const effectiveDate = getEffectiveDate(contrib.date, year);
       const interest = calculateProRataInterest(contrib.amount, effectiveRate, effectiveDate, year);
       yearlyInterest += interest;
     });
 
+    // Step 4: Add all interest to balance
     balance += yearlyInterest;
 
     // Track totals
@@ -126,3 +156,5 @@ export const generateFinancialYearData = (yearlyData: PPFYearData[]) => {
     interestEarned: data.interest,
   }));
 };
+
+export { getFiscalYearFromDate };

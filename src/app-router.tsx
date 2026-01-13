@@ -5,6 +5,7 @@ import Home from './modules/Home';
 import './App.css';
 import Loader from './components/common/Loader';
 import Footer from './components/common/Footer';
+import AlertContainer from './components/common/AlertContainer';
 
 // Lazy load FD and Mutual Funds pages for code splitting
 const FD = lazy(() => import('./modules/fd/FD'));
@@ -18,6 +19,7 @@ const Layout = () => {
     return (
         <>
             <ScrollRestoration />
+            <AlertContainer />
             <Outlet />
             <Footer />
         </>

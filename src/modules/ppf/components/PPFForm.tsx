@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { PPFContribution, PPFCalculationResult, PPFSingleContribution } from '../types/ppf';
-import { calculatePPF } from '../utils/ppfCalculator';
+import { calculatePPF, getFiscalYearFromDate } from '../utils/ppfCalculator';
+import { useAlert } from '../../../context/AlertContext';
 import PPFFormBasics from './PPFFormBasics';
 import PPFVariableContributionsModal from './PPFVariableContributionsModal';
 import PPFContributionsSummary from './PPFContributionsSummary';
@@ -10,6 +11,7 @@ interface PPFFormProps {
 }
 
 const PPFForm = ({ onCalculate }: PPFFormProps) => {
+  const { showAlert } = useAlert();
   const currentYear = new Date().getFullYear();
   const PPF_MATURITY_YEARS = 15;
   const [startYear, setStartYear] = useState<number | null>(null);
@@ -161,15 +163,25 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
 
   const handleCalculate = () => {
     if (!startYear) {
-      alert('Please enter the start year');
+      showAlert('Please enter the start year', 'alert');
       return;
     }
 
     let contributions: PPFContribution[];
 
     if (variablePastContributions) {
+      // Reorganize contributions to their correct fiscal years based on dates
+      const normalizedContributions = normalizeContributionsByFiscalYear(yearlyContributions);
+      
+      // Validate that contributions start from the correct FY
+      const minYear = Math.min(...normalizedContributions.map(c => c.year));
+      if (minYear < startYear) {
+        showAlert(`Some contributions fall in FY ${minYear}-${minYear + 1}, which is before the selected start year (FY ${startYear}-${startYear + 1}). Please adjust the dates or start year.`, 'warning');
+        return;
+      }
+      
       // Fill missing years with last captured contribution
-      contributions = fillMissingYears(yearlyContributions);
+      contributions = fillMissingYears(normalizedContributions);
     } else {
       contributions = Array.from({ length: PPF_MATURITY_YEARS }, (_, i) => ({
         year: startYear + i,
@@ -185,6 +197,42 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
 
     const result = calculatePPF(startYear, interestRate, contributions);
     onCalculate?.(result);
+  };
+
+  /**
+   * Reorganize contributions to their correct fiscal years based on dates
+   * This ensures that a contribution dated 10 Jan 2019 is categorized under FY 2018-2019, not FY 2019-2020
+   */
+  const normalizeContributionsByFiscalYear = (contributions: PPFContribution[]): PPFContribution[] => {
+    const yearMap = new Map<number, PPFSingleContribution[]>();
+
+    contributions.forEach((yearData) => {
+      yearData.contributions.forEach((contrib) => {
+        // Determine correct fiscal year from date
+        let correctYear = yearData.year;
+        if (contrib.date) {
+          correctYear = getFiscalYearFromDate(contrib.date);
+        }
+
+        if (!yearMap.has(correctYear)) {
+          yearMap.set(correctYear, []);
+        }
+        yearMap.get(correctYear)!.push(contrib);
+      });
+    });
+
+    // Build normalized contributions array, sorted by year
+    const years = Array.from(yearMap.keys()).sort((a, b) => a - b);
+    const normalized: PPFContribution[] = years.map((year) => {
+      const firstContribInYear = yearlyContributions.find(c => c.year === year);
+      return {
+        year,
+        interestRate: firstContribInYear?.interestRate || interestRate,
+        contributions: yearMap.get(year) || [],
+      };
+    });
+
+    return normalized;
   };
 
   const handleClearVariableContributions = () => {
