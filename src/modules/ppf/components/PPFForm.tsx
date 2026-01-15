@@ -364,7 +364,7 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
             type="button"
             onClick={handleCalculate}
             disabled={!startYear}
-            className={`my-2 font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg text-text-inverse ${
+            className={`my-2 font-bold py-3 px-6 bg-primary-main rounded-lg transition transform hover:scale-105 text-lg text-text-inverse ${
               startYear
                 ? 'bg-gradient-to-r from-primary-main to-secondary-main cursor-pointer opacity-100'
                 : 'bg-border-main cursor-not-allowed opacity-50'

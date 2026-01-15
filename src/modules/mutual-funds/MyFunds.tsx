@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router';
 import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
@@ -8,11 +8,16 @@ import MyFundsCard from './components/MyFundsCard';
 import MyFundsSummary from './components/MyFundsSummary';
 import Accordion from '../../components/common/Accordion';
 import Loader from '../../components/common/Loader';
+import { calculatePortfolioPerformanceTimeline } from './utils/portfolioPerformanceCalculations';
+
+const PortfolioPerformanceCurve = lazy(
+  () => import('./components/PortfolioPerformanceCurve')
+);
 
 export default function MyFunds() {
   const navigate = useNavigate();
   const { loadInvestments, getAllInvestments, hasInvestments } = useInvestmentStore();
-  const { loadSchemes, getOrFetchSchemeDetails } = useMutualFundsStore();
+  const { loadSchemes, getOrFetchSchemeDetails, getOrFetchSchemeHistory } = useMutualFundsStore();
   const [fundsWithDetails, setFundsWithDetails] = useState<
     Array<{
       scheme: MutualFundScheme;
@@ -20,6 +25,10 @@ export default function MyFunds() {
     }>
   >([]);
   const [loading, setLoading] = useState(true);
+  const [portfolioPerformanceSnapshots, setPortfolioPerformanceSnapshots] = useState(
+    [] as Array<{ date: string; investedAmount: number; currentValue: number; gain: number; returnPercentage: number }>
+  );
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
 
   useEffect(() => {
     loadInvestments();
@@ -32,10 +41,12 @@ export default function MyFunds() {
 
       if (investments.length === 0) {
         setLoading(false);
+        setPortfolioError(null);
         return;
       }
 
       setLoading(true);
+      setPortfolioError(null);
       try {
         const fundDetails = await Promise.all(
           investments.map(async (investmentData) => {
@@ -50,15 +61,74 @@ export default function MyFunds() {
           })
         );
         setFundsWithDetails(fundDetails);
+
+        // Calculate portfolio performance timeline
+        try {
+          const allInvestments = fundDetails.flatMap((f) => f.investmentData.investments);
+          
+          if (allInvestments.length === 0) {
+            console.warn('No investments found for portfolio calculation');
+            setPortfolioPerformanceSnapshots([]);
+            setPortfolioError(null);
+            return;
+          }
+
+          const navHistories = new Map();
+
+          // Fetch NAV histories for all schemes
+          for (const { scheme } of fundDetails) {
+            try {
+              const history = await getOrFetchSchemeHistory(scheme.schemeCode, 3650); // Get 10 years of history
+              if (history?.data && Array.isArray(history.data) && history.data.length > 0) {
+                navHistories.set(scheme.schemeCode, history.data);
+              } else {
+                console.warn(`No NAV history available for scheme ${scheme.schemeCode}`);
+              }
+            } catch (histErr) {
+              console.error(`Error fetching NAV history for scheme ${scheme.schemeCode}:`, histErr);
+              // Continue with other schemes instead of breaking
+            }
+          }
+
+          if (navHistories.size === 0) {
+            console.warn('No NAV histories available for any scheme');
+            setPortfolioPerformanceSnapshots([]);
+            setPortfolioError('Unable to fetch NAV history. Please try again later.');
+            return;
+          }
+
+          // Calculate performance snapshots
+          const snapshots = calculatePortfolioPerformanceTimeline(allInvestments, navHistories);
+          
+          if (!Array.isArray(snapshots) || snapshots.length === 0) {
+            console.warn('Portfolio calculation returned empty snapshots');
+            setPortfolioPerformanceSnapshots([]);
+            setPortfolioError(null);
+          } else {
+            setPortfolioPerformanceSnapshots(snapshots);
+            setPortfolioError(null);
+          }
+        } catch (calcErr) {
+          console.error('Error calculating portfolio performance:', calcErr);
+          setPortfolioPerformanceSnapshots([]);
+          setPortfolioError(
+            `Error calculating portfolio performance: ${calcErr instanceof Error ? calcErr.message : 'Unknown error'}`
+          );
+        }
       } catch (error) {
         console.error('Error loading fund details:', error);
+        setFundsWithDetails([]);
+        setPortfolioPerformanceSnapshots([]);
+        setPortfolioError(
+          `Error loading fund details: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       } finally {
         setLoading(false);
       }
     };
 
     loadFundDetails();
-  }, [getAllInvestments, hasInvestments, getOrFetchSchemeDetails]);
+  }, [getAllInvestments, hasInvestments, getOrFetchSchemeDetails, getOrFetchSchemeHistory]);
 
  const handleCardClick = (schemeCode: string | number) => {
     navigate(`/mutual-funds/my-funds/investment/${schemeCode}`);
@@ -124,6 +194,37 @@ export default function MyFunds() {
               <Accordion title="Portfolio Summary" isOpen={true}>
                 <MyFundsSummary fundsWithDetails={fundsWithDetails} />
               </Accordion>
+            </section>
+
+            {/* Portfolio Performance Curve */}
+            <section className="mb-6">
+              {portfolioError ? (
+                <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
+                  <div className="flex gap-3 text-sm">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-medium text-text-primary">Portfolio Performance Unavailable</p>
+                      <p className="text-text-secondary">{portfolioError}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Suspense
+                  fallback={
+                    <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
+                      <div className="h-96 flex items-center justify-center">
+                        <Loader message="Loading portfolio performance..." fullHeight={false} />
+                      </div>
+                    </div>
+                  }
+                >
+                  <PortfolioPerformanceCurve snapshots={portfolioPerformanceSnapshots} />
+                </Suspense>
+              )}
             </section>
 
             {/* Funds List */}

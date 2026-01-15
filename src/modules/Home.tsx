@@ -42,7 +42,7 @@ export default function Home() {
               description="Explore mutual fund options, compare returns, and analyze your portfolio performance. Make informed investment decisions."
               icon="📈"
               gradient="from-blue-500 to-cyan-600"
-              onClick={() => navigate('mutual-funds')}
+              onClick={() => navigate('mutual-funds/my-funds')}
             />
           </div>
           <div className="cursor-pointer">

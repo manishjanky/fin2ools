@@ -72,12 +72,13 @@ export async function fetchSchemeDetails(
 
 export async function fetchSchemeHistory(
   schemeCode: number,
-  years: number = 10
+  days: number = 3650
 ): Promise<SchemeHistoryResponse | null> {
   try {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - years);
+    // Subtract days from current date to get start date
+    startDate.setDate(startDate.getDate() - days);
 
     const formatDate = (date: Date): string => {
       const year = date.getFullYear();
