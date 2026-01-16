@@ -1,9 +1,6 @@
-import { useNavigate } from 'react-router';
 import Header from '../components/common/Header';
 
 export default function PrivacyNotice() {
-    const navigate = useNavigate();
-
     return (
         <div className="min-h-screen bg-bg-primary">
             <Header />
