@@ -39,7 +39,7 @@ jobs:
           npm i -g vercel
 
           # Authenticate using the token
-          echo "$VERCEL_TOKEN" | vercel login --token -
+          echo "$VERCEL_TOKEN" | vercel login --token
 
           # Deploy – `--prod` makes it a production deployment
           vercel --prod \
