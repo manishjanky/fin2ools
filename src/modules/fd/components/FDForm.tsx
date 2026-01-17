@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import moment from 'moment';
 import type { FDInput, FDSummary as FDSummaryType } from './../types/fd';
 import { calculateFDReturns } from '../utils/fdCalculator';
 import FDSummary from './FDSummary';
@@ -7,7 +8,7 @@ import FYSummaryTable from '../../../components/common/FYSummaryTable';
 
 export default function FDForm() {
   const [formData, setFormData] = useState<FDInput>({
-    startDate: new Date().toISOString().split('T')[0],
+    startDate: moment().format('YYYY-MM-DD'),
     principal: 100000.00,
     rate: 7.50,
     tenureYears: 5,

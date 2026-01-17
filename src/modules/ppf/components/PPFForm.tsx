@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import moment from 'moment';
 import type { PPFContribution, PPFCalculationResult, PPFSingleContribution } from '../types/ppf';
 import { calculatePPF, getFiscalYearFromDate } from '../utils/ppfCalculator';
 import { useAlert } from '../../../context/AlertContext';
@@ -12,7 +13,7 @@ interface PPFFormProps {
 
 const PPFForm = ({ onCalculate }: PPFFormProps) => {
   const { showAlert } = useAlert();
-  const currentYear = new Date().getFullYear();
+  const currentYear = moment().year();
   const PPF_MATURITY_YEARS = 15;
   const [startYear, setStartYear] = useState<number | null>(null);
   const [interestRate, setInterestRate] = useState(7.25);

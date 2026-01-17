@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import moment from 'moment';
 import type { NAVData, ReturnsMetrics } from '../types/mutual-funds';
 import Accordion from '../../../components/common/Accordion';
 import ReturnsSummary from './ReturnsSummary';
@@ -26,13 +27,13 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
     const filteredNavData = useMemo(() => {
         if (!selectedMetric.isAvailable) return [];
 
-        const today = new Date();
-        const targetDate = new Date(today);
-        targetDate.setDate(targetDate.getDate() - selectedMetric.days);
+        const today = moment();
+        const targetDate = today.clone().subtract(selectedMetric.days, 'days');
 
         return navData.filter((nav) => {
-            const navDate = new Date(nav.date.split('-').reverse().join('-'));
-            return navDate >= targetDate && navDate <= today;
+            // nav.date is in DD-MM-YYYY format
+            const navDate = moment(nav.date, 'DD-MM-YYYY', true);
+            return navDate.isValid() && navDate.isSameOrAfter(targetDate) && navDate.isSameOrBefore(today);
         });
     }, [navData, selectedMetric]);
 

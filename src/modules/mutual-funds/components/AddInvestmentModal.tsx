@@ -186,7 +186,7 @@ export default function AddInvestmentModal({
         <div className="mb-6 p-3 rounded-lg bg-bg-secondary">
           <p className="text-xs text-text-secondary">
             Investment started on: <span className="font-semibold text-text-primary">
-              {new Date(editingInvestment.startDate).toLocaleDateString('en-IN')}
+              {moment(editingInvestment.startDate, 'DD-MM-YYYY').format('D MMM YYYY')}
             </span>
           </p>
         </div>
@@ -320,12 +320,12 @@ export default function AddInvestmentModal({
                 {editingInvestment && (
                   <>
                     <p className="text-xs mt-1 text-text-tertiary">
-                      SIP started on: {new Date(editingInvestment.startDate).toLocaleDateString('en-IN')}
+                      SIP started on: {moment(editingInvestment.startDate, 'DD-MM-YYYY').format('D MMM YYYY')}
                     </p>
                     <p className="text-xs mt-2 text-text-secondary">
                       <strong>Preview:</strong> Current Amount: ₹{editingInvestment?.sipAmount || 0} | New Amount: ₹{sipAmount || 0}
                       <br />
-                      Change applies from {new Date(sipAmountChangeDate).toLocaleDateString('en-IN')}
+                      Change applies from {moment(sipAmountChangeDate, 'YYYY-MM-DD').format('D MMM YYYY')}
                     </p>
                   </>
                 )}

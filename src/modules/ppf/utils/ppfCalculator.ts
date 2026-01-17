@@ -1,4 +1,5 @@
 import type { PPFCalculationResult, PPFContribution, PPFYearData } from '../types/ppf';
+import moment from 'moment';
 
 const getFYYear = (year: number): string => {
   // Financial year in India: April to March
@@ -19,9 +20,13 @@ const getDefaultContributionDate = (year: number): string => {
  */
 const getFiscalYearFromDate = (dateString: string): number => {
   try {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = date.getMonth(); // 0-indexed, so April = 3
+    // Parse date safely using moment with explicit format (YYYY-MM-DD)
+    const date = moment(dateString, 'YYYY-MM-DD', true);
+    if (!date.isValid()) {
+      return 0;
+    }
+    const year = date.year();
+    const month = date.month(); // 0-indexed, so April = 3
 
     // If date is before April (month < 3), it belongs to previous FY
     if (month < 3) {
@@ -48,18 +53,23 @@ const calculateProRataInterest = (
   year: number
 ): number => {
   try {
-    const contribDate = new Date(date);
-    const fyStartDate = new Date(`${year}-04-01`);
-    
-    // If contribution date is before FY start, assume full year
-    if (contribDate < fyStartDate) {
+    // Parse date safely using moment with explicit format (YYYY-MM-DD)
+    const contribDate = moment(date, 'YYYY-MM-DD', true);
+    if (!contribDate.isValid()) {
       return amount * (rate / 100);
     }
 
-    const nextFYStartDate = new Date(`${year + 1}-04-01`);
+    const fyStartDate = moment(`${year}-04-01`, 'YYYY-MM-DD');
+    
+    // If contribution date is before FY start, assume full year
+    if (contribDate.isBefore(fyStartDate)) {
+      return amount * (rate / 100);
+    }
+
+    const nextFYStartDate = moment(`${year + 1}-04-01`, 'YYYY-MM-DD');
     const daysInFY = 365;
     const daysAfterContribution = Math.floor(
-      (nextFYStartDate.getTime() - contribDate.getTime()) / (1000 * 60 * 60 * 24)
+      nextFYStartDate.diff(contribDate, 'days', true)
     );
 
     // Pro-rata interest based on days remaining in FY

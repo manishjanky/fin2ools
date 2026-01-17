@@ -1,35 +1,42 @@
 import type { FDInput, FDSummary } from '../types/fd';
 import type { FYData } from '../../../types/fy-data';
+import moment from 'moment';
+import type { Moment } from 'moment';
 
 const INDIAN_FY_MONTH = 4; // April is month 4 (0-indexed: 3)
 
-function getIndianFYYear(date: Date): number {
-  const month = date.getMonth();
-  const year = date.getFullYear();
+function getIndianFYYear(date: Moment): number {
+  const month = date.month();
+  const year = date.year();
   if (month >= INDIAN_FY_MONTH - 1) {
     return year;
   }
   return year - 1;
 }
 
-function getIndianFYStartDate(fyYear: number): Date {
-  return new Date(fyYear, 3, 1); // April 1st
+function getIndianFYStartDate(fyYear: number): Moment {
+  return moment(`${fyYear}-04-01`, 'YYYY-MM-DD'); // April 1st
 }
 
-function getIndianFYEndDate(fyYear: number): Date {
-  return new Date(fyYear + 1, 2, 31); // March 31st
+function getIndianFYEndDate(fyYear: number): Moment {
+  return moment(`${fyYear + 1}-03-31`, 'YYYY-MM-DD'); // March 31st
 }
 
 export function calculateFDReturns(input: FDInput): FDSummary {
-  const startDate = new Date(input.startDate);
+  // Parse date safely using moment with explicit format (YYYY-MM-DD from HTML input)
+  const startDate = moment(input.startDate, 'YYYY-MM-DD', true);
+  if (!startDate.isValid()) {
+    throw new Error('Invalid start date format');
+  }
+
   const rate = input.rate / 100;
   const principal = input.principal;
 
   // Calculate end date by adding years, months, and days
-  const endDate = new Date(startDate);
-  endDate.setFullYear(endDate.getFullYear() + input.tenureYears);
-  endDate.setMonth(endDate.getMonth() + input.tenureMonths);
-  endDate.setDate(endDate.getDate() + input.tenureDays);
+  const endDate = startDate.clone();
+  endDate.add(input.tenureYears, 'years');
+  endDate.add(input.tenureMonths, 'months');
+  endDate.add(input.tenureDays, 'days');
 
   // Get compounding frequency details
   const compoundingFrequency = getCompoundingFrequency(input.compounding);
@@ -47,12 +54,10 @@ export function calculateFDReturns(input: FDInput): FDSummary {
     const fyEnd = getIndianFYEndDate(fyYear);
 
     // Calculate actual dates within this FY that overlap with FD tenure
-    const periodStart = new Date(
-      Math.max(startDate.getTime(), fyStart.getTime())
-    );
-    const periodEnd = new Date(Math.min(endDate.getTime(), fyEnd.getTime()));
+    const periodStart = moment.max(startDate, fyStart);
+    const periodEnd = moment.min(endDate, fyEnd);
 
-    if (periodStart > periodEnd) continue;
+    if (periodStart.isAfter(periodEnd)) continue;
 
     // Calculate balance at end of this FY period
     const endBalance = calculateCompoundedAmount(
@@ -111,14 +116,12 @@ function getCompoundingFrequency(
 function calculateCompoundedAmount(
   principal: number,
   annualRate: number,
-  startDate: Date,
-  endDate: Date,
+  startDate: Moment,
+  endDate: Moment,
   compoundingFrequency: number
 ): number {
   // Calculate exact days elapsed
-  const daysElapsed = Math.floor(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const daysElapsed = Math.floor(endDate.diff(startDate, 'days', true));
   
   // Convert to years (using 365 days per year for accuracy)
   const yearsElapsed = daysElapsed / 365;

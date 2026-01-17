@@ -46,8 +46,8 @@ export const calculatePortfolioPerformanceTimeline = (
     // Convert to sorted array and reduce excessive dates by sampling
     let allDates = Array.from(dateSet)
       .sort((a, b) => {
-        const dateA = moment(a, 'DD-MM-YYYY');
-        const dateB = moment(b, 'DD-MM-YYYY');
+        const dateA = moment(a, 'DD-MM-YYYY', true);
+        const dateB = moment(b, 'DD-MM-YYYY', true);
         return dateA.diff(dateB);
       });
 
@@ -61,7 +61,7 @@ export const calculatePortfolioPerformanceTimeline = (
     // Pre-create moment objects for investments for reuse
     const investmentMoments = investments.map((inv) => ({
       investment: inv,
-      startMoment: moment(inv.startDate, 'DD-MM-YYYY'),
+      startMoment: moment(inv.startDate, 'DD-MM-YYYY', true),
     }));
 
     const snapshots: PortfolioValueSnapshot[] = [];
@@ -69,7 +69,7 @@ export const calculatePortfolioPerformanceTimeline = (
     allDates.forEach((date) => {
       let totalInvested = 0;
       let totalCurrentValue = 0;
-      const snapshotMoment = moment(date, 'DD-MM-YYYY');
+      const snapshotMoment = moment(date, 'DD-MM-YYYY', true);
 
       investmentMoments.forEach(({ investment, startMoment }) => {
         try {
@@ -82,8 +82,8 @@ export const calculatePortfolioPerformanceTimeline = (
           // Create a filtered NAV history up to the snapshot date
           const filteredNavHistory = navHistory.filter((nav) => {
             if (!nav || !nav.date) return false;
-            const navDate = moment(nav.date, 'DD-MM-YYYY');
-            return navDate.isSameOrBefore(snapshotMoment);
+            const navDate = moment(nav.date, 'DD-MM-YYYY', true);
+            return navDate.isValid() && navDate.isSameOrBefore(snapshotMoment);
           });
 
           if (filteredNavHistory.length === 0) return;

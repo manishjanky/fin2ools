@@ -27,19 +27,17 @@ export const calculateSchemeReturns = (
   const metrics: Record<string, ReturnsMetrics> = {};
 
   TIMEFRAMES.forEach(({ label, days }) => {
-    const targetDate = moment().toDate();
-    // Subtract days to get the target date for the timeframe
-    targetDate.setDate(targetDate.getDate() - days);
+    const targetDate = moment().subtract(days, 'days');
 
     const filteredDates = navData.filter(({ date }) =>
-      moment(date, "DD-MM-YYYY").isSameOrBefore(targetDate)
+      moment(date, "DD-MM-YYYY", true).isSameOrBefore(targetDate)
     );
     const sortedDates = filteredDates.sort((a, b) =>
       moment(b.date, "DD-MM-YYYY").diff(moment(a.date, "DD-MM-YYYY"))
     );
     // Find the closest NAV data point before or on the target date
     const historicalNav = sortedDates.find((nav) =>
-      moment(nav.date, "DD-MM-YYYY").isSameOrBefore(targetDate)
+      moment(nav.date, "DD-MM-YYYY", true).isSameOrBefore(targetDate)
     );
     if (historicalNav) {
       const startNav = parseFloat(historicalNav.nav);
