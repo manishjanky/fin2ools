@@ -147,7 +147,7 @@ export default function MyFunds() {
             </section>
 
             {/* Funds List */}
-            <section className="grid grid-cols-1 gap-6">
+            <section className="grid grid-cols-1 gap-6 mb-8">
               {fundsWithDetails.map(({ scheme, investmentData }) => (
                 <div
                   key={scheme.schemeCode}

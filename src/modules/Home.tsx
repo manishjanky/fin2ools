@@ -13,12 +13,12 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
         <section className="mb-16">
-          <h2 
+          <h2
             className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
           >
             Choose Your Tool
           </h2>
-          <p 
+          <p
             className="text-xl max-w-2xl text-text-secondary"
           >
             Select which financial tool you'd like to explore today.
@@ -59,14 +59,3 @@ export default function Home() {
     </div>
   );
 }
-
-// function StatCard({ number, label }: { number: string; label: string }) {
-//   return (
-//     <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg p-6 text-center hover:border-purple-500/50 transition">
-//       <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-//         {number}
-//       </p>
-//       <p className="text-purple-200">{label}</p>
-//     </div>
-//   );
-// }
