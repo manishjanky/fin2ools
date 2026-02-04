@@ -62,7 +62,7 @@ export default function SearchableSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-96 rounded-lg px-4 py-3 text-left transition border focus:outline-none bg-bg-secondary border-border-main text-text-primary focus:border-primary-main focus:ring-2 focus:ring-primary-main/20 flex justify-between items-center"
+        className="w-full rounded-lg px-4 py-3 text-left transition border focus:outline-none bg-bg-secondary border-border-main text-text-primary focus:border-primary-main focus:ring-2 focus:ring-primary-main/20 flex justify-between items-center"
       >
         <span>{displayValue}</span>
         <svg

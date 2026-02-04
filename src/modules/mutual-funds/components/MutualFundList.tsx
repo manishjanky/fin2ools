@@ -63,15 +63,15 @@ export default function MutualFundList() {
   // Filter by category and fund house
   const categoryFilteredSchemes = useMemo(() => {
     let filtered = filteredSchemes;
-    
+
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(scheme => scheme.schemeCategory === selectedCategory);
     }
-    
+
     if (selectedFundHouse !== 'all') {
       filtered = filtered.filter(scheme => scheme.fundHouse === selectedFundHouse);
     }
-    
+
     return filtered;
   }, [filteredSchemes, selectedCategory, selectedFundHouse]);
 
@@ -132,86 +132,91 @@ export default function MutualFundList() {
         </div>
       </div>
 
-      {/* Filter Buttons */}
-      <div className="mb-4 flex gap-2">
-        <button
-          onClick={() => setFundTypeFilter('all')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-            fundTypeFilter === 'all'
-              ? 'bg-primary-main text-white'
-              : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFundTypeFilter('direct')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-            fundTypeFilter === 'direct'
-              ? 'bg-primary-main text-white'
-              : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
-          }`}
-        >
-          Direct
-        </button>
-        <button
-          onClick={() => setFundTypeFilter('regular')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-            fundTypeFilter === 'regular'
-              ? 'bg-primary-main text-white'
-              : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
-          }`}
-        >
-          Regular
-        </button>
-      </div>
-
-      {/* Filters */}
-      {(categories.length > 0 || fundHouses.length > 0) && (
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Category Filter */}
-          {categories.length > 0 && (
-            <SearchableSelect
-              label="Filter by Category"
-              options={[
-                { value: 'all', label: 'All Categories', count: filteredSchemes.length },
-                ...categories.map(category => ({
-                  value: category,
-                  label: category,
-                  count: filteredSchemes.filter(s => s.schemeCategory === category).length
-                }))
-              ]}
-              value={selectedCategory}
-              onChange={(value) => {
-                setSelectedCategory(value);
-                setCurrentPage(1);
-              }}
-              placeholder="Select a category..."
-            />
-          )}
-          
-          {/* Fund House Filter */}
-          {fundHouses.length > 0 && (
-            <SearchableSelect
-              label="Filter by Fund House"
-              options={[
-                { value: 'all', label: 'All Fund Houses', count: filteredSchemes.length },
-                ...fundHouses.map(fundHouse => ({
-                  value: fundHouse,
-                  label: fundHouse,
-                  count: filteredSchemes.filter(s => s.fundHouse === fundHouse).length
-                }))
-              ]}
-              value={selectedFundHouse}
-              onChange={(value) => {
-                setSelectedFundHouse(value);
-                setCurrentPage(1);
-              }}
-              placeholder="Select a fund house..."
-            />
-          )}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:gap-6 mb-8">
+        {/* Filter Buttons */}
+        <div className="col-span-3 lg:col-span-1">
+          <label className="block text-sm font-medium text-text-secondary mb-2 w-full basis-full">
+            Filter by type
+          </label>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setFundTypeFilter('all')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${fundTypeFilter === 'all'
+                ? 'bg-primary-main text-white'
+                : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
+                }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFundTypeFilter('direct')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${fundTypeFilter === 'direct'
+                ? 'bg-primary-main text-white'
+                : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
+                }`}
+            >
+              Direct
+            </button>
+            <button
+              onClick={() => setFundTypeFilter('regular')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${fundTypeFilter === 'regular'
+                ? 'bg-primary-main text-white'
+                : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary border border-border-main'
+                }`}
+            >
+              Regular
+            </button>
+          </div>
         </div>
-      )}
+
+        {/* Filters */}
+        {(categories.length > 0 || fundHouses.length > 0) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 md:col-span-3 lg:col-span-2 gap-4 mt-4 lg:mt-0">
+            {/* Category Filter */}
+            {categories.length > 0 && (
+              <SearchableSelect
+                label="Filter by Category"
+                options={[
+                  { value: 'all', label: 'All Categories', count: filteredSchemes.length },
+                  ...categories.map(category => ({
+                    value: category,
+                    label: category,
+                    count: filteredSchemes.filter(s => s.schemeCategory === category).length
+                  }))
+                ]}
+                value={selectedCategory}
+                onChange={(value) => {
+                  setSelectedCategory(value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Select a category..."
+              />
+            )}
+
+            {/* Fund House Filter */}
+            {fundHouses.length > 0 && (
+              <SearchableSelect
+                label="Filter by Fund House"
+                options={[
+                  { value: 'all', label: 'All Fund Houses', count: filteredSchemes.length },
+                  ...fundHouses.map(fundHouse => ({
+                    value: fundHouse,
+                    label: fundHouse,
+                    count: filteredSchemes.filter(s => s.fundHouse === fundHouse).length
+                  }))
+                ]}
+                value={selectedFundHouse}
+                onChange={(value) => {
+                  setSelectedFundHouse(value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Select a fund house..."
+              />
+            )}
+          </div>
+        )}
+
+      </div>
 
       {/* Error State */}
       {error && (
@@ -293,11 +298,10 @@ export default function MutualFundList() {
                       )}
                       <button
                         onClick={() => setCurrentPage(page)}
-                        className={`px-4 py-2 rounded-lg transition ${
-                          currentPage === page
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-slate-800 text-purple-200 hover:bg-slate-700'
-                        }`}
+                        className={`px-4 py-2 rounded-lg transition ${currentPage === page
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-slate-800 text-purple-200 hover:bg-slate-700'
+                          }`}
                       >
                         {page}
                       </button>
