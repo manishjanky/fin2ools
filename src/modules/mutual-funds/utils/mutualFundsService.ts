@@ -1,18 +1,21 @@
+import { convertToCamelCase } from "../../../utils/utils";
 import type {
   MutualFundScheme,
   SearchResult,
   SchemeHistoryResponse,
+  MutualFundSchemeDetails,
 } from "../types/mutual-funds";
 
 const API_BASE = "https://api.mfapi.in";
+const NEMO_API_BASE = "https://mf.captnemo.in/kuvera/";
 
 export async function fetchLatestNAV(
   limit: number = 100,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<MutualFundScheme[]> {
   try {
     const response = await fetch(
-      `${API_BASE}/mf/latest?limit=${limit}&offset=${offset}`
+      `${API_BASE}/mf/latest?limit=${limit}&offset=${offset}`,
     );
     if (!response.ok) {
       throw new Error(`API Error: ${response.statusText}`);
@@ -25,11 +28,11 @@ export async function fetchLatestNAV(
 }
 
 export async function searchMutualFunds(
-  query: string
+  query: string,
 ): Promise<SearchResult[]> {
   try {
     const response = await fetch(
-      `${API_BASE}/mf/search?q=${encodeURIComponent(query)}`
+      `${API_BASE}/mf/search?q=${encodeURIComponent(query)}`,
     );
     if (!response.ok) {
       throw new Error(`API Error: ${response.statusText}`);
@@ -42,7 +45,7 @@ export async function searchMutualFunds(
 }
 
 export async function fetchSchemeDetails(
-  schemeCode: number
+  schemeCode: number,
 ): Promise<MutualFundScheme | null> {
   try {
     const response = await fetch(`${API_BASE}/mf/${schemeCode}/latest`);
@@ -50,20 +53,19 @@ export async function fetchSchemeDetails(
       throw new Error(`API Error: ${response.statusText}`);
     }
     const data = await response.json();
+    let schemeDetails: MutualFundScheme | null = null;
     if (data.data && data.data.length > 0 && data.meta) {
-      return {
-        schemeCode: data.meta.scheme_code,
-        schemeName: data.meta.scheme_name,
-        fundHouse: data.meta.fund_house,
-        schemeType: data.meta.scheme_type,
-        schemeCategory: data.meta.scheme_category,
-        isinGrowth: data.meta.isin_growth,
-        isinDivReinvestment: data.meta.isin_div_reinvestment,
+      schemeDetails = convertToCamelCase<MutualFundScheme>(data.meta);
+      schemeDetails = {
+        ...schemeDetails,
         nav: data.data[0].nav,
         date: data.data[0].date,
       };
+      const details = await fetchSchemeDetailsNemo(schemeDetails);
+      schemeDetails = { ...schemeDetails, details };
     }
-    return null;
+
+    return schemeDetails;
   } catch (error) {
     console.error("Error fetching scheme details:", error);
     throw error;
@@ -72,7 +74,7 @@ export async function fetchSchemeDetails(
 
 export async function fetchSchemeHistory(
   schemeCode: number,
-  days: number = 3650
+  days: number = 3650,
 ): Promise<SchemeHistoryResponse | null> {
   try {
     const endDate = new Date();
@@ -89,18 +91,32 @@ export async function fetchSchemeHistory(
 
     const response = await fetch(
       `${API_BASE}/mf/${schemeCode}?startDate=${formatDate(
-        startDate
-      )}&endDate=${formatDate(endDate)}`
+        startDate,
+      )}&endDate=${formatDate(endDate)}`,
     );
 
     if (!response.ok) {
       throw new Error(`API Error: ${response.statusText}`);
     }
-
     const navHistory = await response.json();
     return { ...navHistory, data: navHistory.data.reverse() };
   } catch (error) {
     console.error("Error fetching scheme history:", error);
     throw error;
   }
+}
+
+export async function fetchSchemeDetailsNemo(
+  scheme: MutualFundScheme,
+): Promise<MutualFundSchemeDetails | null> {
+  // Get A detailed info from CaptainNemo MF API
+  const nemoResponse = await fetch(`${NEMO_API_BASE}${scheme.isinGrowth}`);
+  // if (!nemoResponse.ok) {
+  //   throw new Error(`NEMO request failed: ${nemoResponse.status}`);
+  // }
+  let schemeDetails = await nemoResponse.json();
+  schemeDetails = convertToCamelCase<MutualFundSchemeDetails>(
+    schemeDetails?.[0],
+  );
+  return schemeDetails || null;
 }

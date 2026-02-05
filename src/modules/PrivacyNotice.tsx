@@ -155,7 +155,6 @@ export default function PrivacyNotice() {
                             </p>
                         </section>
 
-                        {/* Data Source - MFapi.in */}
                         <section>
                             <h2 className="text-2xl font-semibold mb-4 text-text-primary">Data Sources & Attribution</h2>
                             <p className="text-text-secondary leading-relaxed mb-4">
@@ -170,6 +169,18 @@ export default function PrivacyNotice() {
                                 </p>
                                 <p className="text-text-secondary text-sm">
                                     MFapi.in is a public API that provides access to Indian mutual fund data. Your browser makes direct API calls to fetch NAV values.
+                                    For their privacy practices, please visit their website.
+                                </p>
+                            </div>
+                            <div className="bg-bg-primary border border-border-main rounded p-4 mb-4">
+                                <p className="text-text-secondary mb-2">
+                                    <strong className="text-text-primary">Mutual Fund Scheme Details:</strong> Sourced from{' '}
+                                    <a href="https://mf.captnemo.in/" target="_blank" rel="noopener noreferrer" className="text-primary-main hover:text-primary-dark underline font-medium">
+                                        https://mf.captnemo.in/
+                                    </a>
+                                </p>
+                                <p className="text-text-secondary text-sm">
+                                    https://mf.captnemo.in/ is a public API that provides access to Indian mutual fund data. Your browser makes direct API calls to fetch NAV values.
                                     For their privacy practices, please visit their website.
                                 </p>
                             </div>

@@ -33,7 +33,7 @@ export default function NavStatisticsDisplay({ navData }: ChartStatisticsDisplay
         const firstMonthYear = firstDate.format('MMM YYYY');
         const lastMonthYear = lastDate.format('MMM YYYY');
         // Data is in reverse chronological order
-        const periodLabel = firstMonthYear === lastMonthYear ? `${firstMonthYear} Stats` : `${lastMonthYear} - ${firstMonthYear} Stats`;
+        const periodLabel = firstMonthYear === lastMonthYear ? `${firstMonthYear}` : `${lastMonthYear} - ${firstMonthYear}`;
 
         return {
             minNav,
@@ -56,7 +56,7 @@ export default function NavStatisticsDisplay({ navData }: ChartStatisticsDisplay
             <h3
               className="text-lg font-semibold mb-4 text-text-secondary"
             >
-              {stats.periodLabel}
+              NAV overview from {stats.periodLabel}
             </h3>
             
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

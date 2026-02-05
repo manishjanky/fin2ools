@@ -8,6 +8,7 @@ export interface MutualFundScheme {
   isinDivReinvestment?: string | null;
   nav?: string;
   date?: string;
+  details?: MutualFundSchemeDetails | null;
 }
 
 export interface MutualFundListResponse {
@@ -59,7 +60,7 @@ export interface SIPAmountModification {
 // New types for user investments
 export interface UserInvestment {
   schemeCode: number;
-  investmentType: 'lumpsum' | 'sip';
+  investmentType: "lumpsum" | "sip";
   startDate: string;
   amount: number;
   sipAmount?: number; // For SIP: monthly investment amount (original amount)
@@ -86,7 +87,7 @@ export interface InvestmentMetrics {
 
 export interface InvestmentInstallment {
   id: string;
-  type: 'lumpsum' | 'sip-installment';
+  type: "lumpsum" | "sip-installment";
   originalStartDate: string;
   installmentDate: string;
   amount: number;
@@ -102,3 +103,116 @@ export interface FundInvestmentDetails {
   summary: InvestmentMetrics;
 }
 
+export interface MutualFundSchemeDetails {
+  code: string;
+  name: string;
+  shortName: string;
+  lumpAvailable: string;
+  sipAvailable: string;
+  lumpMin: number;
+  lumpMinAdditional: number;
+  lumpMax: number;
+  lumpMultiplier: number;
+  sipMin: number;
+  sipMax: number;
+  sipMultiplier: number;
+
+  /** The shape of the items in these arrays is not defined in the source JSON,
+   *  so they are typed as `any[]`. Replace with a more specific type if you know it. */
+  sipDates: any[];
+  upsizecodeSipDates: any[];
+
+  redemptionAllowed: string;
+  redemptionAmountMultiple: number;
+  redemptionAmountMinimum: number;
+  redemptionQuantityMultiple: number;
+  redemptionQuantityMinimum: number;
+  category: string;
+  lockInPeriod: number;
+  sipMaximumGap: number;
+
+  fundHouse: string;
+  fundName: string;
+  shortCode: string;
+  detailInfo: string;
+  ISIN: string;
+  direct: string;
+  switchAllowed: string;
+  stpFlag: string;
+  swpFlag: string;
+
+  /** Array of SIP definitions */
+  sips: Sip[];
+
+  instant: string;
+  reinvestment: string;
+
+  /** Tags array – unknown shape, kept as `any[]` */
+  tags: any[];
+  slug: string;
+  channelPartnerCode: string;
+  taxPeriod: number;
+
+  /** Current NAV */
+  nav: NavInfo;
+  /** Previous NAV */
+  lastNav: NavInfo;
+
+  jan31Nav: number;
+  volatility: number;
+  returns: ReturnsInfo;
+
+  startDate: string;
+  faceValue: string;
+  fundType: string;
+  fundCategory: string;
+  plan: string;
+  expenseRatio: string;
+  expenseRatioDate: string;
+  fundManager: string;
+  crisilRating: string;
+  investmentObjective: string;
+  portfolioTurnover: string;
+  maturityType: string;
+  aum: number;
+  comparison: CompareFunds[];
+}
+
+/** SIP definition */
+export interface Sip {
+  sipFrequency: string;
+  sipDates: any[];
+  sipMinimumGap: string;
+  sipMaximumGap: string;
+}
+
+/** NAV container */
+export interface NavInfo {
+  nav: number;
+  date: string;
+}
+
+/** Returns container */
+export interface ReturnsInfo {
+  week1: number;
+  year1: number;
+  year3: number;
+  year5: number;
+  inception: number;
+  date: string;
+}
+
+export interface CompareFunds {
+  name: string;
+  shortName: string;
+  code: string;
+  slug?: string;
+  "1y"?: number;
+  "3y": number;
+  "5y"?: number;
+  inception?: number;
+  volatility?: number;
+  expenseRatio?: number;
+  aum?: number;
+  infoRatio?: number;
+}

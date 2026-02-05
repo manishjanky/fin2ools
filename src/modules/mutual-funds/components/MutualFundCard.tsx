@@ -17,7 +17,7 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
     const { addInvestment } = useInvestmentStore();
     const { getOrFetchSchemeHistory } = useMutualFundsStore();
     const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlistStore();
-    
+
     const inWatchlist = isInWatchlist(scheme.schemeCode);
 
     // Fetch 1D change data
@@ -27,7 +27,7 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                 setIsLoadingChange(true);
                 // Fetch 2 days of data to calculate 1D change
                 const historyData = await getOrFetchSchemeHistory(scheme.schemeCode, 2);
-                
+
                 if (historyData?.data && historyData.data.length >= 2) {
                     const previousNav = parseFloat(historyData.data[0].nav);
                     const latestNav = parseFloat(historyData.data[1].nav);
@@ -49,11 +49,11 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
         addInvestment(scheme.schemeCode, investment);
         setShowModal(false);
     };
-    const addToMyFunds = ($event: React.MouseEvent<HTMLButtonElement>) => {
+    const addToMyFunds = ($event: React.MouseEvent<HTMLElement>) => {
         $event.stopPropagation();
         setShowModal(true);
     };
-    
+
     const toggleWatchlist = ($event: React.MouseEvent<HTMLButtonElement>) => {
         $event.stopPropagation();
         if (inWatchlist) {
@@ -66,29 +66,29 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
     return (
         <>
             <div
-                className="rounded-lg p-4 hover:shadow-lg transition transform h-full border cursor-pointer bg-bg-secondary border-primary-lighter hover:border-primary-main"
+                className="rounded-lg p-3 hover:shadow-lg transition transform h-full border cursor-pointer bg-bg-secondary border-primary-lighter hover:border-primary-main"
             >
                 <div className="flex flex-col h-full justify-between">
                     {/* Header: Scheme Name + NAV */}
-                    <div className="mb-1">
+                    <div>
                         <div className="flex items-start gap-2">
                             {/* Star Icon */}
                             <button
                                 onClick={toggleWatchlist}
-                                className="mt-1 flex-shrink-0 text-text-secondary hover:text-warning transition"
+                                className="mt-1 shrink-0 text-text-secondary hover:text-warning transition"
                                 aria-label={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
                             >
                                 {inWatchlist ? (
                                     <svg className="w-6 h-6 fill-warning" viewBox="0 0 24 24">
-                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                     </svg>
                                 ) : (
                                     <svg className="w-6 h-6 fill-none stroke-current" strokeWidth="2" viewBox="0 0 24 24">
-                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                     </svg>
                                 )}
                             </button>
-                            
+
                             <div className="flex flex-col md:flex-row lg:items-start lg:justify-between lg:gap-4 flex-1">
                                 <div className="flex-1">
                                     <h3
@@ -107,10 +107,10 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                                             Category: <b>{scheme.schemeCategory}</b>
                                         </p>
                                     )}
-                                    
+
                                     {/* 1D Change */}
                                     {!isLoadingChange && oneDayChange !== null && (
-                                        <div className="mt-2">
+                                        <div className="mt-1">
                                             <span className="text-xs text-text-secondary">1D Change: </span>
                                             <span className={`text-sm font-semibold ${oneDayChange >= 0 ? 'text-success' : 'text-error'}`}>
                                                 {oneDayChange >= 0 ? '+' : ''}{oneDayChange.toFixed(2)}%
@@ -118,20 +118,21 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                                         </div>
                                     )}
                                 </div>
-                                <SchemeNAV scheme={scheme} />
+                                <div>
+                                    <SchemeNAV scheme={scheme} />
+                                    <div className='flex justify-end'>
+                                        <label
+                                            role='button'
+                                            onClick={addToMyFunds}
+                                            className="w-full md:w-auto p-1 text-md text-primary hover:text-primary-dark cursor-pointer transition text-center font-bold"
+                                        >
+                                            + Add to My Funds
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div className='flex justify-end'>
-                        <button
-                            onClick={addToMyFunds}
-                            className="w-full md:w-auto mt-4 px-4 py-2 rounded-lg transition font-medium text-sm bg-primary-main text-text-inverse hover:bg-primary-dark"
-                        >
-                            + Add to My Funds
-                        </button>
-                    </div>
-
                 </div>
             </div>
 

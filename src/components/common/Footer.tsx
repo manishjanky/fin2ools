@@ -65,6 +65,15 @@ export default function Footer() {
                         >
                             MFapi.in
                         </a>
+                         {' '}&  <a 
+                            href="https://mf.captnemo.in/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:underline transition"
+                            style={{ color: 'var(--color-primary-main)' }}
+                        >
+                            https://mf.captnemo.in/
+                        </a>
                         {' '}&bull;{' '}
                         Built with React, Tailwind CSS & Chart.js
                     </p>

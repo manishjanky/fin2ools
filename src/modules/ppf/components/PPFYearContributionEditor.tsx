@@ -51,14 +51,14 @@ const PPFYearContributionEditor = ({
                         Interest Rate (% per annum)
                     </label>
                     {isNotLastYear && (
-                        <button
-                            type="button"
+                        <label
+                            role="button"
                             onClick={onApplyRateToFuture}
-                            className="text-xs px-2 py-1 rounded transition bg-bg-secondary text-primary-main border border-primary-main hover:opacity-80"
+                            className="text-md text-primary hover:text-primary-dark cursor-pointer transition text-center font-bold"
                             title="Apply this year's rate to all future years"
                         >
                             Apply to future →
-                        </button>
+                        </label>
                     )}
                 </div>
                 <input
