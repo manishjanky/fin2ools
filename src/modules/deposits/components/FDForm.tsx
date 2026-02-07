@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import moment from 'moment';
-import type { FDInput, FDSummary as FDSummaryType } from '../types/fd';
+import type { FDInput, FDSummary as FDSummaryType } from '../types/deposits';
 import { calculateFDReturns } from '../utils/fdCalculator';
 import FDSummary from './FDSummary';
 import FYSummaryTable from '../../../components/common/FYSummaryTable';
@@ -9,7 +9,7 @@ import FYSummaryTable from '../../../components/common/FYSummaryTable';
 export default function FDForm() {
   const [formData, setFormData] = useState<FDInput>({
     startDate: moment().format('YYYY-MM-DD'),
-    principal: 100000.00,
+    investedAmount: 100000.00,
     rate: 7.50,
     tenureYears: 5,
     tenureMonths: 0,
@@ -29,7 +29,7 @@ export default function FDForm() {
     setFormData((prev) => ({
       ...prev,
       [key]:
-        key === 'principal' || key === 'rate' || key === 'tenureYears' || key === 'tenureMonths' || key === 'tenureDays'
+        Object.keys(formData).includes(key)
           ? parseFloat(value) || 0
           : value,
     }));
@@ -45,7 +45,7 @@ export default function FDForm() {
     <div
       className="rounded-lg p-8 bg-bg-primary border border-primary-lighter"
     >
-      <h2 
+      <h2
         className="text-2xl font-bold mb-6 text-text-primary"
       >
         FD Calculator
@@ -86,7 +86,7 @@ export default function FDForm() {
             <input
               type="number"
               name="principal"
-              value={formData.principal}
+              value={formData.investedAmount}
               onChange={handleChange}
               min="1000"
               step="0.01"
@@ -275,7 +275,7 @@ export default function FDForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full font-bold py-3 px-6 rounded-lg transition transform hover:scale-105 text-lg bg-gradient-to-r from-primary-main to-secondary-main text-text-inverse hover:opacity-90"
+          className="w-full font-bold py-3 px-6 rounded-lg transition text-lg bg-linear-to-r from-primary-main to-secondary-main text-text-inverse hover:opacity-90"
         >
           Calculate FD Returns
         </button>

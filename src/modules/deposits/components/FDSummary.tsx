@@ -1,4 +1,4 @@
-import type { FDSummary as FDSummaryType } from '../types/fd';
+import type { FDSummary as FDSummaryType } from '../types/deposits';
 
 interface FDSummaryProps {
   summary: FDSummaryType;

@@ -1,9 +1,9 @@
-import type { FDInput, FDSummary } from '../types/fd';
+import type { FDInput, FDSummary } from '../types/deposits';
 import type { FYData } from '../../../types/fy-data';
 import moment from 'moment';
 import type { Moment } from 'moment';
 
-const INDIAN_FY_MONTH = 4; // April is month 4 (0-indexed: 3)
+const INDIAN_FY_MONTH = 4; // April is month 4
 
 function getIndianFYYear(date: Moment): number {
   const month = date.month();
@@ -30,7 +30,7 @@ export function calculateFDReturns(input: FDInput): FDSummary {
   }
 
   const rate = input.rate / 100;
-  const principal = input.principal;
+  const principal = input.investedAmount;
 
   // Calculate end date by adding years, months, and days
   const endDate = startDate.clone();

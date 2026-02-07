@@ -17,6 +17,7 @@ const Watchlist = lazy(() => import('./modules/mutual-funds/Watchlist'));
 const FundInvestmentDetails = lazy(() => import('./modules/mutual-funds/components/FundInvestmentDetails'));
 const PPF = lazy(() => import('./modules/ppf/PPF'));
 const PrivacyNotice = lazy(() => import('./modules/PrivacyNotice'));
+const RD = lazy(() => import('./modules/deposits/RD'))
 
 const Layout = () => {
     return (
@@ -58,7 +59,7 @@ const routes = [
                         path: "rd",
                         element: (
                             <Suspense fallback={<Loader fullHeight={true} />}>
-                                <FD />
+                                <RD />
                             </Suspense>
                         ),
                     }

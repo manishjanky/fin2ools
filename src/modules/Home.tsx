@@ -27,33 +27,7 @@ export default function Home() {
 
         {/* Features Grid */}
         <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <div className="cursor-pointer">
-            <FeatureTile
-              title="FD Projections"
-              description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
-              icon="📊"
-              gradient="from-purple-500 to-blue-600"
-              onClick={() => navigate('deposits/fd')}
-            />
-          </div>
-          <div className="cursor-pointer">
-            <FeatureTile
-              title="RD Projections"
-              description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
-              icon="📊"
-              gradient="from-purple-500 to-blue-600"
-              onClick={() => navigate('deposits/rd')}
-            />
-          </div>
-          <div className="cursor-pointer">
-            <FeatureTile
-              title="Public Provident Fund"
-              description="Calculate and analyze your Public Provident Fund returns with detailed year-wise breakdowns."
-              icon="💰"
-              gradient="from-blue-500 to-cyan-600"
-              onClick={() => navigate('ppf')}
-            />
-          </div>
+
           <div className="cursor-pointer">
             <FeatureTile
               title="Mutual Funds"
@@ -70,6 +44,33 @@ export default function Home() {
               icon="📈"
               gradient="from-blue-500 to-cyan-600"
               onClick={() => navigate('mutual-funds/my-funds')}
+            />
+          </div>
+          <div className="cursor-pointer">
+            <FeatureTile
+              title="Public Provident Fund"
+              description="Calculate and analyze your Public Provident Fund returns with detailed year-wise breakdowns."
+              icon="💰"
+              gradient="from-blue-500 to-cyan-600"
+              onClick={() => navigate('ppf')}
+            />
+          </div>
+          <div className="cursor-pointer">
+            <FeatureTile
+              title="FD Projections"
+              description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
+              icon="📊"
+              gradient="from-purple-500 to-blue-600"
+              onClick={() => navigate('deposits/fd')}
+            />
+          </div>
+          <div className="cursor-pointer">
+            <FeatureTile
+              title="RD Projections"
+              description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
+              icon="📊"
+              gradient="from-purple-500 to-blue-600"
+              onClick={() => navigate('deposits/rd')}
             />
           </div>
         </section>
