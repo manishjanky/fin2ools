@@ -1,7 +1,7 @@
-import type { FDInput, FDSummary } from '../types/deposits';
-import type { FYData } from '../../../types/fy-data';
-import moment from 'moment';
-import type { Moment } from 'moment';
+import type { FDInput, DepositSummary, RDInput } from "../types/deposits";
+import type { FYData } from "../../../types/fy-data";
+import moment from "moment";
+import type { Moment } from "moment";
 
 const INDIAN_FY_MONTH = 4; // April is month 4
 
@@ -15,18 +15,18 @@ function getIndianFYYear(date: Moment): number {
 }
 
 function getIndianFYStartDate(fyYear: number): Moment {
-  return moment(`${fyYear}-04-01`, 'YYYY-MM-DD'); // April 1st
+  return moment(`${fyYear}-04-01`, "YYYY-MM-DD"); // April 1st
 }
 
 function getIndianFYEndDate(fyYear: number): Moment {
-  return moment(`${fyYear + 1}-03-31`, 'YYYY-MM-DD'); // March 31st
+  return moment(`${fyYear + 1}-03-31`, "YYYY-MM-DD"); // March 31st
 }
 
-export function calculateFDReturns(input: FDInput): FDSummary {
+export function calculateFDReturns(input: FDInput): DepositSummary {
   // Parse date safely using moment with explicit format (YYYY-MM-DD from HTML input)
-  const startDate = moment(input.startDate, 'YYYY-MM-DD', true);
+  const startDate = moment(input.startDate, "YYYY-MM-DD", true);
   if (!startDate.isValid()) {
-    throw new Error('Invalid start date format');
+    throw new Error("Invalid start date format");
   }
 
   const rate = input.rate / 100;
@@ -34,9 +34,9 @@ export function calculateFDReturns(input: FDInput): FDSummary {
 
   // Calculate end date by adding years, months, and days
   const endDate = startDate.clone();
-  endDate.add(input.tenureYears, 'years');
-  endDate.add(input.tenureMonths, 'months');
-  endDate.add(input.tenureDays, 'days');
+  endDate.add(input.tenureYears, "years");
+  endDate.add(input.tenureMonths, "months");
+  endDate.add(input.tenureDays, "days");
 
   // Get compounding frequency details
   const compoundingFrequency = getCompoundingFrequency(input.compounding);
@@ -65,7 +65,7 @@ export function calculateFDReturns(input: FDInput): FDSummary {
       rate,
       periodStart,
       periodEnd,
-      compoundingFrequency
+      compoundingFrequency,
     );
 
     const interestEarned = endBalance - previousFYEndBalance;
@@ -97,16 +97,16 @@ export function calculateFDReturns(input: FDInput): FDSummary {
 }
 
 function getCompoundingFrequency(
-  compounding: 'monthly' | 'quarterly' | 'halfYearly' | 'annually'
+  compounding: "monthly" | "quarterly" | "halfYearly" | "annually",
 ): number {
   switch (compounding) {
-    case 'monthly':
+    case "monthly":
       return 12;
-    case 'quarterly':
+    case "quarterly":
       return 4;
-    case 'halfYearly':
+    case "halfYearly":
       return 2;
-    case 'annually':
+    case "annually":
       return 1;
     default:
       return 1;
@@ -118,23 +118,49 @@ function calculateCompoundedAmount(
   annualRate: number,
   startDate: Moment,
   endDate: Moment,
-  compoundingFrequency: number
+  compoundingFrequency: number,
 ): number {
   // Calculate exact days elapsed
-  const daysElapsed = Math.floor(endDate.diff(startDate, 'days', true));
-  
+  const daysElapsed = Math.floor(endDate.diff(startDate, "days", true));
+
   // Convert to years (using 365 days per year for accuracy)
   const yearsElapsed = daysElapsed / 365;
-  
+
   // Calculate rate per compounding period
   const ratePerPeriod = annualRate / compoundingFrequency;
-  
+
   // Calculate total number of compounding periods
   const numberOfPeriods = yearsElapsed * compoundingFrequency;
-  
+
   // Apply compound interest formula: A = P(1 + r/n)^(nt)
   return principal * Math.pow(1 + ratePerPeriod, numberOfPeriods);
 }
 
+export function calculateRDReturns(rdData: RDInput): DepositSummary {
+  const monthlyInstallment = rdData.monthlyInstallment;
+  const annualInterestRate = rdData.rate / 100; // percent
+  const tenureYears = rdData.tenureYears + rdData.tenureMonths / 12;
+
+  // Convert interest rate to monthly
+  const ratePerMonth = annualInterestRate / 12;
+  const totalMonths = tenureYears * 12;
+  const compoundFactor = Math.pow(1 + ratePerMonth, totalMonths);
+
+  const maturityAmount =
+    monthlyInstallment * ((compoundFactor - 1) / ratePerMonth);
+
+  // Calculate total principal invested
+  const principal = monthlyInstallment * totalMonths;
+
+  // Calculate interest earned
+  const totalInterestEarned = maturityAmount - principal;
+  return {
+    maturityAmount,
+    principal,
+    fyData: [],
+    totalInterestEarned,
+  };
+}
+
 // Re-export types for backward compatibility
-export type { FDInput, FYData, FDSummary };
+export type { FDInput, FYData, DepositSummary };

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import moment from 'moment';
-import type { FDInput, FDSummary as FDSummaryType } from '../types/deposits';
+import type { FDInput, DepositSummary } from '../types/deposits';
 import { calculateFDReturns } from '../utils/fdCalculator';
-import FDSummary from './FDSummary';
 import FYSummaryTable from '../../../components/common/FYSummaryTable';
+import DepositReturns from './FDSummary';
 
 
 export default function FDForm() {
@@ -17,7 +17,7 @@ export default function FDForm() {
     compounding: 'annually',
     payoutType: 'maturity',
   });
-  const [summary, setSummary] = useState<FDSummaryType | null>(null);
+  const [summary, setSummary] = useState<DepositSummary | null>(null);
 
 
   const handleChange = (
@@ -43,10 +43,10 @@ export default function FDForm() {
 
   return (
     <div
-      className="rounded-lg p-8 bg-bg-primary border border-primary-lighter"
+      className="rounded-lg p-4 bg-bg-primary border border-primary-lighter"
     >
       <h2
-        className="text-2xl font-bold mb-6 text-text-primary"
+        className="text-2xl font-bold mb-5 text-text-primary"
       >
         FD Calculator
       </h2>
@@ -101,7 +101,6 @@ export default function FDForm() {
             />
           </div>
 
-          {/* Interest Rate */}
           <div>
             <label
               className="block font-medium mb-2 text-text-secondary"
@@ -127,9 +126,8 @@ export default function FDForm() {
           </div>
         </div>
 
-        {/* Tenure Section */}
         <div
-          className="rounded-lg p-6 bg-bg-secondary border border-border-light"
+          className="rounded-lg p-3 bg-bg-secondary border border-border-light"
         >
           <label
             className="block font-semibold mb-4 text-text-secondary"
@@ -282,12 +280,11 @@ export default function FDForm() {
       </form>
 
 
-      {/* Results Section */}
       {summary && (
         <>
           {/* Summary Card */}
           <section className="mb-12 mt-12">
-            <FDSummary summary={summary} />
+            <DepositReturns summary={summary} />
           </section>
 
           {/* Results Table */}

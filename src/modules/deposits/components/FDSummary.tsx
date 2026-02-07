@@ -1,29 +1,25 @@
-import type { FDSummary as FDSummaryType } from '../types/deposits';
+import type { DepositSummary } from '../types/deposits';
 
-interface FDSummaryProps {
-  summary: FDSummaryType;
+interface DepositSummaryProps {
+  summary: DepositSummary;
 }
 
-export default function FDSummary({ summary }: FDSummaryProps) {
+export default function DepositReturns({ summary }: DepositSummaryProps) {
   const principal = summary.maturityAmount - summary.totalInterestEarned;
 
   return (
     <div className="grid md:grid-cols-3 gap-6">
-      {/* Principal Card */}
       <div
         className="rounded-lg p-6 transition bg-bg-secondary border border-border-light hover:border-primary-main"
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-text-secondary">
-            Principal
+            Amount Invested
           </h3>
           <span className="text-2xl">💰</span>
         </div>
         <p className="text-3xl font-bold text-text-primary">
           ₹{principal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-sm mt-2 text-text-secondary">
-          Initial investment
         </p>
       </div>
 
@@ -33,15 +29,12 @@ export default function FDSummary({ summary }: FDSummaryProps) {
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-success">
-            Total Interest
+            Total Interest Earned
           </h3>
           <span className="text-2xl">📈</span>
         </div>
         <p className="text-3xl font-bold text-text-primary">
           ₹{summary.totalInterestEarned.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-sm mt-2 text-success">
-          Total earnings
         </p>
       </div>
 
@@ -57,9 +50,6 @@ export default function FDSummary({ summary }: FDSummaryProps) {
         </div>
         <p className="text-3xl font-bold text-text-primary">
           ₹{summary.maturityAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-        </p>
-        <p className="text-sm mt-2 text-primary-main">
-          Total at maturity
         </p>
       </div>
     </div>

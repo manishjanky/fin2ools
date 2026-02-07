@@ -5,7 +5,7 @@ export interface DepositInput {
   rate: number;
   tenureYears: number;
   tenureMonths: number;
-  tenureDays: number;
+  tenureDays?: number;
 }
 
 export interface FDInput extends DepositInput {
@@ -19,9 +19,10 @@ export interface RDInput extends DepositInput {
   monthlyInstallment: number;
 }
 
-export interface FDSummary {
+export interface DepositSummary {
   totalInterestEarned: number;
   maturityAmount: number;
+  principal?: number;
   fyData: FYData[];
 }
 
