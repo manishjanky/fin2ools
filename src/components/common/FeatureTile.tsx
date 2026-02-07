@@ -16,16 +16,16 @@ export default function FeatureTile({
   const outerGradient = gradient;
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className={`w-full h-full text-left bg-linear-to-br ${outerGradient} p-0.5 rounded-lg hover:shadow-lg transition transform hover:scale-105 group`}
+      className={`w-full h-full text-left bg-linear-to-br ${outerGradient} px-2 py-1 rounded-lg hover:shadow-lg transition transform hover:scale-105 group bg-bg-primary`}
     >
       <div
-        className="rounded-lg p-8 h-full flex flex-col justify-between transition bg-bg-primary hover:bg-bg-secondary"
+        className="rounded-lg p-4 h-full flex flex-col justify-between transition bg-bg-primary hover:bg-bg-secondary"
       >
         <div>
-          <div className="text-5xl mb-4">{icon}</div>
-          <h3 className="text-2xl font-bold mb-3 text-text-primary">
+          <div className="text-4xl mb-2">{icon}</div>
+          <h3 className="text-xl font-bold mb-2 text-text-primary">
             {title}
           </h3>
           <p className="leading-relaxed text-text-secondary">
@@ -49,6 +49,6 @@ export default function FeatureTile({
           </svg>
         </div>
       </div>
-    </button>
+    </div>
   );
 }

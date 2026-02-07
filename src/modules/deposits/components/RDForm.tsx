@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { DepositSummary, RDInput } from "../types/deposits";
 import { calculateRDReturns } from "../utils";
-import DepositReturns from "./FDSummary";
+import DepositReturns from "./DepositReturns";
 import FYSummaryTable from "../../../components/common/FYSummaryTable";
 import moment from "moment";
 

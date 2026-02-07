@@ -10,9 +10,9 @@ export default function Home() {
       <Header />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Welcome Section */}
-        <section className="mb-16">
+        <section className="mb-8">
           <h2
             className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
           >
@@ -58,7 +58,7 @@ export default function Home() {
           <div className="cursor-pointer">
             <FeatureTile
               title="FD Projections"
-              description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
+              description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings."
               icon="📊"
               gradient="from-purple-500 to-blue-600"
               onClick={() => navigate('deposits/fd')}
@@ -67,7 +67,7 @@ export default function Home() {
           <div className="cursor-pointer">
             <FeatureTile
               title="RD Projections"
-              description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
+              description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings."
               icon="📊"
               gradient="from-purple-500 to-blue-600"
               onClick={() => navigate('deposits/rd')}

@@ -3,7 +3,7 @@ import moment from 'moment';
 import type { FDInput, DepositSummary } from '../types/deposits';
 import { calculateFDReturns } from '../utils/fdCalculator';
 import FYSummaryTable from '../../../components/common/FYSummaryTable';
-import DepositReturns from './FDSummary';
+import DepositReturns from './DepositReturns';
 
 
 export default function FDForm() {
