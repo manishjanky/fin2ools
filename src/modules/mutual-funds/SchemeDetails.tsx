@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import type { MutualFundScheme, SchemeHistoryResponse } from './types/mutual-funds';
 import { useMutualFundsStore } from './store/mutualFundsStore';
@@ -104,7 +104,9 @@ export default function SchemeDetails() {
                         >
                             NAV History
                         </h2>
-                        <ReturnsCalculator navData={history.data} currentNav={currentNav} />
+                        <Suspense>
+                            <ReturnsCalculator navData={history.data} currentNav={currentNav} />
+                        </Suspense>
                     </section>
                 )}
                 {

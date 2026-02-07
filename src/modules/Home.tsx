@@ -33,16 +33,16 @@ export default function Home() {
               description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
               icon="📊"
               gradient="from-purple-500 to-blue-600"
-              onClick={() => navigate('fd')}
+              onClick={() => navigate('deposits/fd')}
             />
           </div>
           <div className="cursor-pointer">
             <FeatureTile
-              title="Mutual Funds"
-              description="Explore mutual fund options, compare returns, and analyze your portfolio performance. Make informed investment decisions."
-              icon="📈"
-              gradient="from-blue-500 to-cyan-600"
-              onClick={() => navigate('mutual-funds/my-funds')}
+              title="RD Projections"
+              description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings. Compare rates from different providers."
+              icon="📊"
+              gradient="from-purple-500 to-blue-600"
+              onClick={() => navigate('deposits/rd')}
             />
           </div>
           <div className="cursor-pointer">
@@ -52,6 +52,24 @@ export default function Home() {
               icon="💰"
               gradient="from-blue-500 to-cyan-600"
               onClick={() => navigate('ppf')}
+            />
+          </div>
+          <div className="cursor-pointer">
+            <FeatureTile
+              title="Mutual Funds"
+              description="Explore mutual fund options, compare returns, and analyze your portfolio performance. Make informed investment decisions."
+              icon="📈"
+              gradient="from-blue-500 to-cyan-600"
+              onClick={() => navigate('mutual-funds/explore-funds')}
+            />
+          </div>
+          <div className="cursor-pointer">
+            <FeatureTile
+              title="My Mutual Funds"
+              description="View and analyze your mutual fund investments in one place."
+              icon="📈"
+              gradient="from-blue-500 to-cyan-600"
+              onClick={() => navigate('mutual-funds/my-funds')}
             />
           </div>
         </section>

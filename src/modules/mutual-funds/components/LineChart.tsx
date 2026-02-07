@@ -135,7 +135,7 @@ export default function LineChart({ navData, timeframeLabel }: LineChartProps) {
     };
 
     return (
-        <div className="w-full relative h-[300px] md:h-[400px]">
+        <div className="w-full relative h-75 md:h-100">
             <Line data={chartData} options={options} height={125} redraw={true} />
         </div>
     );

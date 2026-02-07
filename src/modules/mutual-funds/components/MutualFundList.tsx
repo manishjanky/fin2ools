@@ -278,7 +278,7 @@ export default function MutualFundList() {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 bg-slate-800 text-purple-200 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
+                className="px-4 py-2 bg-slate-800 text-purple-200 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed rounded-lg transition"
               >
                 Previous
               </button>
@@ -312,7 +312,7 @@ export default function MutualFundList() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-slate-800 text-purple-200 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
+                className="px-4 py-2 bg-slate-800 text-purple-200 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed rounded-lg transition"
               >
                 Next
               </button>

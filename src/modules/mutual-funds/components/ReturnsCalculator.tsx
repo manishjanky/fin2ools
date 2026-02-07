@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import moment from 'moment';
 import type { NAVData, ReturnsMetrics } from '../types/mutual-funds';
 import Accordion from '../../../components/common/Accordion';
@@ -50,7 +50,7 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
         <div className="space-y-6">
             {/* Timeframe Selector */}
             <div
-              className="rounded-lg p-4 bg-bg-secondary border border-border-light"
+                className="rounded-lg p-4 bg-bg-secondary border border-border-light"
             >
                 <div className="flex flex-wrap gap-2 md:gap-3">
                     {TIMEFRAMES.map(({ label }) => {
@@ -61,11 +61,10 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
                                 key={label}
                                 onClick={() => setSelectedTimeframe(label)}
                                 disabled={!metric.isAvailable}
-                                className={`${getTimeFrameClassname(label, metric)} ${
-                                  isSelected
+                                className={`${getTimeFrameClassname(label, metric)} ${isSelected
                                     ? 'bg-primary-main text-text-inverse border-primary-main'
                                     : 'bg-transparent text-text-secondary border-border-light hover:opacity-80'
-                                }`}
+                                    }`}
                             >
                                 {label}
                             </button>
@@ -76,33 +75,33 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
 
             {/* Chart Statistics Display */}
             {selectedMetric.isAvailable && filteredNavData.length > 0 && (
-                <NavStatisticsDisplay navData={filteredNavData} />
+                <Suspense>
+                    <NavStatisticsDisplay navData={filteredNavData} />
+                </Suspense>
             )}
 
             {/* Chart Type Selector and Chart */}
             {selectedMetric.isAvailable && filteredNavData.length > 0 && (
                 <div
-                  className="rounded-lg p-4 space-y-4 bg-bg-secondary border border-border-light"
+                    className="rounded-lg p-4 space-y-4 bg-bg-secondary border border-border-light"
                 >
                     {/* Chart Type Selector */}
                     <div className="flex gap-2">
                         <button
                             onClick={() => setChartType('line')}
-                            className={`px-4 py-2 rounded-lg transition font-medium text-sm border ${
-                              chartType === 'line'
+                            className={`px-4 py-2 rounded-lg transition font-medium text-sm border ${chartType === 'line'
                                 ? 'bg-primary-main text-text-inverse border-primary-lighter'
                                 : 'bg-transparent text-text-secondary border-border-light'
-                            }`}
+                                }`}
                         >
                             Line Chart
                         </button>
                         <button
                             onClick={() => setChartType('histogram')}
-                            className={`px-4 py-2 rounded-lg transition font-medium text-sm border ${
-                              chartType === 'histogram'
+                            className={`px-4 py-2 rounded-lg transition font-medium text-sm border ${chartType === 'histogram'
                                 ? 'bg-primary-main text-text-inverse border-primary-lighter'
                                 : 'bg-transparent text-text-secondary border-border-light'
-                            }`}
+                                }`}
                         >
                             Histogram
                         </button>
@@ -111,25 +110,30 @@ export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalcul
 
                     {/* NAV Chart */}
                     <div>
-                        {chartType === 'histogram' ? (
-                            <NAVChart navData={filteredNavData} timeframeLabel={selectedMetric.timeframeLabel} />
-                        ) : (
-                            <LineChart navData={filteredNavData} timeframeLabel={selectedMetric.timeframeLabel} />
-                        )}
+                        <Suspense>
+                            {chartType === 'histogram' ? (
+                                <NAVChart navData={filteredNavData} timeframeLabel={selectedMetric.timeframeLabel} />
+                            ) : (
+                                <LineChart navData={filteredNavData} timeframeLabel={selectedMetric.timeframeLabel} />
+                            )}
+                        </Suspense>
                     </div>
                 </div>
             )}
 
 
             {selectedMetric.isAvailable && (
-                <Accordion title="Returns Summary" isOpen={true}>
-                    <ReturnsSummary selectedMetric={selectedMetric} />
-                </Accordion>
+                <Suspense>
+                    <Accordion title="Returns Summary" isOpen={true}>
+                        <ReturnsSummary selectedMetric={selectedMetric} />
+                    </Accordion>
+                </Suspense>
+
             )}
 
             {!selectedMetric.isAvailable && (
                 <div
-                  className="rounded-lg p-6 bg-bg-secondary border border-border-light"
+                    className="rounded-lg p-6 bg-bg-secondary border border-border-light"
                 >
                     <div className="text-center py-8">
                         <p className="text-text-secondary">

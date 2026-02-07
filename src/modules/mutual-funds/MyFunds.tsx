@@ -1,5 +1,4 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router';
 import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
 import { useMutualFundsStore } from './store/mutualFundsStore';
@@ -8,6 +7,7 @@ import MyFundsCard from './components/MyFundsCard';
 import MyFundsSummary from './components/MyFundsSummary';
 import Accordion from '../../components/common/Accordion';
 import Loader from '../../components/common/Loader';
+import { useNavigate } from 'react-router';
 
 const PortfolioPerformanceCurve = lazy(
   () => import('./components/PortfolioPerformanceCurve')
@@ -65,9 +65,6 @@ export default function MyFunds() {
     loadFundDetails();
   }, [getAllInvestments, hasInvestments, getOrFetchSchemeDetails]);
 
- const handleCardClick = (schemeCode: string | number) => {
-    navigate(`/mutual-funds/my-funds/investment/${schemeCode}`);
-  };
 
   return (
     <div
@@ -105,7 +102,7 @@ export default function MyFunds() {
 
       <main className="max-w-7xl mx-auto px-4">
         {loading ? (
-          <Loader message="Loading your investments..." fullHeight={true}/>
+          <Loader message="Loading your investments..." fullHeight={true} />
         ) : fundsWithDetails.length === 0 ? (
           <div
             className="rounded-lg p-12 text-center border bg-bg-primary border-border-main"
@@ -126,9 +123,11 @@ export default function MyFunds() {
           <>
             {/* Summary Section */}
             <section className="mb-6">
-              <Accordion title="Portfolio Summary" isOpen={true}>
-                <MyFundsSummary fundsWithDetails={fundsWithDetails} />
-              </Accordion>
+              <Suspense>
+                <Accordion title="Portfolio Summary" isOpen={true}>
+                  <MyFundsSummary fundsWithDetails={fundsWithDetails} />
+                </Accordion>
+              </Suspense>
             </section>
 
             {/* Portfolio Performance Curve */}
@@ -151,7 +150,6 @@ export default function MyFunds() {
               {fundsWithDetails.map(({ scheme, investmentData }) => (
                 <div
                   key={scheme.schemeCode}
-                  onClick={() => handleCardClick(scheme.schemeCode)}
                   className="cursor-pointer"
                 >
                   <MyFundsCard

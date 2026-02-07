@@ -13,7 +13,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition bg-transparent">
-              <img src="/logo.svg" className="min-h-[48px]" />
+              <img src="/logo.svg" className="min-h-12" />
             </Link>
             <Menu isMobile={false} />
             {/* Hamburger Menu Button - Mobile */}

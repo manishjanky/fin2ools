@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import moment from 'moment';
 import type { MutualFundScheme, UserInvestmentData } from '../types/mutual-funds';
 import { calculateInvestmentValue, calculateXIRR, calculateCAGRForInvestments } from '../utils/investmentCalculations';
@@ -116,46 +116,49 @@ export default function MyFundsSummary({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2">
-      <MetricCard
-        label="Total Invested"
-        value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
-        colorKey="secondary"
-      />
+      <Suspense>
+        <MetricCard
+          label="Total Invested"
+          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          colorKey="secondary"
+        />
 
-      <MetricCard
-        label="Current Value"
-        value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
-        colorKey="primary"
-      />
+        <MetricCard
+          label="Current Value"
+          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          colorKey="primary"
+        />
 
-      <MetricCard
-        label="Absolute Gains"
-        value={`₹${Math.abs(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
-        colorKey={isPositiveGain ? 'success' : 'error'}
-      />
+        <MetricCard
+          label={`Absolute ${isPositiveGain ? 'Gain' : 'Loss'}`}
+          value={`₹${Math.abs(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          colorKey={isPositiveGain ? 'success' : 'error'}
+        />
 
-      <MetricCard
-        label="Returns (%)"
-        value={metrics.percentageReturn.toFixed(2)}
-        suffix="%"
-        colorKey={isPositiveGain ? 'success' : 'error'}
-      />
+        <MetricCard
+          label="Returns (%)"
+          value={metrics.percentageReturn.toFixed(2)}
+          suffix="%"
+          colorKey={isPositiveGain ? 'success' : 'error'}
+        />
 
-      <MetricCard
-        label="XIRR"
-        value={metrics.xirr.toFixed(2)}
-        suffix="%"
-        colorKey="warning"
-        subtext="Extended Internal Rate of Return"
-      />
+        <MetricCard
+          label="XIRR"
+          value={metrics.xirr.toFixed(2)}
+          suffix="%"
+          colorKey="warning"
+          subtext="Extended Internal Rate of Return"
+        />
 
-      <MetricCard
-        label="CAGR"
-        value={metrics.cagr.toFixed(2)}
-        suffix="%"
-        colorKey="info"
-        subtext="Compound Annual Growth Rate"
-      />
+        <MetricCard
+          label="CAGR"
+          value={metrics.cagr.toFixed(2)}
+          suffix="%"
+          colorKey="info"
+          subtext="Compound Annual Growth Rate"
+        />
+      </Suspense>
+
     </div>
   );
 }

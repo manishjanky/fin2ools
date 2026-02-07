@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import moment from 'moment';
-import type { FDInput, FDSummary as FDSummaryType } from './../types/fd';
+import type { FDInput, FDSummary as FDSummaryType } from '../types/fd';
 import { calculateFDReturns } from '../utils/fdCalculator';
 import FDSummary from './FDSummary';
 import FYSummaryTable from '../../../components/common/FYSummaryTable';

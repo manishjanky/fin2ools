@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import type {
   MutualFundScheme,
@@ -162,23 +162,25 @@ export default function FundInvestmentDetails() {
 
         {/* Investment Summary */}
         <section className="mb-6">
-          <Accordion title="Investment Summary" isOpen={true}>
-            <FundInvestmentSummary
-              metrics={metrics}
-              currentNav={currentNav}
-              investmentData={investmentData}
-              navHistory={navHistory}
-            />
-          </Accordion>
+          <Suspense>
+            <Accordion title="Investment Summary" isOpen={true}>
+              <FundInvestmentSummary
+                metrics={metrics}
+                currentNav={currentNav}
+                investmentData={investmentData}
+                navHistory={navHistory}
+              />
+            </Accordion>
+          </Suspense>
         </section>
 
         {/* Action Buttons */}
         <section className="mb-6 flex gap-3 justify-end">
           <button
             onClick={handleAddLumpsum}
-            className="px-6 py-3 rounded-lg transition font-medium bg-secondary-main text-text-inverse hover:opacity-90"
+            className="rounded-lg transition font-medium bg-secondary-main text-text-inverse hover:opacity-90"
           >
-            + Add Lumpsum
+            + Add Investment
           </button>
 
           {/* Show Edit SIP button only if there's an active SIP */}
@@ -196,23 +198,27 @@ export default function FundInvestmentDetails() {
             </button>
           )}
         </section>
-
-        <FundInvestmentHistory installments={installments} />
+        <Suspense>
+          <FundInvestmentHistory installments={installments} />
+        </Suspense>
       </main>
 
       {/* Investment Modal (Add or Edit) */}
-      <AddInvestmentModal
-        isOpen={showAddModal}
-        onClose={() => {
-          setShowAddModal(false);
-          setEditingSIP(null);
-        }}
-        onSubmit={handleInvestmentSubmit}
-        schemeName={scheme?.schemeName || ''}
-        schemeCode={scheme?.schemeCode || 0}
-        editingInvestment={editingSIP || undefined}
-        mode={modalMode}
-      />
+      <Suspense>
+        <AddInvestmentModal
+          isOpen={showAddModal}
+          onClose={() => {
+            setShowAddModal(false);
+            setEditingSIP(null);
+          }}
+          onSubmit={handleInvestmentSubmit}
+          schemeName={scheme?.schemeName || ''}
+          schemeCode={scheme?.schemeCode || 0}
+          editingInvestment={editingSIP || undefined}
+          mode={modalMode}
+        />
+      </Suspense>
+
     </div>
   );
 }

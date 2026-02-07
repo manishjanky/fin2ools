@@ -18,7 +18,7 @@ export default function FeatureTile({
   return (
     <button
       onClick={onClick}
-      className={`w-full h-full text-left bg-gradient-to-br ${outerGradient} p-0.5 rounded-lg hover:shadow-lg transition transform hover:scale-105 group`}
+      className={`w-full h-full text-left bg-linear-to-br ${outerGradient} p-0.5 rounded-lg hover:shadow-lg transition transform hover:scale-105 group`}
     >
       <div
         className="rounded-lg p-8 h-full flex flex-col justify-between transition bg-bg-primary hover:bg-bg-secondary"

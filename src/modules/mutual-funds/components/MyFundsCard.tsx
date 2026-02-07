@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import type { MutualFundScheme, UserInvestmentData, NAVData } from '../types/mutual-funds';
 import { investmentMetricSingleFund } from '../utils/investmentCalculations';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
-import AddInvestmentModal from './AddInvestmentModal';
 import { useInvestmentStore } from '../store';
 import SchemeNAV from './SchemeNAV';
+import AddToMyFunds from './AddToMyFunds';
+import { useNavigate } from 'react-router';
+import moment from 'moment';
 
 interface MyFundsCardProps {
   scheme: MutualFundScheme;
@@ -12,14 +14,16 @@ interface MyFundsCardProps {
 }
 
 export default function MyFundsCard({ scheme, investmentData }: MyFundsCardProps) {
+  const navigate = useNavigate();
   const getOrFetchSchemeHistory = useMutualFundsStore(
     (state) => state.getOrFetchSchemeHistory
   );
   const [navHistory, setNavHistory] = useState<NAVData[]>([]);
   const [, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const { getSchemeInvestments, addInvestment } = useInvestmentStore();
+  const { getSchemeInvestments } = useInvestmentStore();
   const [investmentDataState, setInvestmentData] = useState<UserInvestmentData>(investmentData);
+  const investedFrom = investmentData.investments.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0]?.startDate;
+
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -40,23 +44,24 @@ export default function MyFundsCard({ scheme, investmentData }: MyFundsCardProps
   const investmentMetrics = investmentMetricSingleFund(navHistory, investmentDataState);
   const isPositive = investmentMetrics.absoluteGain >= 0;
 
-  const handleAddInvestment = (investment: any) => {
+  const handleAddInvestment = () => {
     if (scheme.schemeCode) {
-      addInvestment(scheme.schemeCode, investment);
       setInvestmentData(getSchemeInvestments(scheme.schemeCode));
-      setShowModal(false);
     }
   };
 
-
-  const addMoreInvestments = ($event: React.MouseEvent) => {
-    $event.stopPropagation();
-    setShowModal(true);
+  const handleCardClick = () => {
+    if (scheme.schemeCode) {
+      // Navigate to the investment details page for this scheme
+      navigate(`/mutual-funds/my-funds/investment/${scheme.schemeCode}`);
+    }
   }
+
 
   return (
     <div
       className="rounded-lg p-4 hover:shadow-lg transition border cursor-pointer bg-bg-primary border-primary-lighter hover:border-primary-main"
+      onClick={handleCardClick}
     >
       <div className="grid md:grid-cols-3 gap-4 items-start">
         {/* Scheme Info */}
@@ -67,15 +72,21 @@ export default function MyFundsCard({ scheme, investmentData }: MyFundsCardProps
             {scheme.schemeName}
           </h3>
           {scheme.schemeCategory && (
-            <p className="text-xs text-text-secondary">
+            <p className="text-sm text-text-secondary">
               <span className="font-semibold">Category:</span> {scheme.schemeCategory}
+            </p>
+          )}
+          {investedFrom && (
+            <p className="text-sm text-text-secondary">
+              <span className="font-semibold">Invested Since:</span> {moment(investedFrom, 'DD-MM-YYYY').format('MMM YYYY')}
             </p>
           )}
         </div>
 
         {/* Current NAV */}
-        <div className="text-right max-w-sm md:ml-auto">
+        <div className="text-right max-w-sm md:ml-auto z-50">
           <SchemeNAV scheme={scheme} />
+          <AddToMyFunds label="+ Add More Investments" scheme={scheme} onClose={handleAddInvestment} />
         </div>
       </div>
 
@@ -132,23 +143,7 @@ export default function MyFundsCard({ scheme, investmentData }: MyFundsCardProps
           </p>
         </div>
       </div>
-
-
-      <section className="mt-4 border-t border-border-light pt-4">
-        <button
-          onClick={addMoreInvestments}
-          className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
-        >
-          + Add More Investment
-        </button>
-      </section>
-      <AddInvestmentModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleAddInvestment}
-        schemeName={scheme.schemeName}
-        schemeCode={scheme.schemeCode}
-      />
     </div>
+
   );
 }
