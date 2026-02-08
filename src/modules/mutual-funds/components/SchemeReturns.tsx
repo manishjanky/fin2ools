@@ -4,7 +4,7 @@ import type { NAVData, ReturnsMetrics } from '../types/mutual-funds';
 import Accordion from '../../../components/common/Accordion';
 import ReturnsSummary from './ReturnsSummary';
 import NAVChart from './NAVChart';
-import LineChart from './LineChart';
+import LineChart from './NAVLineChart';
 import NavStatisticsDisplay from './NavStatisticsDisplay';
 import { calculateSchemeReturns } from '../utils/metrics-calculations';
 import { TIMEFRAMES } from '../utils/constants';
@@ -15,7 +15,7 @@ interface ReturnsCalculatorProps {
 }
 
 
-export default function ReturnsCalculator({ navData, currentNav }: ReturnsCalculatorProps) {
+export default function SchemeReturns({ navData, currentNav }: ReturnsCalculatorProps) {
     const [selectedTimeframe, setSelectedTimeframe] = useState('1Y');
     const [chartType, setChartType] = useState<'line' | 'histogram'>('line');
 

@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { MutualFundScheme, UserInvestmentData, NAVData } from '../types/mutual-funds';
 import { investmentMetricSingleFund } from '../utils/investmentCalculations';
-import { useMutualFundsStore } from '../store/mutualFundsStore';
 import { useInvestmentStore } from '../store';
 import SchemeNAV from './SchemeNAV';
 import AddToMyFunds from './AddToMyFunds';
@@ -11,35 +10,15 @@ import moment from 'moment';
 interface MyFundsCardProps {
   scheme: MutualFundScheme;
   investmentData: UserInvestmentData;
+  navHistory: NAVData[]
 }
 
-export default function MyFundsCard({ scheme, investmentData }: MyFundsCardProps) {
+export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFundsCardProps) {
   const navigate = useNavigate();
-  const getOrFetchSchemeHistory = useMutualFundsStore(
-    (state) => state.getOrFetchSchemeHistory
-  );
-  const [navHistory, setNavHistory] = useState<NAVData[]>([]);
-  const [, setLoading] = useState(true);
   const { getSchemeInvestments } = useInvestmentStore();
   const [investmentDataState, setInvestmentData] = useState<UserInvestmentData>(investmentData);
   const investedFrom = investmentData.investments.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0]?.startDate;
 
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const history = await getOrFetchSchemeHistory(scheme.schemeCode, 365);
-        if (history?.data) {
-          setNavHistory(history.data);
-        }
-      } catch (error) {
-        console.error('Error loading NAV history:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadHistory();
-  }, [scheme.schemeCode, getOrFetchSchemeHistory]);
 
   const investmentMetrics = investmentMetricSingleFund(navHistory, investmentDataState);
   const isPositive = investmentMetrics.absoluteGain >= 0;

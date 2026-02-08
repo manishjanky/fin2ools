@@ -51,6 +51,14 @@ export interface ReturnsMetrics {
   isAvailable: boolean;
 }
 
+export interface PortfolioReturnMetrics {
+  totalInvested: number;
+  totalCurrentValue: number;
+  absoluteGain: number;
+  percentageReturn: number;
+  xirr: number;
+  cagr: number;
+}
 // Track SIP amount modifications with effective dates
 export interface SIPAmountModification {
   effectiveDate: string; // Date from which new amount applies

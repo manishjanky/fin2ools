@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment';
 import type { ChartOptions } from 'chart.js';
@@ -15,8 +15,8 @@ import {
 } from 'chart.js';
 import type { PortfolioValueSnapshot } from '../utils/portfolioPerformanceCalculations';
 import { resamplePortfolioData, getPerformanceMetrics, calculatePortfolioPerformanceTimeline } from '../utils/portfolioPerformanceCalculations';
-import { useInvestmentStore } from '../store';
-import { useMutualFundsStore } from '../store/mutualFundsStore';
+import type { MutualFundScheme, NAVData, UserInvestmentData } from '../types/mutual-funds';
+import Loader from '../../../components/common/Loader';
 
 ChartJS.register(
   CategoryScale,
@@ -29,14 +29,22 @@ ChartJS.register(
   Filler
 );
 
-interface PortfolioPerformanceCurveProps {}
+interface PortfolioPerformanceCurveProps {
+  investments: UserInvestmentData[],
+  navHistoryData: { schemeCode: number, data: NAVData[] }[]
+  fundDetails: {
+    scheme: MutualFundScheme,
+    investmentData: UserInvestmentData
+  }[]
+}
 
 export default function PortfolioPerformanceCurve(
-  _props: PortfolioPerformanceCurveProps
+  { investments,
+    navHistoryData,
+    fundDetails
+  }: PortfolioPerformanceCurveProps,
 ) {
-  const { getAllInvestments } = useInvestmentStore();
-  const { getOrFetchSchemeDetails, getOrFetchSchemeHistory } = useMutualFundsStore();
-  
+
   const [snapshots, setSnapshots] = useState<PortfolioValueSnapshot[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,33 +56,14 @@ export default function PortfolioPerformanceCurve(
       try {
         setIsLoading(true);
         setError(null);
-
-        const investments = getAllInvestments();
-
-        if (investments.length === 0) {
-          console.warn('No investments found for portfolio calculation');
+        if (investments.length === 0 || navHistoryData?.length === 0) {
+          console.warn('No investments or NAV history found for portfolio calculation');
           setSnapshots([]);
           setIsRendered(true);
           setIsLoading(false);
           return;
         }
-
-        // Get scheme details for all investments
-        const fundDetails = await Promise.all(
-          investments.map(async (investmentData) => {
-            const scheme = await getOrFetchSchemeDetails(investmentData.schemeCode);
-            return {
-              scheme: scheme || {
-                schemeCode: investmentData.schemeCode,
-                schemeName: 'Unknown Scheme',
-              },
-              investmentData,
-            };
-          })
-        );
-
         const allInvestments = fundDetails.flatMap((f) => f.investmentData.investments);
-
         if (allInvestments.length === 0) {
           console.warn('No investments found for portfolio calculation');
           setSnapshots([]);
@@ -85,24 +74,7 @@ export default function PortfolioPerformanceCurve(
 
         const navHistories = new Map();
 
-        // Fetch NAV histories for all schemes in parallel
-        const historyPromises = fundDetails.map(async ({ scheme }) => {
-          try {
-            const history = await getOrFetchSchemeHistory(scheme.schemeCode, 3650); // Get 10 years of history
-            if (history?.data && Array.isArray(history.data) && history.data.length > 0) {
-              return { schemeCode: scheme.schemeCode, data: history.data };
-            } else {
-              console.warn(`No NAV history available for scheme ${scheme.schemeCode}`);
-              return { schemeCode: scheme.schemeCode, data: null };
-            }
-          } catch (histErr) {
-            console.error(`Error fetching NAV history for scheme ${scheme.schemeCode}:`, histErr);
-            return { schemeCode: scheme.schemeCode, data: null };
-          }
-        });
-
-        const historyResults = await Promise.all(historyPromises);
-        historyResults.forEach(({ schemeCode, data }) => {
+        navHistoryData.forEach(({ schemeCode, data }) => {
           if (data) {
             navHistories.set(schemeCode, data);
           }
@@ -144,7 +116,7 @@ export default function PortfolioPerformanceCurve(
     };
 
     calculatePortfolioData();
-  }, [getAllInvestments, getOrFetchSchemeDetails, getOrFetchSchemeHistory]);
+  }, [investments, navHistoryData]);
 
   // Validate snapshots after they're calculated
   useEffect(() => {
@@ -182,7 +154,7 @@ export default function PortfolioPerformanceCurve(
       console.error('Error validating snapshots:', err);
       setError(`Error processing portfolio data: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-  }, [snapshots]);
+  }, [snapshots, snapshots.length]);
 
   if (error) {
     return (
@@ -219,7 +191,7 @@ export default function PortfolioPerformanceCurve(
 
   try {
     // Resample data for better chart performance
-    const sampledSnapshots = resamplePortfolioData(snapshots, 50);
+    const sampledSnapshots = resamplePortfolioData(snapshots);
     const metrics = getPerformanceMetrics(snapshots);
 
     // Additional validation before rendering
@@ -237,205 +209,205 @@ export default function PortfolioPerformanceCurve(
     const investedAmounts = sampledSnapshots.map((s) => s?.investedAmount ?? 0);
     const gains = sampledSnapshots.map((s) => s?.gain ?? 0);
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+    // Format currency
+    const formatCurrency = (value: number) => {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0,
+      }).format(value);
+    };
 
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: 'Portfolio Value',
-        data: currentValues,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#10b981',
-        pointBorderColor: '#e0f2fe',
-        pointBorderWidth: 1,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        borderWidth: 2,
-        spanGaps: true,
-        yAxisID: 'y',
-      },
-      {
-        label: 'Amount Invested',
-        data: investedAmounts,
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245, 158, 11, 0.05)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#f59e0b',
-        pointBorderColor: '#fef3c7',
-        pointBorderWidth: 1,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        borderWidth: 2,
-        borderDash: [5, 5],
-        spanGaps: true,
-        yAxisID: 'y',
-      },
-      {
-        label: 'Gains',
-        data: gains,
-        borderColor: gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
-        backgroundColor:
-          gains[gains.length - 1] >= 0
-            ? 'rgba(6, 182, 212, 0.1)'
-            : 'rgba(239, 68, 68, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor:
-          gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
-        pointBorderColor: gains[gains.length - 1] >= 0 ? '#cffafe' : '#fee2e2',
-        pointBorderWidth: 1,
-        pointRadius: 3,
-        pointHoverRadius: 5,
-        borderWidth: 2,
-        borderDash: [2, 2],
-        spanGaps: true,
-        yAxisID: 'y1',
-      },
-    ],
-  };
+    const chartData = {
+      labels,
+      datasets: [
+        {
+          label: 'Portfolio Value',
+          data: currentValues,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#10b981',
+          pointBorderColor: '#e0f2fe',
+          pointBorderWidth: 1,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          spanGaps: true,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Amount Invested',
+          data: investedAmounts,
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.05)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#f59e0b',
+          pointBorderColor: '#fef3c7',
+          pointBorderWidth: 1,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          borderDash: [5, 5],
+          spanGaps: true,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Gains',
+          data: gains,
+          borderColor: gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
+          backgroundColor:
+            gains[gains.length - 1] >= 0
+              ? 'rgba(6, 182, 212, 0.1)'
+              : 'rgba(239, 68, 68, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor:
+            gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
+          pointBorderColor: gains[gains.length - 1] >= 0 ? '#cffafe' : '#fee2e2',
+          pointBorderWidth: 1,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          borderDash: [2, 2],
+          spanGaps: true,
+          yAxisID: 'y1',
+        },
+      ],
+    };
 
-  const options: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: 'index' as const,
-      intersect: false,
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top' as const,
-        labels: {
-          color: '#cbd5e1',
-          font: {
-            size: 12,
-            weight: 600,
-          },
-          padding: 15,
-          usePointStyle: true,
-          pointStyle: 'circle',
-        },
+    const options: ChartOptions<'line'> = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
       },
-      tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        borderColor: '#475569',
-        borderWidth: 1,
-        padding: 14,
-        displayColors: true,
-        callbacks: {
-          title: function (context) {
-            return `Date: ${context[0].label}`;
-          },
-          label: function (context) {
-            const value = context.parsed.y;
-            if (context.datasetIndex === 2) {
-              // Gains dataset - show on secondary axis
-              const gainValue = gains[context.dataIndex];
-              return `${context.dataset.label}: ${formatCurrency(gainValue)}`;
-            }
-            return `${context.dataset.label}: ${formatCurrency(value ?? 0)}`;
-          },
-          afterLabel: function (context) {
-            const snapshot = sampledSnapshots[context.dataIndex];
-            if (context.datasetIndex === 0) {
-              return `Return: ${snapshot.returnPercentage.toFixed(2)}%`;
-            }
-            return '';
-          },
-        },
-      },
-    },
-    scales: {
-      y: {
-        type: 'linear' as const,
-        display: true,
-        position: 'left' as const,
-        grid: {
-          color: 'rgba(71, 85, 105, 0.1)',
-        },
-        ticks: {
-          color: '#cbd5e1',
-          font: {
-            size: 11,
-          },
-          callback: function (value) {
-            return formatCurrency(value as number);
-          },
-        },
-        title: {
+      plugins: {
+        legend: {
           display: true,
-          text: 'Value (₹)',
-          color: '#cbd5e1',
-          font: {
-            size: 12,
-            weight: 600,
+          position: 'top' as const,
+          labels: {
+            color: '#cbd5e1',
+            font: {
+              size: 12,
+              weight: 600,
+            },
+            padding: 15,
+            usePointStyle: true,
+            pointStyle: 'circle',
+          },
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.95)',
+          titleColor: '#f1f5f9',
+          bodyColor: '#cbd5e1',
+          borderColor: '#475569',
+          borderWidth: 1,
+          padding: 14,
+          displayColors: true,
+          callbacks: {
+            title: function (context) {
+              return `Date: ${context[0].label}`;
+            },
+            label: function (context) {
+              const value = context.parsed.y;
+              if (context.datasetIndex === 2) {
+                // Gains dataset - show on secondary axis
+                const gainValue = gains[context.dataIndex];
+                return `${context.dataset.label}: ${formatCurrency(gainValue)}`;
+              }
+              return `${context.dataset.label}: ${formatCurrency(value ?? 0)}`;
+            },
+            afterLabel: function (context) {
+              const snapshot = sampledSnapshots[context.dataIndex];
+              if (context.datasetIndex === 0) {
+                return `Return: ${snapshot.returnPercentage.toFixed(2)}%`;
+              }
+              return '';
+            },
           },
         },
       },
-      y1: {
-        type: 'linear' as const,
-        display: true,
-        position: 'right' as const,
-        grid: {
-          drawOnChartArea: false,
-        },
-        ticks: {
-          color: '#cbd5e1',
-          font: {
-            size: 11,
-          },
-          callback: function (value) {
-            return formatCurrency(value as number);
-          },
-        },
-        title: {
+      scales: {
+        y: {
+          type: 'linear' as const,
           display: true,
-          text: 'Gains (₹)',
-          color: '#cbd5e1',
-          font: {
-            size: 12,
-            weight: 600,
+          position: 'left' as const,
+          grid: {
+            color: 'rgba(71, 85, 105, 0.1)',
+          },
+          ticks: {
+            color: '#cbd5e1',
+            font: {
+              size: 11,
+            },
+            callback: function (value) {
+              return formatCurrency(value as number);
+            },
+          },
+          title: {
+            display: true,
+            text: 'Value (₹)',
+            color: '#cbd5e1',
+            font: {
+              size: 12,
+              weight: 600,
+            },
           },
         },
-      },
-      x: {
-        grid: {
-          color: 'rgba(71, 85, 105, 0.1)',
-        },
-        ticks: {
-          color: '#cbd5e1',
-          font: {
-            size: 10,
-          },
-          maxRotation: 45,
-          minRotation: 0,
-        },
-        title: {
+        y1: {
+          type: 'linear' as const,
           display: true,
-          text: 'Date',
-          color: '#cbd5e1',
-          font: {
-            size: 12,
-            weight: 600,
+          position: 'right' as const,
+          grid: {
+            drawOnChartArea: false,
+          },
+          ticks: {
+            color: '#cbd5e1',
+            font: {
+              size: 11,
+            },
+            callback: function (value) {
+              return formatCurrency(value as number);
+            },
+          },
+          title: {
+            display: true,
+            text: 'Gains (₹)',
+            color: '#cbd5e1',
+            font: {
+              size: 12,
+              weight: 600,
+            },
+          },
+        },
+        x: {
+          grid: {
+            color: 'rgba(71, 85, 105, 0.1)',
+          },
+          ticks: {
+            color: '#cbd5e1',
+            font: {
+              size: 10,
+            },
+            maxRotation: 45,
+            minRotation: 0,
+          },
+          title: {
+            display: true,
+            text: 'Date',
+            color: '#cbd5e1',
+            font: {
+              size: 12,
+              weight: 600,
+            },
           },
         },
       },
-    },
-  };
+    };
 
     return (
       <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
@@ -449,7 +421,13 @@ export default function PortfolioPerformanceCurve(
         </div>
 
         <div className="mb-6 h-96">
-          <Line data={chartData} options={options} />
+          {
+            snapshots?.length && (
+              <Suspense fallback={<Loader />}>
+                <Line data={chartData} options={options} />
+              </Suspense>
+            )
+          }
         </div>
 
         {/* Performance Metrics */}
@@ -461,9 +439,9 @@ export default function PortfolioPerformanceCurve(
             <p className="text-sm font-semibold text-text-primary">
               {metrics.startDate && metrics.endDate
                 ? moment(metrics.endDate, 'DD-MM-YYYY').diff(
-                    moment(metrics.startDate, 'DD-MM-YYYY'),
-                    'days'
-                  ) + ' days'
+                  moment(metrics.startDate, 'DD-MM-YYYY'),
+                  'days'
+                ) + ' days'
                 : 'N/A'}
             </p>
           </div>
@@ -473,11 +451,10 @@ export default function PortfolioPerformanceCurve(
               Total Return
             </p>
             <p
-              className={`text-sm font-semibold ${
-                metrics.totalReturn >= 0
-                  ? 'text-green-400'
-                  : 'text-red-400'
-              }`}
+              className={`text-sm font-semibold ${metrics.totalReturn >= 0
+                ? 'text-green-400'
+                : 'text-red-400'
+                }`}
             >
               {isFinite(metrics.totalReturn) ? metrics.totalReturn.toFixed(2) : 'N/A'}%
             </p>

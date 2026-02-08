@@ -103,9 +103,9 @@ export const calculateInvestmentValue = (
     // Start from the first SIP date with the specified monthly date
     let currentSipDate = startDate.clone().date(sipMonthlyDate);
     
-    // If the calculated date is before the start date, move to next month
+    // If the calculated date is before the start date, then start date becomes 1st investment
     if (currentSipDate.isBefore(startDate)) {
-      currentSipDate = currentSipDate.add(1, "month");
+      currentSipDate = startDate;
     }
     
     while (currentSipDate.isSameOrBefore(endDate)) {
@@ -200,7 +200,7 @@ export const calculateXIRR = (
       
       // If the calculated date is before the start date, move to next month
       if (currentSipDate.isBefore(startDate)) {
-        currentSipDate = currentSipDate.add(1, "month");
+        currentSipDate = startDate;
       }
 
       while (currentSipDate.isSameOrBefore(endDate)) {
@@ -414,7 +414,7 @@ export const generateInvestmentInstallments = (
       
       // If the calculated date is before the start date, move to next month
       if (currentSipDate.isBefore(startDate)) {
-        currentSipDate = currentSipDate.add(1, "month");
+        currentSipDate = startDate;
       }
       
       while (currentSipDate.isSameOrBefore(endDate)) {

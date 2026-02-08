@@ -171,11 +171,13 @@ export default function AddInvestmentModal({
   const modalTitle = isEditMode ? 'Edit SIP Investment' : 'Add Investment';
   const submitButtonText = isEditMode ? 'Update Investment' : 'Add Investment';
 
-  // const onBackDropClick = (event: React.MouseEvent) => {
-  //   event.stopPropagation();
-  // }
+  const onBackDropClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  }
   return (
-    <div>
+    <div
+      onClick={onBackDropClick}
+    >
       <Modal onClose={onClose}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-text-primary">

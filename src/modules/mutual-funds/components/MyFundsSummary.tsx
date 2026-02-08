@@ -1,110 +1,22 @@
 import { Suspense, useEffect, useState } from 'react';
-import moment from 'moment';
-import type { MutualFundScheme, UserInvestmentData } from '../types/mutual-funds';
-import { calculateInvestmentValue, calculateXIRR, calculateCAGRForInvestments } from '../utils/investmentCalculations';
-import { useMutualFundsStore } from '../store/mutualFundsStore';
+
 import Loader from '../../../components/common/Loader';
 import MetricCard from './MetricCard';
+import type { PortfolioReturnMetrics } from '../types/mutual-funds';
 
 interface MyFundsSummaryProps {
-  fundsWithDetails: Array<{
-    scheme: MutualFundScheme;
-    investmentData: UserInvestmentData;
-  }>;
+  metrics: PortfolioReturnMetrics
 }
 
 export default function MyFundsSummary({
-  fundsWithDetails,
+  metrics,
 }: MyFundsSummaryProps) {
-  const getOrFetchSchemeHistory = useMutualFundsStore(
-    (state) => state.getOrFetchSchemeHistory
-  );
-  const [metrics, setMetrics] = useState({
-    totalInvested: 0,
-    totalCurrentValue: 0,
-    absoluteGain: 0,
-    percentageReturn: 0,
-    xirr: 0,
-    cagr: 0,
-  });
+
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const calculateMetrics = async () => {
-      try {
-        let totalInvested = 0;
-        let totalCurrentValue = 0;
-        let allInvestments = [];
-        let allNavHistories = [];
-
-        for (const { scheme, investmentData } of fundsWithDetails) {
-          const history = await getOrFetchSchemeHistory(scheme.schemeCode, 365);
-          if (!history?.data || history.data.length === 0) continue;
-
-          for (const investment of investmentData.investments) {
-            const value = calculateInvestmentValue(investment, history.data);
-            totalInvested += value.investedAmount;
-            totalCurrentValue += value.currentValue;
-            allInvestments.push(investment);
-          }
-          allNavHistories.push(history.data);
-        }
-
-        const absoluteGain = totalCurrentValue - totalInvested;
-        const percentageReturn = totalInvested > 0 ? (absoluteGain / totalInvested) * 100 : 0;
-
-        // Calculate CAGR - need combined nav history
-        let cagr = 0;
-        if (allInvestments.length > 0 && allNavHistories.length > 0) {
-          // Merge and sort all NAV histories
-          const mergedNavHistory = allNavHistories
-            .flat()
-            .reduce((acc: typeof allNavHistories[0], current) => {
-              const exists = (acc as typeof allNavHistories[0]).some(nav => nav.date === current.date);
-              if (!exists) (acc as typeof allNavHistories[0]).push(current);
-              return acc;
-            }, [] as typeof allNavHistories[0])
-            .sort((a, b) => moment(a.date, 'DD-MM-YYYY').diff(moment(b.date, 'DD-MM-YYYY')));
-
-          cagr = calculateCAGRForInvestments(allInvestments, mergedNavHistory);
-        }
-
-        // Calculate XIRR for all investments across all funds
-        let xirr = 0;
-        if (allInvestments.length > 0 && allNavHistories.length > 0) {
-          const mergedNavHistory = allNavHistories
-            .flat()
-            .reduce((acc: typeof allNavHistories[0], current) => {
-              const exists = (acc as typeof allNavHistories[0]).some(nav => nav.date === current.date);
-              if (!exists) (acc as typeof allNavHistories[0]).push(current);
-              return acc;
-            }, [] as typeof allNavHistories[0])
-            .sort((a, b) => moment(a.date, 'DD-MM-YYYY').diff(moment(b.date, 'DD-MM-YYYY')));
-
-          xirr = calculateXIRR(allInvestments, mergedNavHistory);
-        }
-
-        setMetrics({
-          totalInvested,
-          totalCurrentValue,
-          absoluteGain,
-          percentageReturn,
-          xirr,
-          cagr,
-        });
-      } catch (error) {
-        console.error('Error calculating metrics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (fundsWithDetails.length > 0) {
-      calculateMetrics();
-    } else {
-      setLoading(false);
-    }
-  }, [fundsWithDetails]);
+  useEffect(()=>{
+    setLoading(false);
+  },[metrics])
 
   const isPositiveGain = metrics.absoluteGain >= 0;
 

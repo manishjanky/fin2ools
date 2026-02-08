@@ -10,6 +10,7 @@ export default function Modal({ children, widthClass, onClose }: { children: Rea
     return createPortal(
         (
             <div
+                onClick={(event: React.MouseEvent) => event.stopPropagation()}
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex lg:items-center justify-center p-4"
             >
                 <div

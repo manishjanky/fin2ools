@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import type { MutualFundScheme, SchemeHistoryResponse } from './types/mutual-funds';
 import { useMutualFundsStore } from './store/mutualFundsStore';
 import Header from '../../components/common/Header';
-import ReturnsCalculator from './components/ReturnsCalculator';
+import SchemeReturns from './components/SchemeReturns';
 import Accordion from '../../components/common/Accordion';
 import FundHeader from './components/FundHeader';
 import SchemeInformation from './components/SchemeInformation';
@@ -105,7 +105,7 @@ export default function SchemeDetails() {
                             NAV History
                         </h2>
                         <Suspense>
-                            <ReturnsCalculator navData={history.data} currentNav={currentNav} />
+                            <SchemeReturns navData={history.data} currentNav={currentNav} />
                         </Suspense>
                     </section>
                 )}
