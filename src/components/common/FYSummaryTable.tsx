@@ -5,29 +5,20 @@ interface FYSummaryTableProps {
 }
 
 export default function FYSummaryTable({ data }: FYSummaryTableProps) {
-      return (
+  return (
     <div
-      className="rounded-lg overflow-hidden"
-      style={{
-        backgroundColor: 'var(--color-bg-secondary)',
-        border: '1px solid var(--color-border-light)',
-      }}
+      className="rounded-lg overflow-hidden bg-bg-secondary border border-border-light"
     >
       <div
-        className="px-6 py-4"
-        style={{
-          borderBottom: '1px solid var(--color-border-light)',
-        }}
+        className="px-6 py-4 border border-border-light"
       >
         <h2
-          className="text-2xl font-bold"
-          style={{ color: 'var(--color-text-primary)' }}
+          className="text-2xl font-bold text-text-primary"
         >
           Financial Year-wise Breakdown
         </h2>
         <p
-          className="text-sm mt-1"
-          style={{ color: 'var(--color-text-secondary)' }}
+          className="text-sm mt-1 text-text-secondary"
         >
           Interest earned and balance details for each financial year
         </p>
@@ -37,38 +28,30 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
         <table className="w-full">
           <thead>
             <tr
-              style={{
-                backgroundColor: 'var(--color-bg-primary)',
-                borderBottom: '1px solid var(--color-border-light)',
-              }}
+              className="bg-bg-primary border border-e-border-light"
             >
               <th
-                className="px-6 py-4 text-left font-semibold"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-6 py-4 text-left font-semibold text-text-secondary"
               >
                 Financial Year
               </th>
               <th
-                className="px-6 py-4 text-right font-semibold"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-6 py-4 text-right font-semibold text-text-secondary"
               >
                 Opening Balance
               </th>
               <th
-                className="px-6 py-4 text-right font-semibold"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-6 py-4 text-right font-semibold text-text-secondary"
               >
                 Amount Invested
               </th>
               <th
-                className="px-6 py-4 text-right font-semibold"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-6 py-4 text-right font-semibold text-text-secondary"
               >
                 Interest Earned
               </th>
               <th
-                className="px-6 py-4 text-right font-semibold"
-                style={{ color: 'var(--color-text-secondary)' }}
+                className="px-6 py-4 text-right font-semibold text-text-secondary"
               >
                 Closing Balance
               </th>
@@ -80,8 +63,8 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
                 key={index}
                 style={{
                   backgroundColor: index % 2 === 0 ? 'rgba(99, 102, 241, 0.05)' : 'transparent',
-                  borderBottom: '1px solid var(--color-border-light)',
                 }}
+                className="border-b border-border-light"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.08)';
                 }}
@@ -90,20 +73,19 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
                 }}
               >
                 <td
-                  className="px-6 py-4 font-medium"
+                  className="px-6 py-4 font-medium text-text-primary"
                   style={{ color: 'var(--color-text-primary)' }}
                 >
                   {row.fyYear}
                 </td>
                 <td
-                  className="px-6 py-4 text-right"
+                  className="px-6 py-4 text-right accent-cyan"
                   style={{ color: 'var(--color-accent-cyan)' }}
                 >
                   ₹{row.startBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </td>
                 <td
-                  className="px-6 py-4 text-right font-semibold"
-                  style={{ color: 'var(--color-secondary-main)' }}
+                  className="px-6 py-4 text-right font-semibold text-secondary-main"
                 >
                   {row.contribution !== undefined && row.contribution > 0
                     ? `₹${row.contribution.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
@@ -117,7 +99,7 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
                   ₹{row.interestEarned.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </td>
                 <td
-                  className="px-6 py-4 text-right font-semibold"
+                  className="px-6 py-4 text-right font-semibold text-primary-main"
                   style={{ color: 'var(--color-primary-main)' }}
                 >
                   ₹{row.endBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
@@ -130,17 +112,12 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
 
       {/* Table Footer with Totals */}
       <div
-        className="px-6 py-4"
-        style={{
-          backgroundColor: 'var(--color-bg-primary)',
-          borderTop: '1px solid var(--color-border-light)',
-        }}
+        className="px-6 py-4 bg-bg-primary border border-border-light"
       >
         <div className="grid md:grid-cols-3 gap-6">
           <div>
             <p
-              className="text-sm"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="text-sm text-text-secondary"
             >
               Total Interest Earned
             </p>
@@ -153,28 +130,24 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
           </div>
           <div>
             <p
-              className="text-sm"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="text-sm text-text-secondary"
             >
               Spread over Financial Years
             </p>
             <p
-              className="text-2xl font-bold mt-1"
-              style={{ color: 'var(--color-text-primary)' }}
+              className="text-2xl font-bold mt-1 text-text-primary"
             >
               {data.length}
             </p>
           </div>
           <div>
             <p
-              className="text-sm"
-              style={{ color: 'var(--color-text-secondary)' }}
+              className="text-sm text-text-secondary"
             >
               Final Balance
             </p>
             <p
-              className="text-2xl font-bold mt-1"
-              style={{ color: 'var(--color-primary-main)' }}
+              className="text-2xl font-bold mt-1 text-primary-main"
             >
               ₹{(data[data.length - 1]?.endBalance || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
             </p>
@@ -183,5 +156,4 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
       </div>
     </div>
   );
-    // Component implementation
 }

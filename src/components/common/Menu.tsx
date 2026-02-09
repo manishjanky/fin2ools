@@ -13,7 +13,7 @@ export default function Menu() {
                     className="transition text-text-secondary hover:text-text-primary relative group"
                 >
                     Deposits
-                    <div className='w-full lg:w-48 md:pt-6 lg:pt-3 md:grid lg:group-hover:grid grid-cols-1 lg:hidden lg:absolute top-full left-0 bg-bg-primary lg:border lg:border-border-light rounded-lg lg:shadow-lg p-2 gap-3'>
+                    <div className='w-full lg:w-48 md:pt-6 lg:pt-3 grid lg:group-hover:grid grid-cols-1 lg:hidden lg:absolute top-full left-0 bg-bg-primary lg:border lg:border-border-light rounded-lg lg:shadow-lg p-2 gap-3'>
                         <Link
                             to="/deposits/fd"
                             className="transition text-text-secondary hover:text-text-primary lg:border-b border-border-light pb-2"
@@ -33,7 +33,7 @@ export default function Menu() {
                     className="transition text-text-secondary hover:text-text-primary relative group"
                 >
                     Mutual Funds
-                    <div className='w-full lg:w-48 md:pt-6 lg:pt-3 md:grid lg:group-hover:grid grid-cols-1 lg:hidden lg:absolute top-full left-0 bg-bg-primary lg:border lg:border-border-light rounded-lg lg:shadow-lg p-2 gap-3'>
+                    <div className='w-full lg:w-48 md:pt-6 lg:pt-3 grid lg:group-hover:grid grid-cols-1 lg:hidden lg:absolute top-full left-0 bg-bg-primary lg:border lg:border-border-light rounded-lg lg:shadow-lg p-2 gap-3'>
                         <Link
                             to="/mutual-funds"
                             className="transition text-text-secondary hover:text-text-primary lg:border-b border-border-light pb-2"
