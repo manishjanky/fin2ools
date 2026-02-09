@@ -19,6 +19,7 @@ import FundHeader from './FundHeader';
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
 
+const InvestmentPerformanceCurve = lazy(() => import('./InvestmentPerformanceCurve'));
 const FundInvestmentSummary = lazy(() => import('./FundInvestmentSummary'));
 const AddInvestmentModal = lazy(() => import('./AddInvestmentModal'));
 const FundInvestmentHistory = lazy(() => import('./FundInvestmentHistory'));
@@ -156,12 +157,10 @@ export default function FundInvestmentDetails() {
   return (
     <div className="min-h-screen bg-bg-primary">
       <Header />
-
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      {metrics ? <main className="max-w-7xl mx-auto px-4 py-6">
 
         <FundHeader scheme={scheme} duration={investmentDuration} />
 
-        {/* Investment Summary */}
         <section className="mb-6">
           <Accordion title="Investment Summary" isOpen={true}>
             <Suspense fallback={<Loader />}>
@@ -172,10 +171,31 @@ export default function FundInvestmentDetails() {
                 navHistory={navHistory}
               />
             </Suspense>
-
           </Accordion>
         </section>
 
+        <section className="mb-6">
+          {
+            navHistory?.length ? (
+              <Suspense fallback={<Loader />}>
+                <InvestmentPerformanceCurve
+                  fundDetails={[
+                    {
+                      investmentData,
+                      scheme
+                    }
+                  ]}
+                  navHistoryData={
+                    [
+                      { data: navHistory, schemeCode: scheme.schemeCode }
+                    ]
+                  }
+                  investments={[investmentData]}
+                />
+              </Suspense>) : <Loader />
+          }
+        </section>
+        
         {/* Action Buttons */}
         <section className="mb-6 flex gap-3 justify-end">
           <button
@@ -203,7 +223,10 @@ export default function FundInvestmentDetails() {
         <Suspense fallback={<Loader />}>
           <FundInvestmentHistory installments={installments} />
         </Suspense>
-      </main>
+      </main> :
+        <Loader />
+      }
+
 
       {/* Investment Modal (Add or Edit) */}
       <Suspense>

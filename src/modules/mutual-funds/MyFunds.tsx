@@ -11,8 +11,8 @@ import moment from 'moment';
 
 const MyFundsCard = lazy(() => import('./components/MyFundsCard'));
 const MyFundsSummary = lazy(() => import('./components/MyFundsSummary'));
-const PortfolioPerformanceCurve = lazy(
-  () => import('./components/PortfolioPerformanceCurve')
+const InvestmentPerformanceCurve = lazy(
+  () => import('./components/InvestmentPerformanceCurve')
 );
 
 export default function MyFunds() {
@@ -245,7 +245,7 @@ export default function MyFunds() {
               >
                 {
                   userInvestments && navHistoryData?.length > 0 && (
-                    <PortfolioPerformanceCurve investments={userInvestments || []} navHistoryData={navHistoryData} fundDetails={fundsWithDetails} />
+                    <InvestmentPerformanceCurve investments={userInvestments || []} navHistoryData={navHistoryData} fundDetails={fundsWithDetails} />
                   )
                 }
               </Suspense>
