@@ -30,20 +30,22 @@ ChartJS.register(
   Filler
 );
 
-interface PortfolioPerformanceCurveProps {
+interface InvestmentPerformanceCurveProps {
   investments: UserInvestmentData[],
   navHistoryData: { schemeCode: number, data: NAVData[] }[]
   fundDetails: {
     scheme: MutualFundScheme,
     investmentData: UserInvestmentData
-  }[]
+  }[];
+  title?: string;
+  subtitle?: string;
 }
 
-export default function PortfolioPerformanceCurve(
+export default function InvestmentPerformanceCurve(
   { investments,
     navHistoryData,
     fundDetails
-  }: PortfolioPerformanceCurveProps,
+  }: InvestmentPerformanceCurveProps,
 ) {
 
   const [snapshots, setSnapshots] = useState<PortfolioValueSnapshot[]>([]);
@@ -224,7 +226,7 @@ export default function PortfolioPerformanceCurve(
       labels,
       datasets: [
         {
-          label: 'Portfolio Value',
+          label: 'Investment Value',
           data: currentValues,
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -415,11 +417,8 @@ export default function PortfolioPerformanceCurve(
       <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
         <div className="mb-6">
           <h3 className="text-xl font-semibold text-text-primary mb-2">
-            Portfolio Performance
+            Investment Overview
           </h3>
-          <p className="text-sm text-text-secondary">
-            Comprehensive view of your portfolio growth over time
-          </p>
         </div>
 
         <div className="mb-6 h-96 relative">
