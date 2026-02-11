@@ -15,7 +15,7 @@ export default defineConfig({
       devOptions: { enabled: true },
       manifest: {
         description:
-          "This application provides your with some financial tools that help you with your day to financial needs in a secure manner. ",
+          "This application provides you with some financial tools that can help you with your day to day financial needs in a secure manner. For e.g. tracking your investments in mutual funds, calculating returns on FD, RD, PPF, etc.",
         theme_color: "#6366F1",
         background_color: "#ffffff",
         display: "standalone",
@@ -27,7 +27,12 @@ export default defineConfig({
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            form_factor: 'wide'
+            form_factor: "wide",
+          },
+          {
+            src: "pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
           },
         ],
         icons: [
