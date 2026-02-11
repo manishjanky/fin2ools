@@ -17,8 +17,12 @@ const InvestmentPerformanceCurve = lazy(
 
 export default function MyFunds() {
   const navigate = useNavigate();
-  const { loadInvestments, getAllInvestments, hasInvestments } = useInvestmentStore();
-  const { loadSchemes, getOrFetchSchemeDetails } = useMutualFundsStore();
+  const loadInvestments = useInvestmentStore((state) => state.loadInvestments);
+  const getAllInvestments = useInvestmentStore((state) => state.getAllInvestments);
+  const loadSchemes = useMutualFundsStore((state) => state.loadSchemes);
+  const getOrFetchSchemeDetails = useMutualFundsStore((state) => state.getOrFetchSchemeDetails);
+  const getOrFetchSchemeHistory = useMutualFundsStore((state) => state.getOrFetchSchemeHistory);
+
   const [fundsWithDetails, setFundsWithDetails] = useState<
     Array<{
       scheme: MutualFundScheme;
@@ -26,9 +30,6 @@ export default function MyFunds() {
     }>
   >([]);
 
-  const getOrFetchSchemeHistory = useMutualFundsStore(
-    (state) => state.getOrFetchSchemeHistory
-  );
   const [metrics, setMetrics] = useState<PortfolioReturnMetrics>({
     totalInvested: 0,
     totalCurrentValue: 0,
@@ -39,13 +40,14 @@ export default function MyFunds() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [metricsLoading, setMetricsLoading] = useState(false);
   const [userInvestments, setUserInvestments] = useState<UserInvestmentData[]>();
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
 
   useEffect(() => {
     loadInvestments();
     loadSchemes();
-  }, [loadInvestments, loadSchemes]);
+  }, []);
 
   useEffect(() => {
     const loadFundDetails = async () => {
@@ -53,11 +55,11 @@ export default function MyFunds() {
       setUserInvestments(investments);
 
       if (investments.length === 0) {
+        setFundsWithDetails([]);
         setLoading(false);
         return;
       }
 
-      setLoading(true);
       try {
         const fundDetails = await Promise.all(
           investments.map(async (investmentData) => {
@@ -72,19 +74,20 @@ export default function MyFunds() {
           })
         );
         setFundsWithDetails(fundDetails);
+        setLoading(false);
       } catch (error) {
         console.error('Error loading fund details:', error);
         setFundsWithDetails([]);
-      } finally {
         setLoading(false);
       }
     };
 
     loadFundDetails();
-  }, [getAllInvestments, hasInvestments, getOrFetchSchemeDetails]);
+  }, []);
 
   useEffect(() => {
     const calculateMetrics = async () => {
+      setMetricsLoading(true);
       try {
         let totalInvested = 0;
         let totalCurrentValue = 0;
@@ -156,14 +159,12 @@ export default function MyFunds() {
       } catch (error) {
         console.error('Error calculating metrics:', error);
       } finally {
-        setLoading(false);
+        setMetricsLoading(false);
       }
     };
 
     if (fundsWithDetails.length > 0) {
       calculateMetrics();
-    } else {
-      setLoading(false);
     }
   }, [fundsWithDetails]);
 
@@ -224,37 +225,48 @@ export default function MyFunds() {
           <>
             {/* Summary Section */}
             <section className="mb-6">
-              <Suspense fallback={<Loader />}>
-                <Accordion title="Portfolio Summary" isOpen={true}>
-                  {userInvestments?.length && metrics.totalInvested ? <MyFundsSummary metrics={metrics} /> :
-                    <Loader />}
-                </Accordion>
-              </Suspense>
+              <Accordion title="Portfolio Summary" isOpen={true}>
+                {metricsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader message="Calculating metrics..." fullHeight={false} />
+                  </div>
+                ) : (
+                  <Suspense fallback={<Loader />}>
+                    <MyFundsSummary metrics={metrics} />
+                  </Suspense>
+                )}
+              </Accordion>
             </section>
 
             {/* Portfolio Performance Curve */}
             <section className="mb-6">
-              <Suspense
-                fallback={
-                  <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
-                    <div className="h-96 flex items-center justify-center">
-                      <Loader message="Evaluating portfolio..." fullHeight={false} />
-                    </div>
+              {metricsLoading || navHistoryData.length === 0 ? (
+                <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
+                  <div className="h-96 flex items-center justify-center">
+                    <Loader message="Evaluating portfolio..." fullHeight={false} />
                   </div>
-                }
-              >
-                {
-                  userInvestments && navHistoryData?.length > 0 && (
+                </div>
+              ) : (
+                <Suspense
+                  fallback={
+                    <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
+                      <div className="h-96 flex items-center justify-center">
+                        <Loader message="Evaluating portfolio..." fullHeight={false} />
+                      </div>
+                    </div>
+                  }
+                >
+                  {userInvestments && navHistoryData?.length > 0 && (
                     <InvestmentPerformanceCurve investments={userInvestments || []} navHistoryData={navHistoryData} fundDetails={fundsWithDetails} />
-                  )
-                }
-              </Suspense>
+                  )}
+                </Suspense>
+              )}
             </section>
 
             {/* Funds List */}
             <section className="grid grid-cols-1 gap-6 mb-8">
-              {navHistoryData?.length > 0 && fundsWithDetails.map(({ scheme, investmentData }) => {
-                const schemeNavHistory = navHistoryData.filter((schemeData) => schemeData.schemeCode === scheme.schemeCode)[0];
+              {fundsWithDetails.map(({ scheme, investmentData }) => {
+                const schemeNavHistory = navHistoryData.find((schemeData) => schemeData.schemeCode === scheme.schemeCode);
                 return (
                   <div
                     key={scheme.schemeCode}
@@ -263,7 +275,7 @@ export default function MyFunds() {
                     <MyFundsCard
                       scheme={scheme}
                       investmentData={investmentData}
-                      navHistory={schemeNavHistory.data}
+                      navHistory={schemeNavHistory?.data || []}
                     />
                   </div>)
               })}

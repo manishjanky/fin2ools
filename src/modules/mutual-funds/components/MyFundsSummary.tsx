@@ -15,6 +15,7 @@ export default function MyFundsSummary({
   const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
+    if(metrics && metrics.totalInvested !== undefined)
     setLoading(false);
   },[metrics])
 

@@ -7,7 +7,7 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
     const latestNavDate = moment(scheme.date, 'DD-MM-YYYY')
 
     const isClosed = latestNavDate.isBefore(moment().subtract(1, 'week'))
-    const lasNavTimePeriod = latestNavDate.diff(moment(), 'weeks')
+    const lastNavTimePeriod = latestNavDate.diff(moment(), 'weeks')
     return (
         <div className="flex flex-col items-end mt-1 lg:mt-0 border bg-linear-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/50 rounded-lg p-1  md:min-w-48">
             <label
@@ -23,7 +23,7 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
                                 <Alert type='warning'
                                     autoCloseDuration={0}
                                     showCloseIcon={false}
-                                    message={`Latest NAV available is ${Math.abs(lasNavTimePeriod)} weeks old. Please verify if scheme is still active.`}
+                                    message={`Latest NAV available is ${Math.abs(lastNavTimePeriod)} weeks old. Please verify if scheme is still active.`}
                                 >
                                 </Alert>
                             </span>
