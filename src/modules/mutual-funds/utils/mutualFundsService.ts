@@ -9,7 +9,7 @@ import type {
 const API_BASE = "https://api.mfapi.in";
 const NEMO_API_BASE = "https://mf.captnemo.in/kuvera/";
 
-export async function fetchLatestNAV(
+export async function fetchMutualFunds(
   limit: number = 100,
   offset: number = 0,
 ): Promise<MutualFundScheme[]> {
