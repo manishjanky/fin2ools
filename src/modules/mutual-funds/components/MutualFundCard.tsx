@@ -4,12 +4,14 @@ import SchemeNAV from './SchemeNAV';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
 import { useWatchlistStore } from '../store/watchlistStore';
 import AddToMyFunds from './AddToMyFunds';
+import { useNavigate } from 'react-router';
 
 interface MutualFundCardProps {
     scheme: MutualFundScheme;
 }
 
 export default function MutualFundCard({ scheme }: MutualFundCardProps) {
+    const navigate = useNavigate();
     const [oneDayChange, setOneDayChange] = useState<number | null>(null);
     const [isLoadingChange, setIsLoadingChange] = useState(true);
     const { getOrFetchSchemeHistory } = useMutualFundsStore();
@@ -43,8 +45,9 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
     }, [scheme.schemeCode, getOrFetchSchemeHistory]);
 
 
-    const toggleWatchlist = ($event: React.MouseEvent<HTMLButtonElement>) => {
-        $event.stopPropagation();
+    const toggleWatchlist = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        event.preventDefault();
         if (inWatchlist) {
             removeFromWatchlist(scheme.schemeCode);
         } else {
@@ -52,9 +55,19 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
         }
     };
 
+    const handleCardClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        // Don't navigate if clicking on the watchlist button or its contents
+        const target = event.target as HTMLElement;
+        if (target.closest('button')) {
+            return;
+        }
+        navigate(`/mutual-funds/scheme/${scheme.schemeCode}`);
+    };
+
     return (
         <>
             <div
+                onClick={handleCardClick}
                 className="rounded-lg p-3 hover:shadow-lg transition transform h-full border cursor-pointer bg-bg-secondary border-primary-lighter hover:border-primary-main"
             >
                 <div className="flex flex-col h-full justify-between">

@@ -19,9 +19,9 @@ export default function Pagination({ items, itemsPerPage, pageChange }: { items:
                     <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
+                        className="px-2 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
                     >
-                        Previous
+                        {`<`}
                     </button>
 
                     <div className="flex gap-2">
@@ -39,7 +39,7 @@ export default function Pagination({ items, itemsPerPage, pageChange }: { items:
                                     )}
                                     <button
                                         onClick={() => setCurrentPage(page)}
-                                        className={`px-4 py-2 rounded-lg transition ${currentPage === page
+                                        className={`px-2 py-2 rounded-lg transition ${currentPage === page
                                             ? 'bg-purple-600 text-white'
                                             : 'bg-slate-800 text-purple-200 hover:bg-slate-700'
                                             }`}
@@ -53,9 +53,9 @@ export default function Pagination({ items, itemsPerPage, pageChange }: { items:
                     <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
+                        className="px-2 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition"
                     >
-                        Next
+                        {`>`}
                     </button>
                 </div>
             )}

@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
 import SearchableSelect from '../../../components/common/SearchableSelect';
 import MutualFundCard from './MutualFundCard';
 import Pagination from '../../../components/common/Pagination';
+import Loader from '../../../components/common/Loader';
 
 const ITEMS_PER_PAGE = 12;
 
 export default function MutualFundList() {
-  const navigate = useNavigate();
   const {
     filteredSchemes,
     currentPage,
@@ -36,9 +35,6 @@ export default function MutualFundList() {
     performSearch(query);
   };
 
-  const handleCardClick = (schemeCode: number) => {
-    navigate(`/mutual-funds/scheme/${schemeCode}`);
-  };
 
   // Get unique categories and fund houses
   const categories = useMemo(() => {
@@ -230,16 +226,7 @@ export default function MutualFundList() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block">
-            <div
-              className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-main"
-            />
-          </div>
-          <p className="mt-4 text-text-secondary">
-            Loading mutual funds...
-          </p>
-        </div>
+        <Loader message='Loading schemes...' />
       )}
 
       {/* Empty State */}
@@ -265,7 +252,6 @@ export default function MutualFundList() {
             {paginatedSchemes.map((scheme) => (
               <div
                 key={scheme.schemeCode}
-                onClick={() => handleCardClick(scheme.schemeCode)}
                 className="cursor-pointer"
               >
                 <MutualFundCard scheme={scheme} />
