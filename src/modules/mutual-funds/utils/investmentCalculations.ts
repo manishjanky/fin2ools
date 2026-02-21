@@ -413,13 +413,26 @@ export function investmentMetricSingleFund(
   const absoluteGain = totalCurrentValue - totalInvested;
   const percentageReturn =
     totalInvested > 0 ? (absoluteGain / totalInvested) * 100 : 0;
+  const xirr = calculateXIRR(investmentDataState.investments, navHistory);
+  const cagr = calculateCAGRForInvestments(
+    investmentDataState.investments,
+    navHistory,
+  );
+  // Calculate 1-day change for overall returns
+  const oneDayChange = calculateOneDayChange(navHistory, {
+    schemeCode: investmentDataState.schemeCode,
+    investments: investmentDataState.investments,
+  });
 
   return {
     totalInvested,
     totalCurrentValue,
     absoluteGain,
+    xirr,
+    cagr,
     percentageReturn,
     units: totalUnits,
+    oneDayChange,
   };
 }
 
@@ -672,7 +685,10 @@ export const calculatePortfolioMetrics = async (
     fundsWithDetails.map(async ({ scheme, investmentData }) => {
       const dateDiff = getEarliestInvestmentDate(investmentData.investments);
 
-      const navHistory = await getOrFetchSchemeHistory(scheme.schemeCode, dateDiff.diff);
+      const navHistory = await getOrFetchSchemeHistory(
+        scheme.schemeCode,
+        dateDiff.diff,
+      );
       if (navHistory?.data && navHistory?.data?.length > 0) {
         for (const investment of investmentData.investments) {
           const value = calculateInvestmentValue(investment, navHistory.data);
@@ -736,6 +752,6 @@ export const calculatePortfolioMetrics = async (
       cagr,
       oneDayChange,
     },
-    navHistoryData: allNavHistories
+    navHistoryData: allNavHistories,
   };
 };
