@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { MutualFundScheme, UserInvestmentData, NAVData } from '../types/mutual-funds';
-import { investmentMetricSingleFund } from '../utils/investmentCalculations';
+import { investmentMetricSingleFund, calculateOneDayChange } from '../utils/investmentCalculations';
 import { useInvestmentStore } from '../store';
 import SchemeNAV from './SchemeNAV';
 import AddToMyFunds from './AddToMyFunds';
@@ -21,7 +21,9 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
 
 
   const investmentMetrics = investmentMetricSingleFund(navHistory, investmentDataState);
+  const oneDayChange = calculateOneDayChange(navHistory, investmentDataState);
   const isPositive = investmentMetrics.absoluteGain >= 0;
+  const isOneDayPositive = oneDayChange.absoluteChange >= 0;
 
   const handleAddInvestment = () => {
     if (scheme.schemeCode) {
@@ -71,14 +73,14 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
 
       {/* Investment Metrics */}
       <div
-        className="grid grid-cols-3 md:grid-cols-5 gap-4 mt-4 pt-4 border-t border-border-light"
+        className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-4 pt-4 border-t border-border-light"
       >
         <div>
           <p className="text-xs mb-1 text-text-tertiary">
             Amount Invested
           </p>
           <p className="text-lg font-semibold text-text-primary">
-            ₹{investmentMetrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            ₹{investmentMetrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -86,7 +88,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             Current Value
           </p>
           <p className="text-lg font-semibold text-text-primary">
-            ₹{investmentMetrics.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            ₹{investmentMetrics.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -97,7 +99,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             className={`text-lg font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
           >
             {investmentMetrics.absoluteGain >= 0 ? '+' : ''}
-            ₹{Math.abs(investmentMetrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+            ₹{(investmentMetrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -109,6 +111,17 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           >
             {investmentMetrics.percentageReturn >= 0 ? '+' : ''}
             {investmentMetrics.percentageReturn.toFixed(2)}%
+          </p>
+        </div>
+        <div>
+          <p className="text-xs mb-1 text-text-tertiary">
+            1D Change
+          </p>
+          <p
+            className={`text-lg font-semibold ${isOneDayPositive ? 'text-success' : 'text-error'}`}
+          >
+            {oneDayChange.absoluteChange >= 0 ? '+' : ''}
+            ₹{(oneDayChange.absoluteChange).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>
