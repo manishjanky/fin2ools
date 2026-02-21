@@ -6,6 +6,7 @@ import type {
   NAVData,
   InvestmentInstallment,
   UserInvestment,
+  InvestmentMetrics,
 } from '../types/mutual-funds';
 import {
   investmentMetricSingleFund,
@@ -18,6 +19,7 @@ import Header from '../../../components/common/Header';
 import FundHeader from './FundHeader';
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
+import { getCalculatedReturns } from '../utils';
 
 const InvestmentPerformanceCurve = lazy(() => import('./InvestmentPerformanceCurve'));
 const FundInvestmentSummary = lazy(() => import('./FundInvestmentSummary'));
@@ -40,7 +42,20 @@ export default function FundInvestmentDetails() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingSIP, setEditingSIP] = useState<UserInvestment | null>(null);
-
+  // const metrics = investmentMetricSingleFund(navHistory, investmentData);
+  const [metrics, setMetrics] = useState<InvestmentMetrics>({
+    totalInvested: 0,
+    totalCurrentValue: 0,
+    absoluteGain: 0,
+    percentageReturn: 0,
+    xirr: 0,
+    cagr: 0,
+    units: 0,
+    oneDayChange: {
+      absoluteChange: 0,
+      percentageChange: 0,
+    },
+  });
   useEffect(() => {
     const loadData = async () => {
       if (!schemeCode) return;
@@ -127,12 +142,27 @@ export default function FundInvestmentDetails() {
     setEditingSIP(null);
   };
 
+  useEffect(() => {
+    const getFundMetrics = async () => {
+      if(!schemeCode || !investmentData) return;
+      let investmentMetrics = await getCalculatedReturns(parseInt(schemeCode), false);
+      if (investmentMetrics) {
+        setMetrics(investmentMetrics.overallReturns);
+      } else if(navHistory.length > 0 && investmentData.investments.length > 0) {
+        // Fallback to on-the-fly calculation if not available in indexedDb
+        const calculatedMetrics = investmentMetricSingleFund(navHistory, investmentData);
+        setMetrics(calculatedMetrics);
+      }
+    }
+    getFundMetrics();
+  }, [investmentData, navHistory, schemeCode]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-primary">
         <Header />
         <main className="max-w-7xl mx-auto px-4 py-6">
-          <Loader message='Visualizing your investment details...' />
+          <Loader message='Loading your investment details...' />
         </main>
       </div>
     );
@@ -155,9 +185,11 @@ export default function FundInvestmentDetails() {
     );
   }
 
-  const metrics = investmentMetricSingleFund(navHistory, investmentData);
+
   const currentNav = scheme.nav ? parseFloat(scheme.nav) : 0;
   const investmentDuration = calculateInvestmentDuration(investmentData.investments);
+
+
 
   return (
     <div className="min-h-screen bg-bg-primary">
