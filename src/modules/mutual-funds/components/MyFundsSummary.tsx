@@ -20,6 +20,7 @@ export default function MyFundsSummary({
   },[metrics])
 
   const isPositiveGain = metrics.absoluteGain >= 0;
+  const isPositiveOneDayChange = (metrics.oneDayChange?.percentageChange ?? 0) >= 0;
 
   if (loading) {
     return (
@@ -28,24 +29,32 @@ export default function MyFundsSummary({
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2">
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
       <Suspense>
         <MetricCard
           label="Total Invested"
-          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey="secondary"
         />
 
         <MetricCard
           label="Current Value"
-          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey="primary"
         />
 
         <MetricCard
           label={`Absolute ${isPositiveGain ? 'Gain' : 'Loss'}`}
-          value={`₹${Math.abs(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          value={`₹${metrics.absoluteGain.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey={isPositiveGain ? 'success' : 'error'}
+        />
+
+        <MetricCard
+          label="1D Change"
+          value={metrics.oneDayChange?.percentageChange.toFixed(2) ?? '0.00'}
+          suffix="%"
+          colorKey={isPositiveOneDayChange ? 'success' : 'error'}
+          subtext={`${isPositiveOneDayChange ? '+' : ''}₹${(metrics.oneDayChange?.absoluteChange ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
         />
 
         <MetricCard

@@ -32,7 +32,7 @@ export default function MetricCard({
       <p className="text-sm font-medium mb-2 text-text-secondary">
         {label}
       </p>
-      <p className={`text-3xl font-bold ${getColorClass()}`}>
+      <p className={`text-2xl font-bold ${getColorClass()}`}>
         {value}
         {suffix && <span className="text-lg ml-1">{suffix}</span>}
       </p>

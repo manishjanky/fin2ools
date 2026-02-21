@@ -28,13 +28,13 @@ export interface NAVData {
 
 export interface SchemeHistoryResponse {
   meta: {
-    scheme_code: number;
-    scheme_name: string;
-    fund_house: string;
-    scheme_type?: string;
-    scheme_category?: string;
-    isin_growth?: string;
-    isin_div_reinvestment?: string;
+    schemeCode: number;
+    schemeName: string;
+    fundHouse: string;
+    schemeType?: string;
+    schemeCategory?: string;
+    isinGrowth?: string;
+    isinDivReinvestment?: string;
   };
   data: NAVData[];
 }
@@ -58,6 +58,10 @@ export interface PortfolioReturnMetrics {
   percentageReturn: number;
   xirr: number;
   cagr: number;
+  oneDayChange?: {
+    absoluteChange: number;
+    percentageChange: number;
+  };
 }
 // Track SIP amount modifications with effective dates
 export interface SIPAmountModification {
@@ -216,4 +220,9 @@ export interface CompareFunds {
   expenseRatio?: number;
   aum?: number;
   infoRatio?: number;
+}
+
+export interface FundWithInvestments {
+  scheme: MutualFundScheme;
+  investmentData: UserInvestmentData;
 }
