@@ -147,8 +147,10 @@ export async function initIndexedDB(): Promise<void> {
  */
 export function isNavDataStale(navHistory: NAVData[]): boolean {
   if (!navHistory || navHistory.length === 0) return true;
-
-  const latestNav = navHistory[navHistory.length - 1];
+  const history = navHistory.sort((a, b) =>
+    moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+  );
+  const latestNav = history[history.length - 1];
   const latestNavDate = moment(latestNav.date, "DD-MM-YYYY");
   const today = moment();
   const yesterday = today.clone().subtract(3, "days");
@@ -171,6 +173,9 @@ export async function getOrFetchSchemeHistoryWithCache(
   days?: number,
   forceFresh: boolean = false, // Force fresh fetch from API
 ): Promise<SchemeHistoryResponse | null> {
+  const apiDays =
+    days || moment().diff(moment(startDate, "DD-MM-YYYY"), "days"); // Request a large range
+
   try {
     // If forceFresh is true, skip cache and fetch from API
     if (!forceFresh) {
@@ -180,7 +185,7 @@ export async function getOrFetchSchemeHistoryWithCache(
         moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
       );
 
-      if (cachedNav && cachedNav.length > 0) {
+      if (cachedNav && cachedNav.length >= apiDays - 3) {
         // Filter cached data from start date onwards
         const filteredNav = filterNavFromDate(cachedNav, startDate);
 
@@ -208,7 +213,6 @@ export async function getOrFetchSchemeHistoryWithCache(
     }
 
     // Fetch latest data from API with all available history
-    const apiDays = days || 10000; // Request a large range
     const schemeHistory = await fetchSchemeHistory(schemeCode, apiDays);
 
     if (schemeHistory && schemeHistory.data && schemeHistory.data.length > 0) {
@@ -377,7 +381,7 @@ export async function storeCalculatedReturns(
   }>,
   portfolioLevel: boolean = false,
 ): Promise<void> {
-  const today = new Date().toISOString().split("T")[0];
+  const today = moment().format("DD-MM-YYYY");
 
   await IndexedDBService.setCalculatedReturns({
     schemeCode,

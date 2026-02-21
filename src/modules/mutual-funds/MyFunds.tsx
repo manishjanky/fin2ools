@@ -19,8 +19,8 @@ const InvestmentPerformanceCurve = lazy(
 export default function MyFunds() {
   const navigate = useNavigate();
   const loadInvestments = useInvestmentStore((state) => state.loadInvestments);
-  const getAllInvestments = useInvestmentStore((state) => state.getAllInvestments);
-  const loadSchemes = useMutualFundsStore((state) => state.loadSchemes);
+  const investments = useInvestmentStore((state) => state.investments);
+  // const loadSchemes = useMutualFundsStore((state) => state.loadSchemes);
   const getOrFetchSchemeDetails = useMutualFundsStore((state) => state.getOrFetchSchemeDetails);
   const getOrFetchSchemeHistory = useMutualFundsStore((state) => state.getOrFetchSchemeHistory);
   const calculatePortfolioReturns = useInvestmentStore((state) => state.calculatePortFolioRetruns);
@@ -44,6 +44,30 @@ export default function MyFunds() {
 
   const investmentCountRef = useRef(0);
 
+  const loadNavHistories = async () => {
+    const historyData = await Promise.all(
+      fundsWithDetails.map(async ({ scheme, investmentData }) => {
+        const date = getEarliestInvestmentDate(investmentData.investments);
+        const history = await getOrFetchSchemeHistory(scheme.schemeCode, date.diff, false);
+        const data = history?.data.sort((a, b) =>
+          moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"))
+        ) || [];
+        const isStale = isNavDataStale(data);
+        if (isStale) {
+          setStaleNavSchemes((prev) => [...prev, scheme.schemeCode]);
+        }
+        return {
+          schemeCode: scheme.schemeCode,
+          data: data,
+        };
+      })
+    );
+    setNavHistoryData(historyData);
+  }
+  if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
+    loadNavHistories();
+  }
+
   const refreshReturns = async () => {
     await calculatePortfolioReturns();
     const results = await calculatePortfolioMetrics(fundsWithDetails, getOrFetchSchemeHistory);
@@ -58,12 +82,10 @@ export default function MyFunds() {
 
   useEffect(() => {
     loadInvestments();
-    loadSchemes();
-  }, [loadInvestments, loadSchemes]);
+  }, [loadInvestments]);
 
   useEffect(() => {
     const loadFundDetails = async () => {
-      const investments = getAllInvestments();
       setUserInvestments(investments);
 
       if (investments.length === 0) {
@@ -120,28 +142,10 @@ export default function MyFunds() {
         investmentCountRef.current = investmentCount;
 
         const oldReturns = await getCalculatedReturns(0, true);
-        const today = new Date().toISOString().split('T')[0];
+        const today = moment().format("DD-MM-YYYY");
         const cacheIsFresh = oldReturns && oldReturns.date === today;
         if (cacheIsFresh && !investmentsChanged) {
           setMetrics({ ...oldReturns.overallReturns });
-          const historyData = await Promise.all(
-            fundsWithDetails.map(async ({ scheme, investmentData }) => {
-              const date = getEarliestInvestmentDate(investmentData.investments);
-              const history = await getOrFetchSchemeHistory(scheme.schemeCode, date.diff, false);
-              const data = history?.data.sort((a, b) =>
-                moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"))
-              ) || [];
-              const isStale = isNavDataStale(data);
-              if (isStale) {
-                setStaleNavSchemes((prev) => [...prev, scheme.schemeCode]);
-              }
-              return {
-                schemeCode: scheme.schemeCode,
-                data: data,
-              };
-            })
-          );
-          setNavHistoryData(historyData);
         } else {
           refreshReturns();
         }

@@ -6,6 +6,7 @@ import Header from '../../components/common/Header';
 import Accordion from '../../components/common/Accordion';
 import FundHeader from './components/FundHeader';
 import Loader from '../../components/common/Loader';
+import { isNavDataStale } from './utils';
 
 const SchemeReturns = lazy(() => import('./components/SchemeReturns'));
 const SchemeInformation = lazy(() => import('./components/SchemeInformation'));
@@ -18,7 +19,7 @@ export default function SchemeDetails() {
     const [history, setHistory] = useState<SchemeHistoryResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isNavDataStale, setIsNavDataStale] = useState(false);
+    const [isNavStale, setIsNavStale] = useState(false);
 
 
     useEffect(() => {
@@ -28,7 +29,7 @@ export default function SchemeDetails() {
             try {
                 setLoading(true);
                 setError(null);
-                setIsNavDataStale(false);
+                setIsNavStale(false);
 
                 // First, fetch scheme details
                 const schemeData = await getOrFetchSchemeDetails(parseInt(schemeCode));
@@ -48,20 +49,8 @@ export default function SchemeDetails() {
                     setHistory(historyData);
                     
                     // Check if NAV data is stale (not from today or yesterday)
-                    if (historyData.data && historyData.data.length > 0) {
-                        const latestNavDate = historyData.data[historyData.data.length - 1].date;
-                        const today = new Date();
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        
-                        const [day, month, year] = latestNavDate.split('-').map(Number);
-                        const navDate = new Date(year, month - 1, day);
-                        
-                        // If NAV is older than yesterday, mark as stale
-                        if (navDate < yesterday) {
-                            setIsNavDataStale(true);
-                        }
-                    }
+                    const isStale = isNavDataStale(historyData.data);
+                    setIsNavStale(isStale);
                 }
             } catch (err) {
                 const errorMessage =
@@ -117,7 +106,7 @@ export default function SchemeDetails() {
                 <FundHeader scheme={scheme} />
 
                 {/* Stale NAV Warning */}
-                {isNavDataStale && (
+                {isNavStale && (
                     <div
                         className="rounded-lg p-4 mb-2 border bg-warning/20 border-warning text-warning"
                     >
