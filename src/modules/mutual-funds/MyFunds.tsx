@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense, useRef } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
 import { useMutualFundsStore } from './store/mutualFundsStore';
@@ -42,8 +42,6 @@ export default function MyFunds() {
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
   const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
 
-  const investmentCountRef = useRef(0);
-
   const loadNavHistories = async () => {
     const historyData = await Promise.all(
       fundsWithDetails.map(async ({ scheme, investmentData }) => {
@@ -64,16 +62,18 @@ export default function MyFunds() {
     );
     setNavHistoryData(historyData);
   }
-  if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
-    loadNavHistories();
-  }
 
-  const refreshReturns = async () => {
+  useEffect(() => {
+    if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
+      loadNavHistories();
+    }
+  }, [fundsWithDetails]);
+
+  const refreshReturnCalculations = async () => {
     await calculatePortfolioReturns();
     const results = await calculatePortfolioMetrics(fundsWithDetails, getOrFetchSchemeHistory);
     setMetrics(results.metrics);
     setNavHistoryData(results.navHistoryData);
-    await calculatePortfolioReturns();
     const freshReturns = await getCalculatedReturns(0, true);
     if (freshReturns && freshReturns.overallReturns) {
       setMetrics({ ...freshReturns.overallReturns });
@@ -82,7 +82,7 @@ export default function MyFunds() {
 
   useEffect(() => {
     loadInvestments();
-  }, [loadInvestments]);
+  }, [investments.length]);
 
   useEffect(() => {
     const loadFundDetails = async () => {
@@ -132,32 +132,28 @@ export default function MyFunds() {
         });
         setNavHistoryData([]);
         setStaleNavSchemes([]);
-        investmentCountRef.current = 0;
         return;
       }
       setMetricsLoading(true);
       try {
-        const investmentCount = fundsWithDetails.reduce((sum, fund) => sum + fund.investmentData.investments.length, 0);
-        const investmentsChanged = investmentCount !== investmentCountRef.current;
-        investmentCountRef.current = investmentCount;
 
         const oldReturns = await getCalculatedReturns(0, true);
         const today = moment().format("DD-MM-YYYY");
         const cacheIsFresh = oldReturns && oldReturns.date === today;
-        if (cacheIsFresh && !investmentsChanged) {
+        if (cacheIsFresh) {
           setMetrics({ ...oldReturns.overallReturns });
         } else {
-          refreshReturns();
+          refreshReturnCalculations();
         }
       } catch (error) {
         console.error('Error calculating portfolio metrics:', error);
-        refreshReturns();
+        refreshReturnCalculations();
       } finally {
         setMetricsLoading(false);
       }
     }
     loadMetrics();
-  }, [fundsWithDetails, getOrFetchSchemeHistory]);
+  }, [fundsWithDetails]);
 
   return (
     <div

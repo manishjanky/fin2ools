@@ -27,7 +27,7 @@ const FundInvestmentHistory = lazy(() => import('./FundInvestmentHistory'));
 export default function FundInvestmentDetails() {
   const { schemeCode } = useParams<{ schemeCode: string }>();
   const navigate = useNavigate();
-  const { getSchemeInvestments, addInvestment, updateInvestment } = useInvestmentStore();
+  const { getSchemeInvestments, addInvestment, updateInvestment, calculatePortFolioRetruns } = useInvestmentStore();
   const getOrFetchSchemeHistory = useMutualFundsStore(
     (state) => state.getOrFetchSchemeHistory
   );
@@ -120,6 +120,7 @@ export default function FundInvestmentDetails() {
         const installs = generateInvestmentInstallments(updated, navHistory);
         setInstallments(installs);
       }
+      calculatePortFolioRetruns();
     }
 
     setShowAddModal(false);
