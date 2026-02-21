@@ -19,7 +19,7 @@ import Header from '../../../components/common/Header';
 import FundHeader from './FundHeader';
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
-import { getCalculatedReturns } from '../utils';
+import { getCalculatedReturns, getEarliestInvestmentDate } from '../utils';
 
 const InvestmentPerformanceCurve = lazy(() => import('./InvestmentPerformanceCurve'));
 const FundInvestmentSummary = lazy(() => import('./FundInvestmentSummary'));
@@ -72,8 +72,9 @@ export default function FundInvestmentDetails() {
         }
 
         setInvestmentData(invData);
+        const startDate = getEarliestInvestmentDate(invData.investments);
 
-        const history = await getOrFetchSchemeHistory(code, 3650, false);
+        const history = await getOrFetchSchemeHistory(code, startDate.date, false);
         if (history?.data) {
           setNavHistory(history.data);
           // Get latest NAV (most recent is at the end of array)
@@ -102,7 +103,7 @@ export default function FundInvestmentDetails() {
     };
 
     loadData();
-  }, [schemeCode, getSchemeInvestments]);
+  }, [schemeCode]);
 
   const handleAddLumpsum = () => {
     setModalMode('add');

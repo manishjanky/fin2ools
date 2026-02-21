@@ -64,10 +64,10 @@ export default function MyFunds() {
   }
 
   useEffect(() => {
-    if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
-      loadNavHistories();
-    }
-  }, [fundsWithDetails]);
+    loadInvestments();
+  }, []);
+
+
 
   const refreshReturnCalculations = async () => {
     await calculatePortfolioReturns();
@@ -80,9 +80,7 @@ export default function MyFunds() {
     }
   }
 
-  useEffect(() => {
-    loadInvestments();
-  }, [fundsWithDetails, loading]);
+
 
   useEffect(() => {
     const loadFundDetails = async () => {
@@ -118,6 +116,12 @@ export default function MyFunds() {
 
     loadFundDetails();
   }, []);
+
+  useEffect(() => {
+    if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
+      loadNavHistories();
+    }
+  }, [fundsWithDetails]);
 
   useEffect(() => {
     const loadMetrics = async () => {

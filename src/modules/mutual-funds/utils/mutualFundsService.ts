@@ -219,12 +219,9 @@ export async function getOrFetchSchemeHistoryWithCache(
       // Store in IndexedDB
       await IndexedDBService.setNavHistoryBatch(schemeCode, schemeHistory.data);
       await IndexedDBService.setSyncMetadata(schemeCode, "nav");
-
-      // Return filtered data from start date with transformed meta
-      const filteredNav = filterNavFromDate(schemeHistory.data, startDate);
       return {
         meta: convertToCamelCase(schemeHistory.meta),
-        data: filteredNav,
+        data: schemeHistory.data,
       };
     }
 
