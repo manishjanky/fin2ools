@@ -2,7 +2,7 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
 import { useMutualFundsStore } from './store/mutualFundsStore';
-import type { FundWithInvestments, NAVData, PortfolioReturnMetrics, UserInvestmentData } from './types/mutual-funds';
+import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentData } from './types/mutual-funds';
 import Accordion from '../../components/common/Accordion';
 import Loader from '../../components/common/Loader';
 import { useNavigate } from 'react-router';
@@ -27,7 +27,7 @@ export default function MyFunds() {
 
   const [fundsWithDetails, setFundsWithDetails] = useState<FundWithInvestments[]>([]);
 
-  const [metrics, setMetrics] = useState<PortfolioReturnMetrics>({
+  const [metrics, setMetrics] = useState<InvestmentMetrics>({
     totalInvested: 0,
     totalCurrentValue: 0,
     absoluteGain: 0,

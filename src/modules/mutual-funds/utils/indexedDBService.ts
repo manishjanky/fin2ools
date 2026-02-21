@@ -2,7 +2,7 @@ import type {
   UserInvestmentData,
   NAVData,
   MutualFundScheme,
-  PortfolioReturnMetrics,
+  CalculatedReturnsData,
 } from "../types/mutual-funds";
 
 const DB_NAME = "fin-tools-mf-db";
@@ -24,28 +24,7 @@ interface SyncMetadata {
   dataType: "nav" | "scheme-info";
 }
 
-interface CalculatedReturnsData {
-  id?: number; // auto-incremented ID
-  schemeCode: number;
-  date: string; // Date when calculation was done
-  overallReturns: PortfolioReturnMetrics;
-  fyReturns: Array<{
-    fy: string; // e.g., "2020-21"
-    startDate: string;
-    endDate: string;
-    totalInvested: number;
-    currentValue: number;
-    absoluteGain: number;
-    percentageReturn: number;
-    xirr?: number;
-    cagr?: number;
-    oneDayChange?: {
-      absoluteChange: number;
-      percentageChange: number;
-    };
-  }>;
-  portfolioLevel?: boolean; // true for portfolio-level calculations
-}
+
 
 export class IndexedDBService {
   private static db: IDBDatabase | null = null;
