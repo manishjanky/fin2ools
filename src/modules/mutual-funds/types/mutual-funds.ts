@@ -50,19 +50,6 @@ export interface ReturnsMetrics {
   xirr?: number;
   isAvailable: boolean;
 }
-
-export interface PortfolioReturnMetrics {
-  totalInvested: number;
-  totalCurrentValue: number;
-  absoluteGain: number;
-  percentageReturn: number;
-  xirr: number;
-  cagr: number;
-  oneDayChange?: {
-    absoluteChange: number;
-    percentageChange: number;
-  };
-}
 // Track SIP amount modifications with effective dates
 export interface SIPAmountModification {
   effectiveDate: string; // Date from which new amount applies
@@ -71,7 +58,7 @@ export interface SIPAmountModification {
 
 // New types for user investments
 export interface UserInvestment {
-  id: string,
+  id: string;
   schemeCode: number;
   investmentType: "lumpsum" | "sip";
   startDate: string;
@@ -89,13 +76,17 @@ export interface UserInvestmentData {
 
 export interface InvestmentMetrics {
   totalInvested: number;
-  currentValue: number;
+  totalCurrentValue: number;
   absoluteGain: number;
   percentageReturn: number;
   xirr?: number;
   cagr?: number;
   numberOfFunds?: number;
   units?: number;
+  oneDayChange?: {
+    absoluteChange: number;
+    percentageChange: number;
+  };
 }
 
 export interface InvestmentInstallment {
@@ -225,4 +216,27 @@ export interface CompareFunds {
 export interface FundWithInvestments {
   scheme: MutualFundScheme;
   investmentData: UserInvestmentData;
+}
+
+export interface CalculatedReturnsData {
+  id?: number; // auto-incremented ID
+  schemeCode: number;
+  date: string; // Date when calculation was done
+  overallReturns: InvestmentMetrics;
+  fyReturns: Array<{
+    fy: string; // e.g., "2020-21"
+    startDate: string;
+    endDate: string;
+    totalInvested: number;
+    currentValue: number;
+    absoluteGain: number;
+    percentageReturn: number;
+    xirr?: number;
+    cagr?: number;
+    oneDayChange?: {
+      absoluteChange: number;
+      percentageChange: number;
+    };
+  }>;
+  portfolioLevel?: boolean; // true for portfolio-level calculations
 }

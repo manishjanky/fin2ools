@@ -6,7 +6,6 @@ import type {
   UserInvestmentData,
   InvestmentInstallment,
   FundWithInvestments,
-  PortfolioReturnMetrics,
 } from "../types/mutual-funds";
 import { getEarliestInvestmentDate } from "./mutualFundsService";
 
@@ -393,7 +392,7 @@ export function investmentMetricSingleFund(
   ) {
     return {
       totalInvested: 0,
-      currentValue: 0,
+      totalCurrentValue: 0,
       absoluteGain: 0,
       percentageReturn: 0,
       units: 0,
@@ -417,7 +416,7 @@ export function investmentMetricSingleFund(
 
   return {
     totalInvested,
-    currentValue: totalCurrentValue,
+    totalCurrentValue,
     absoluteGain,
     percentageReturn,
     units: totalUnits,
@@ -647,7 +646,7 @@ export const calculatePortfolioMetrics = async (
     forceRefresh?: boolean,
   ) => Promise<{ data: NAVData[] } | null>,
 ): Promise<{
-  metrics: PortfolioReturnMetrics;
+  metrics: InvestmentMetrics;
   navHistoryData: Array<{ schemeCode: number; data: NAVData[] }>;
 }> => {
   if (fundsWithDetails.length === 0) {

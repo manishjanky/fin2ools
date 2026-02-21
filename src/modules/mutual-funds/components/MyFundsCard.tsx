@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import type { MutualFundScheme, UserInvestmentData, NAVData } from '../types/mutual-funds';
-import { investmentMetricSingleFund, calculateOneDayChange } from '../utils/investmentCalculations';
+import { useEffect, useState } from 'react';
+import type { MutualFundScheme, UserInvestmentData, NAVData, InvestmentMetrics } from '../types/mutual-funds';
+import { investmentMetricSingleFund } from '../utils/investmentCalculations';
 import { useInvestmentStore } from '../store';
 import SchemeNAV from './SchemeNAV';
 import AddToMyFunds from './AddToMyFunds';
 import { useNavigate } from 'react-router';
 import moment from 'moment';
+import { getCalculatedReturns } from '../utils';
 
 interface MyFundsCardProps {
   scheme: MutualFundScheme;
@@ -17,13 +18,43 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
   const navigate = useNavigate();
   const { getSchemeInvestments } = useInvestmentStore();
   const [investmentDataState, setInvestmentData] = useState<UserInvestmentData>(investmentData);
+  const [investmentMetrics, setInvestmentMetrics] = useState<InvestmentMetrics>({
+    totalInvested: 0,
+    totalCurrentValue: 0,
+    absoluteGain: 0,
+    percentageReturn: 0,
+    xirr: 0,
+    cagr: 0,
+    units: 0,
+    oneDayChange: {
+      absoluteChange: 0,
+      percentageChange: 0,
+    },
+  });
+
+  const [isPositive, setIsPositive] = useState(true);
+  const [isOneDayPositive, setIsOneDayPositive] = useState(true);
+
   const investedFrom = investmentData.investments.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0]?.startDate;
 
-
-  const investmentMetrics = investmentMetricSingleFund(navHistory, investmentDataState);
-  const oneDayChange = calculateOneDayChange(navHistory, investmentDataState);
-  const isPositive = investmentMetrics.absoluteGain >= 0;
-  const isOneDayPositive = oneDayChange.absoluteChange >= 0;
+  useEffect(() => {
+    const getFundMetrics = async () => {
+      if (navHistory.length === 0 || investmentDataState.investments.length === 0) {
+        return;
+      }
+      let investmentMetrics = await getCalculatedReturns(scheme.schemeCode, true);
+      if (investmentMetrics) {
+        setInvestmentMetrics(investmentMetrics.overallReturns);
+      } else {
+        // Fallback to on-the-fly calculation if not available in indexedDb
+        const calculatedMetrics = investmentMetricSingleFund(navHistory, investmentDataState);
+        setInvestmentMetrics(calculatedMetrics);
+      }
+      setIsPositive((investmentMetrics?.overallReturns?.absoluteGain || 0) >= 0 || false);
+      setIsOneDayPositive((investmentMetrics?.overallReturns?.oneDayChange?.absoluteChange || 0) >= 0 || false);
+    }
+    getFundMetrics();
+  }, [investmentData, navHistory, scheme.schemeCode]);
 
   const handleAddInvestment = () => {
     if (scheme.schemeCode) {
@@ -88,7 +119,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             Current Value
           </p>
           <p className="text-lg font-semibold text-text-primary">
-            ₹{investmentMetrics.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+            ₹{investmentMetrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -120,8 +151,8 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           <p
             className={`text-lg font-semibold ${isOneDayPositive ? 'text-success' : 'text-error'}`}
           >
-            {oneDayChange.absoluteChange >= 0 ? '+' : ''}
-            ₹{(oneDayChange.absoluteChange).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+            {(investmentMetrics.oneDayChange?.absoluteChange || 0) >= 0 ? '+' : ''}
+            ₹{(investmentMetrics.oneDayChange?.absoluteChange || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div>

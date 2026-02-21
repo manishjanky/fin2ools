@@ -132,7 +132,7 @@ export default function FundInvestmentDetails() {
       <div className="min-h-screen bg-bg-primary">
         <Header />
         <main className="max-w-7xl mx-auto px-4 py-6">
-          <Loader message='Loading your investment details...' />
+          <Loader message='Visualizing your investment details...' />
         </main>
       </div>
     );
@@ -180,22 +180,20 @@ export default function FundInvestmentDetails() {
         </section>
 
         <section className="mb-6">
-          <Suspense fallback={<Loader />}>
-            <InvestmentPerformanceCurve
-              fundDetails={[
-                {
-                  investmentData,
-                  scheme
-                }
-              ]}
-              navHistoryData={
-                [
-                  { data: navHistory, schemeCode: scheme.schemeCode }
-                ]
+          <InvestmentPerformanceCurve
+            fundDetails={[
+              {
+                investmentData,
+                scheme
               }
-              investments={[investmentData]}
-            />
-          </Suspense>
+            ]}
+            navHistoryData={
+              [
+                { data: navHistory, schemeCode: scheme.schemeCode }
+              ]
+            }
+            investments={[investmentData]}
+          />
         </section>
 
         {/* Action Buttons */}

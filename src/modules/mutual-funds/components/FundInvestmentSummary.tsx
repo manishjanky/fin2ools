@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import type { InvestmentMetrics, UserInvestmentData } from '../types/mutual-funds';
-import { calculateXIRR, calculateOneDayChange } from '../utils/investmentCalculations';
 import MetricCard from './MetricCard';
 
 interface FundInvestmentSummaryProps {
@@ -13,17 +12,10 @@ interface FundInvestmentSummaryProps {
 export default function FundInvestmentSummary({
   metrics,
   currentNav,
-  investmentData,
-  navHistory,
 }: FundInvestmentSummaryProps) {
-  const isPositive = metrics.absoluteGain >= 0;
-
-  // Calculate XIRR for this specific fund
-  const xirr = calculateXIRR(investmentData.investments, navHistory);
-
-  // Calculate 1-day change
-  const oneDayChange = calculateOneDayChange(navHistory, investmentData);
-  const isOneDayPositive = oneDayChange.absoluteChange >= 0;
+  const isPositive = (metrics.absoluteGain || 0) >= 0;
+  const oneDayChange = metrics.oneDayChange || { absoluteChange: 0, percentageChange: 0 };
+  const isOneDayPositive = (oneDayChange.absoluteChange || 0) >= 0;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
@@ -36,7 +28,7 @@ export default function FundInvestmentSummary({
 
         <MetricCard
           label="Current Value"
-          value={`₹${metrics.currentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey="primary"
         />
 
@@ -56,7 +48,7 @@ export default function FundInvestmentSummary({
 
         <MetricCard
           label="1D Change"
-          value={`₹${Math.abs(oneDayChange.absoluteChange).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey={isOneDayPositive ? 'success' : 'error'}
           subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(2)}%`}
         />
@@ -70,7 +62,7 @@ export default function FundInvestmentSummary({
 
         <MetricCard
           label="XIRR"
-          value={xirr.toFixed(2)}
+          value={metrics.xirr?.toFixed(2) || '0'}
           suffix="%"
           colorKey="warning"
           subtext="Extended Internal Rate of Return"
