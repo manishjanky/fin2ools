@@ -82,7 +82,7 @@ export default function MyFunds() {
 
   useEffect(() => {
     loadInvestments();
-  }, [investments.length]);
+  }, [investments]);
 
   useEffect(() => {
     const loadFundDetails = async () => {
