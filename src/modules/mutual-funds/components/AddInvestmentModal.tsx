@@ -300,8 +300,7 @@ export default function AddInvestmentModal({
                     type="number"
                     value={sipMonthlyDate}
                     onChange={(e) => {
-                      const val = Math.min(31, Math.max(1, parseInt(e.target.value) || 1));
-                      setSipMonthlyDate(val.toString());
+                      setSipMonthlyDate(e.target.value);
                     }}
                     placeholder="Enter day of month (1-31)"
                     min="1"
