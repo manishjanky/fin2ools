@@ -3,7 +3,6 @@ import SchemeNAV from "./SchemeNAV";
 import AddToMyFunds from "./AddToMyFunds";
 
 export default function FundHeader({ scheme, duration }: { scheme: MutualFundScheme; duration?: string }) {
-
     return (
         <section className="mb-4 border border-primary-lighter/30 rounded-lg p-4" >
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">

@@ -7,9 +7,12 @@ import type {
 import {
   fetchMutualFunds,
   searchMutualFunds,
-  fetchSchemeHistory,
-  fetchSchemeDetails,
+  initIndexedDB,
+  getOrFetchSchemeHistoryWithCache,
+  getOrFetchSchemeDetailsWithCache,
+  syncLatestNAVForInvestedSchemes,
 } from "../utils/mutualFundsService";
+import moment from "moment";
 
 type FundTypeFilter = "all" | "direct" | "regular";
 
@@ -46,6 +49,7 @@ interface MutualFundsStore {
   inFlightRequests: Map<string, Promise<any>>;
 
   // Actions
+  initIndexedDB: () => Promise<void>;
   loadSchemes: () => Promise<void>;
   setSearchQuery: (query: string) => void;
   performSearch: (query: string) => Promise<void>;
@@ -55,9 +59,11 @@ interface MutualFundsStore {
   setError: (error: string | null) => void;
   getOrFetchSchemeHistory: (
     schemeCode: number,
-    days: number,
+    daysOrStartDate: number | string, // number for days, string for DD-MM-YYYY date
+    forceFresh?: boolean // Force fresh fetch from API
   ) => Promise<SchemeHistoryResponse>;
   getOrFetchSchemeDetails: (schemeCode: number) => Promise<MutualFundScheme>;
+  syncLatestNAV: () => Promise<void>;
 }
 
 export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
@@ -74,6 +80,15 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
   schemeHistoryCache: new Map(),
   schemeDetailsCache: new Map(),
   inFlightRequests: new Map(),
+
+  // Initialize IndexedDB
+  initIndexedDB: async () => {
+    try {
+      await initIndexedDB();
+    } catch (error) {
+      console.error("Error initializing IndexedDB:", error);
+    }
+  },
 
   // Load all schemes
   loadSchemes: async () => {
@@ -227,13 +242,30 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     set({ error });
   },
 
-  // Get or fetch scheme history with caching and deduplication
-  getOrFetchSchemeHistory: async (schemeCode: number, days: number) => {
+  // Get or fetch scheme history with IndexedDB caching
+  getOrFetchSchemeHistory: async (
+    schemeCode: number,
+    daysOrStartDate: number | string,
+    forceFresh: boolean = false,
+  ): Promise<SchemeHistoryResponse> => {
     const { schemeHistoryCache, inFlightRequests } = get();
-    const cacheKey = `${schemeCode}-${days}`;
+    
+    // Convert days to start date if needed
+    let startDate: string;
+    if (typeof daysOrStartDate === 'number') {
+      // It's a number of days, convert to date
+      const startMoment = moment().subtract(daysOrStartDate, 'days');
+      startDate = startMoment.format('DD-MM-YYYY');
+    } else {
+      // It's already a date string
+      startDate = daysOrStartDate;
+    }
+    const days = moment().diff(moment(startDate, 'DD-MM-YYYY'), 'days');
 
-    // Return cached data if available
-    if (schemeHistoryCache.has(cacheKey)) {
+    const cacheKey = `${schemeCode}-${startDate}`;
+
+    // Return cached data if available and not forcing fresh
+    if (!forceFresh && schemeHistoryCache.has(cacheKey)) {
       return schemeHistoryCache.get(cacheKey)!;
     }
 
@@ -242,8 +274,13 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
       return inFlightRequests.get(cacheKey)!;
     }
 
-    // Make the API call
-    const promise = fetchSchemeHistory(schemeCode, days);
+    // Make the request through mutualFundsService with IndexedDB caching
+    const promise = getOrFetchSchemeHistoryWithCache(
+      schemeCode,
+      startDate,
+      days - 1,
+      forceFresh
+    );
 
     // Track this request as in-flight
     set((state) => {
@@ -271,7 +308,7 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
         return { inFlightRequests: newInFlightRequests };
       });
 
-      return data;
+      return data || { meta: {} as any, data: [] };
     } catch (error) {
       // Remove from in-flight on error
       set((state) => {
@@ -283,12 +320,12 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     }
   },
 
-  // Get or fetch scheme details with caching and deduplication
+  // Get or fetch scheme details with IndexedDB caching
   getOrFetchSchemeDetails: async (schemeCode: number) => {
     const { schemeDetailsCache, inFlightRequests } = get();
     const cacheKey = `details-${schemeCode}`;
 
-    // Return cached data if available
+    // Return cached data if available in memory
     if (schemeDetailsCache.has(schemeCode)) {
       return schemeDetailsCache.get(schemeCode)!;
     }
@@ -298,8 +335,8 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
       return inFlightRequests.get(cacheKey)!;
     }
 
-    // Make the API call
-    const promise = fetchSchemeDetails(schemeCode);
+    // Make the request through mutualFundsService with IndexedDB caching
+    const promise = getOrFetchSchemeDetailsWithCache(schemeCode);
 
     // Track this request as in-flight
     set((state) => {
@@ -327,7 +364,7 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
         return { inFlightRequests: newInFlightRequests };
       });
 
-      return data;
+      return data || null;
     } catch (error) {
       // Remove from in-flight on error
       set((state) => {
@@ -336,6 +373,15 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
         return { inFlightRequests: newInFlightRequests };
       });
       throw error;
+    }
+  },
+
+  // Sync latest NAV for all invested schemes
+  syncLatestNAV: async () => {
+    try {
+      await syncLatestNAVForInvestedSchemes();
+    } catch (error) {
+      console.error("Error syncing latest NAV:", error);
     }
   },
 }));

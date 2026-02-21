@@ -1,13 +1,14 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense, useRef } from 'react';
 import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
 import { useMutualFundsStore } from './store/mutualFundsStore';
-import type { MutualFundScheme, NAVData, PortfolioReturnMetrics, UserInvestmentData } from './types/mutual-funds';
+import type { FundWithInvestments, NAVData, PortfolioReturnMetrics, UserInvestmentData } from './types/mutual-funds';
 import Accordion from '../../components/common/Accordion';
 import Loader from '../../components/common/Loader';
 import { useNavigate } from 'react-router';
-import { calculateCAGRForInvestments, calculateInvestmentValue, calculateXIRR } from './utils/investmentCalculations';
+import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from './utils/mutualFundsService';
 import moment from 'moment';
+import { calculatePortfolioMetrics } from './utils/investmentCalculations';
 
 const MyFundsCard = lazy(() => import('./components/MyFundsCard'));
 const MyFundsSummary = lazy(() => import('./components/MyFundsSummary'));
@@ -22,13 +23,9 @@ export default function MyFunds() {
   const loadSchemes = useMutualFundsStore((state) => state.loadSchemes);
   const getOrFetchSchemeDetails = useMutualFundsStore((state) => state.getOrFetchSchemeDetails);
   const getOrFetchSchemeHistory = useMutualFundsStore((state) => state.getOrFetchSchemeHistory);
+  const calculatePortfolioReturns = useInvestmentStore((state) => state.calculatePortFolioRetruns);
 
-  const [fundsWithDetails, setFundsWithDetails] = useState<
-    Array<{
-      scheme: MutualFundScheme;
-      investmentData: UserInvestmentData;
-    }>
-  >([]);
+  const [fundsWithDetails, setFundsWithDetails] = useState<FundWithInvestments[]>([]);
 
   const [metrics, setMetrics] = useState<PortfolioReturnMetrics>({
     totalInvested: 0,
@@ -43,11 +40,26 @@ export default function MyFunds() {
   const [metricsLoading, setMetricsLoading] = useState(false);
   const [userInvestments, setUserInvestments] = useState<UserInvestmentData[]>();
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
+  const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
+
+  const investmentCountRef = useRef(0);
+
+  const refreshReturns = async () => {
+    await calculatePortfolioReturns();
+    const results = await calculatePortfolioMetrics(fundsWithDetails, getOrFetchSchemeHistory);
+    setMetrics(results.metrics);
+    setNavHistoryData(results.navHistoryData);
+    await calculatePortfolioReturns();
+    const freshReturns = await getCalculatedReturns(0, true);
+    if (freshReturns && freshReturns.overallReturns) {
+      setMetrics({ ...freshReturns.overallReturns });
+    }
+  }
 
   useEffect(() => {
     loadInvestments();
     loadSchemes();
-  }, []);
+  }, [loadInvestments, loadSchemes]);
 
   useEffect(() => {
     const loadFundDetails = async () => {
@@ -86,87 +98,62 @@ export default function MyFunds() {
   }, []);
 
   useEffect(() => {
-    const calculateMetrics = async () => {
+    const loadMetrics = async () => {
+      if (fundsWithDetails.length === 0) {
+        setMetrics({
+          totalInvested: 0,
+          totalCurrentValue: 0,
+          absoluteGain: 0,
+          percentageReturn: 0,
+          xirr: 0,
+          cagr: 0,
+        });
+        setNavHistoryData([]);
+        setStaleNavSchemes([]);
+        investmentCountRef.current = 0;
+        return;
+      }
       setMetricsLoading(true);
       try {
-        let totalInvested = 0;
-        let totalCurrentValue = 0;
-        let allInvestments: any[] = [];
-        let allNavHistories: any[] = [];
+        const investmentCount = fundsWithDetails.reduce((sum, fund) => sum + fund.investmentData.investments.length, 0);
+        const investmentsChanged = investmentCount !== investmentCountRef.current;
+        investmentCountRef.current = investmentCount;
 
-        const historyData = await Promise.all(
-          fundsWithDetails.map(async ({ scheme, investmentData }) => {
-            const history = await getOrFetchSchemeHistory(scheme.schemeCode, 365);
-
-            if (history?.data && Array.isArray(history.data) && history.data.length > 0) {
-              for (const investment of investmentData.investments) {
-                const value = calculateInvestmentValue(investment, history.data);
-                totalInvested += value.investedAmount;
-                totalCurrentValue += value.currentValue;
-                allInvestments.push(investment);
+        const oldReturns = await getCalculatedReturns(0, true);
+        const today = new Date().toISOString().split('T')[0];
+        const cacheIsFresh = oldReturns && oldReturns.date === today;
+        if (cacheIsFresh && !investmentsChanged) {
+          setMetrics({ ...oldReturns.overallReturns });
+          const historyData = await Promise.all(
+            fundsWithDetails.map(async ({ scheme, investmentData }) => {
+              const date = getEarliestInvestmentDate(investmentData.investments);
+              const history = await getOrFetchSchemeHistory(scheme.schemeCode, date.diff, false);
+              const data = history?.data.sort((a, b) =>
+                moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"))
+              ) || [];
+              const isStale = isNavDataStale(data);
+              if (isStale) {
+                setStaleNavSchemes((prev) => [...prev, scheme.schemeCode]);
               }
-              allNavHistories.push(history.data);
-
-            }
-            return { schemeCode: scheme.schemeCode, data: history?.data || [] }
-          })
-        );
-
-
-        const absoluteGain = totalCurrentValue - totalInvested;
-        const percentageReturn = totalInvested > 0 ? (absoluteGain / totalInvested) * 100 : 0;
-
-        // Calculate CAGR - need combined nav history
-        let cagr = 0;
-        if (allInvestments.length > 0 && allNavHistories.length > 0) {
-          // Merge and sort all NAV histories
-          const mergedNavHistory = allNavHistories
-            .flat()
-            .reduce((acc: typeof allNavHistories[0], current) => {
-              const exists = (acc as typeof allNavHistories[0]).some((nav: any) => nav.date === current.date);
-              if (!exists) (acc as typeof allNavHistories[0]).push(current);
-              return acc;
-            }, [] as typeof allNavHistories[0])
-            .sort((a: any, b: any) => moment(a.date, 'DD-MM-YYYY').diff(moment(b.date, 'DD-MM-YYYY')));
-
-          cagr = calculateCAGRForInvestments(allInvestments, mergedNavHistory);
+              return {
+                schemeCode: scheme.schemeCode,
+                data: data,
+              };
+            })
+          );
+          setNavHistoryData(historyData);
+        } else {
+          refreshReturns();
         }
-
-        // Calculate XIRR for all investments across all funds
-        let xirr = 0;
-        if (allInvestments.length > 0 && allNavHistories.length > 0) {
-          const mergedNavHistory = allNavHistories
-            .flat()
-            .reduce((acc: typeof allNavHistories[0], current) => {
-              const exists = (acc as typeof allNavHistories[0]).some((nav: any) => nav.date === current.date);
-              if (!exists) (acc as typeof allNavHistories[0]).push(current);
-              return acc;
-            }, [] as typeof allNavHistories[0])
-            .sort((a: any, b: any) => moment(a.date, 'DD-MM-YYYY').diff(moment(b.date, 'DD-MM-YYYY')));
-
-          xirr = calculateXIRR(allInvestments, mergedNavHistory);
-        }
-
-        setMetrics({
-          totalInvested,
-          totalCurrentValue,
-          absoluteGain,
-          percentageReturn,
-          xirr,
-          cagr,
-        });
-        setNavHistoryData(historyData);
       } catch (error) {
-        console.error('Error calculating metrics:', error);
+        console.error('Error calculating portfolio metrics:', error);
+        refreshReturns();
       } finally {
         setMetricsLoading(false);
       }
-    };
-
-    if (fundsWithDetails.length > 0) {
-      calculateMetrics();
     }
-  }, [fundsWithDetails]);
+    loadMetrics();
+  }, [fundsWithDetails, getOrFetchSchemeHistory]);
 
   return (
     <div
@@ -203,8 +190,21 @@ export default function MyFunds() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4">
+        {/* Stale NAV Alert */}
+        {!loading && staleNavSchemes.length > 0 && (
+          <div
+            className="rounded-lg p-4 mb-4 border bg-warning/20 border-warning text-warning"
+          >
+            <p className="font-semibold">⚠️ Recent NAV Data Not Available</p>
+            <p className="text-sm mt-1">
+              {staleNavSchemes.length} {staleNavSchemes.length === 1 ? 'fund has' : 'funds have'} NAV data from a previous date.
+              Please check back later for the most recent updates.
+            </p>
+          </div>
+        )}
+
         {loading ? (
-          <Loader message="Loading your investments..." fullHeight={true} />
+          <Loader message="Loading your investments..." />
         ) : fundsWithDetails.length === 0 ? (
           <div
             className="rounded-lg p-12 text-center border bg-bg-primary border-border-main"

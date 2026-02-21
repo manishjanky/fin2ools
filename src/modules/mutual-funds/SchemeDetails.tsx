@@ -18,6 +18,7 @@ export default function SchemeDetails() {
     const [history, setHistory] = useState<SchemeHistoryResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isNavDataStale, setIsNavDataStale] = useState(false);
 
 
     useEffect(() => {
@@ -27,6 +28,7 @@ export default function SchemeDetails() {
             try {
                 setLoading(true);
                 setError(null);
+                setIsNavDataStale(false);
 
                 // First, fetch scheme details
                 const schemeData = await getOrFetchSchemeDetails(parseInt(schemeCode));
@@ -39,11 +41,27 @@ export default function SchemeDetails() {
                     return;
                 }
 
-                // Then, fetch history after scheme details are loaded
+                // Fetch maximum history available (10 years)
                 const historyData = await getOrFetchSchemeHistory(parseInt(schemeCode), 3650); // 10 years of history
 
                 if (historyData) {
                     setHistory(historyData);
+                    
+                    // Check if NAV data is stale (not from today or yesterday)
+                    if (historyData.data && historyData.data.length > 0) {
+                        const latestNavDate = historyData.data[historyData.data.length - 1].date;
+                        const today = new Date();
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        
+                        const [day, month, year] = latestNavDate.split('-').map(Number);
+                        const navDate = new Date(year, month - 1, day);
+                        
+                        // If NAV is older than yesterday, mark as stale
+                        if (navDate < yesterday) {
+                            setIsNavDataStale(true);
+                        }
+                    }
                 }
             } catch (err) {
                 const errorMessage =
@@ -97,6 +115,16 @@ export default function SchemeDetails() {
 
             <main className="max-w-7xl mx-auto px-4 py-4 mt-0 grid grid-cols-1 gap-6">
                 <FundHeader scheme={scheme} />
+
+                {/* Stale NAV Warning */}
+                {isNavDataStale && (
+                    <div
+                        className="rounded-lg p-4 mb-2 border bg-warning/20 border-warning text-warning"
+                    >
+                        <p className="font-semibold">⚠️ Recent NAV Data Not Available</p>
+                        <p className="text-sm mt-1">The latest NAV data for this scheme is from a previous date. Please check back later for the most recent NAV update.</p>
+                    </div>
+                )}
 
                 {/* Returns Summary */}
                 {history && history.data.length > 0 && (

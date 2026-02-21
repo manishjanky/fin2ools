@@ -58,20 +58,19 @@ export default function FundInvestmentDetails() {
 
         setInvestmentData(invData);
 
-        // Fetch scheme details and history
-        const history = await getOrFetchSchemeHistory(code, 365);
+        const history = await getOrFetchSchemeHistory(code, 3650, false);
         if (history?.data) {
           setNavHistory(history.data);
           // Get latest NAV (most recent is at the end of array)
           const latestNav = history.data[history.data.length - 1];
           setScheme({
             schemeCode: code,
-            schemeName: history.meta.scheme_name,
-            fundHouse: history.meta.fund_house,
-            schemeType: history.meta.scheme_type,
-            schemeCategory: history.meta.scheme_category,
-            isinGrowth: history.meta.isin_growth,
-            isinDivReinvestment: history.meta.isin_div_reinvestment,
+            schemeName: history.meta.schemeName,
+            fundHouse: history.meta.fundHouse,
+            schemeType: history.meta.schemeType,
+            schemeCategory: history.meta.schemeCategory,
+            isinGrowth: history.meta.isinGrowth,
+            isinDivReinvestment: history.meta.isinDivReinvestment,
             nav: latestNav?.nav,
             date: latestNav?.date,
           });
@@ -180,25 +179,22 @@ export default function FundInvestmentDetails() {
         </section>
 
         <section className="mb-6">
-          {
-            navHistory?.length ? (
-              <Suspense fallback={<Loader />}>
-                <InvestmentPerformanceCurve
-                  fundDetails={[
-                    {
-                      investmentData,
-                      scheme
-                    }
-                  ]}
-                  navHistoryData={
-                    [
-                      { data: navHistory, schemeCode: scheme.schemeCode }
-                    ]
-                  }
-                  investments={[investmentData]}
-                />
-              </Suspense>) : <Loader />
-          }
+          <Suspense fallback={<Loader />}>
+            <InvestmentPerformanceCurve
+              fundDetails={[
+                {
+                  investmentData,
+                  scheme
+                }
+              ]}
+              navHistoryData={
+                [
+                  { data: navHistory, schemeCode: scheme.schemeCode }
+                ]
+              }
+              investments={[investmentData]}
+            />
+          </Suspense>
         </section>
 
         {/* Action Buttons */}
