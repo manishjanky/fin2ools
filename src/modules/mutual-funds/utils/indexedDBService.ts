@@ -25,6 +25,7 @@ interface SyncMetadata {
 }
 
 interface CalculatedReturnsData {
+  id?: number; // auto-incremented ID
   schemeCode: number;
   date: string; // Date when calculation was done
   overallReturns: PortfolioReturnMetrics;
@@ -492,9 +493,27 @@ export class IndexedDBService {
       const store = db
         .transaction(STORES.CALCULATED_RETURNS, "readwrite")
         .objectStore(STORES.CALCULATED_RETURNS);
-      const request = store.add(returns); // Using add instead of put to always create new entry
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
+      const index = store.index("schemeCode");
+
+      const getRequest = index.getAll(IDBKeyRange.only(returns.schemeCode));
+      getRequest.onsuccess = () => {
+        const existing = getRequest.result as CalculatedReturnsData[];
+        // Check if an entry with the same date and portfolioLevel exists
+        const duplicate = existing.filter(
+          (r) =>
+            r.date === returns.date &&
+            (r.portfolioLevel ?? false) === (returns.portfolioLevel ?? false),
+        );
+        duplicate.forEach((dup) => {
+          // Delete duplicate entry
+          store.delete(dup.id!);
+        });
+        // No duplicate, safe to add new entry
+        const addRequest = store.add(returns);
+        addRequest.onerror = () => reject(addRequest.error);
+        addRequest.onsuccess = () => resolve();
+      };
+      getRequest.onerror = () => reject(getRequest.error);
     });
   }
 
@@ -583,17 +602,24 @@ export class IndexedDBService {
   /**
    * Clear calculated returns for a specific scheme to force recalculation
    */
-  static async clearCalculatedReturnsForScheme(schemeCode: number): Promise<void> {
+  static async clearCalculatedReturnsForScheme(
+    schemeCode: number,
+  ): Promise<void> {
     const db = this.getDB();
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction(STORES.CALCULATED_RETURNS, "readwrite");
+      const transaction = db.transaction(
+        STORES.CALCULATED_RETURNS,
+        "readwrite",
+      );
       const store = transaction.objectStore(STORES.CALCULATED_RETURNS);
       const index = store.index("schemeCode");
 
       const request = index.getAll(IDBKeyRange.only(schemeCode));
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
-        const results = request.result as Array<CalculatedReturnsData & { id: number }>;
+        const results = request.result as Array<
+          CalculatedReturnsData & { id: number }
+        >;
         for (const result of results) {
           store.delete(result.id);
         }
