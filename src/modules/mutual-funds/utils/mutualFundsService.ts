@@ -6,7 +6,7 @@ import type {
   MutualFundSchemeDetails,
   NAVData,
   UserInvestment,
-  PortfolioReturnMetrics,
+  InvestmentMetrics,
 } from "../types/mutual-funds";
 import { IndexedDBService } from "./indexedDBService";
 import { ReturnCalculationService } from "./returnCalculationService";
@@ -363,7 +363,7 @@ export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
  */
 export async function storeCalculatedReturns(
   schemeCode: number,
-  overallReturns: PortfolioReturnMetrics,
+  overallReturns: InvestmentMetrics,
   fyReturns: Array<{
     fy: string;
     startDate: string;

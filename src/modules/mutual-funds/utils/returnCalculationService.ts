@@ -3,8 +3,8 @@ import {
   calculateInvestmentValue,
   calculateXIRR,
   calculateCAGRForInvestments,
-  calculateOneDayChange,
   calculatePortfolioOneDayChange,
+  investmentMetricSingleFund,
 } from "./investmentCalculations";
 import { storeCalculatedReturns } from "./mutualFundsService";
 import moment from "moment";
@@ -35,42 +35,14 @@ export class ReturnCalculationService {
     }
 
     // Calculate overall returns using existing functions
-    let totalInvested = 0;
-    let totalCurrentValue = 0;
-    let units = 0;
-
-    for (const inv of investments) {
-      const value = calculateInvestmentValue(inv, navHistory);
-      totalInvested += value.investedAmount;
-      totalCurrentValue += value.currentValue;
-      units += value.units;
-    }
-
-    const xirr = calculateXIRR(investments, navHistory);
-    const cagr = calculateCAGRForInvestments(investments, navHistory);
-
-    // Calculate 1-day change for overall returns
-    const oneDayChange = calculateOneDayChange(navHistory, {
+    const fundReturns = investmentMetricSingleFund(navHistory, {
       schemeCode,
       investments,
     });
-
     // Store overall returns
     await storeCalculatedReturns(
       schemeCode,
-      {
-        totalInvested,
-        totalCurrentValue,
-        absoluteGain: totalCurrentValue - totalInvested,
-        percentageReturn:
-          totalInvested > 0
-            ? ((totalCurrentValue - totalInvested) / totalInvested) * 100
-            : 0,
-        xirr,
-        cagr,
-        oneDayChange,
-        units,
-      },
+      { ...fundReturns },
       [], // Empty FY array for now
       false, // scheme-level
     );

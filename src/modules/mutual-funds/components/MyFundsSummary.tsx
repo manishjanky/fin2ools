@@ -2,10 +2,10 @@ import { Suspense, useEffect, useState } from 'react';
 
 import Loader from '../../../components/common/Loader';
 import MetricCard from './MetricCard';
-import type { PortfolioReturnMetrics } from '../types/mutual-funds';
+import type { InvestmentMetrics } from '../types/mutual-funds';
 
 interface MyFundsSummaryProps {
-  metrics: PortfolioReturnMetrics
+  metrics: InvestmentMetrics;
 }
 
 export default function MyFundsSummary({
@@ -66,7 +66,7 @@ export default function MyFundsSummary({
 
         <MetricCard
           label="XIRR"
-          value={metrics.xirr.toFixed(2)}
+          value={metrics.xirr?.toFixed(2) || '0.00'}
           suffix="%"
           colorKey="warning"
           subtext="Extended Internal Rate of Return"
@@ -74,7 +74,7 @@ export default function MyFundsSummary({
 
         <MetricCard
           label="CAGR"
-          value={metrics.cagr.toFixed(2)}
+          value={metrics.cagr?.toFixed(2) || '0.00'}
           suffix="%"
           colorKey="info"
           subtext="Compound Annual Growth Rate"
