@@ -68,13 +68,13 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                                     {moment(inst.installmentDate, 'DD-MM-YYYY').format('DD MMM YYYY')}
                                 </td>
                                 <td className="px-6 py-4 text-right text-secondary-main">
-                                    ₹{inst.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                                    ₹{inst.amount.toFixed(3)}
                                 </td>
                                 <td className="px-6 py-4 text-right text-secondary-main">
-                                    ₹{inst.stampDuty.toLocaleString('en-IN', { maximumFractionDigits: 4 })}
+                                    ₹{inst.stampDuty.toFixed(4)}
                                 </td>
                                 <td className="px-6 py-4 text-right text-text-primary">
-                                    ₹{inst.nav.toFixed(2)}
+                                    ₹{inst.nav}
                                 </td>
                                 <td className="px-6 py-4 text-right font-semibold text-secondary-main">
                                     {inst.units.toFixed(4)}

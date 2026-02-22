@@ -55,8 +55,8 @@ export const findClosestNav = (
 
   // 2. Find next available NAV after target date
   for (const nav of sorted) {
-    const navDate = moment(nav.date, "DD-MM-YYYY").startOf('day');
-    if (navDate.isAfter(target, 'day')) {
+    const navDate = moment(nav.date, "DD-MM-YYYY").startOf("day");
+    if (navDate.isAfter(target, "day")) {
       return nav;
     }
   }
@@ -401,13 +401,13 @@ export function investmentMetricSingleFund(
 
   let totalInvested = 0;
   let totalCurrentValue = 0;
-  let totalUnits = 0;
+  let units = 0;
 
   for (const investment of investmentDataState.investments) {
     const value = calculateInvestmentValue(investment, navHistory);
     totalInvested += value.investedAmount;
     totalCurrentValue += value.currentValue;
-    totalUnits += value.units;
+    units = value.units;
   }
 
   const absoluteGain = totalCurrentValue - totalInvested;
@@ -431,7 +431,7 @@ export function investmentMetricSingleFund(
     xirr,
     cagr,
     percentageReturn,
-    units: totalUnits,
+    units,
     oneDayChange,
   };
 }

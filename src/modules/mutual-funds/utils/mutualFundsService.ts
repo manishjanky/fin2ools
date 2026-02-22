@@ -182,7 +182,7 @@ export async function getOrFetchSchemeHistoryWithCache(
       // First, try to get from IndexedDB
       let cachedNav = await IndexedDBService.getNavHistory(schemeCode);
       cachedNav = cachedNav.sort((a, b) =>
-        moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"), "days"),
+        moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
       );
 
       if (cachedNav && cachedNav.length >= apiDays - 3) {

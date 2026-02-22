@@ -7,7 +7,6 @@ import Loader from '../../../components/common/Loader';
 import { useNavigate } from 'react-router';
 import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils/mutualFundsService';
 import moment from 'moment';
-import { calculatePortfolioMetrics } from '../utils/investmentCalculations';
 
 const MyFundsCard = lazy(() => import('./MyFundsCard'));
 const MyFundsSummary = lazy(() => import('./MyFundsSummary'));
@@ -76,11 +75,8 @@ export default function MyFunds() {
 
   const refreshReturnCalculations = async () => {
     await calculatePortfolioReturns();
-    const results = await calculatePortfolioMetrics(fundsWithDetails, getOrFetchSchemeHistory);
-    setMetrics(results.metrics);
-    setNavHistoryData(results.navHistoryData);
     const freshReturns = await getCalculatedReturns(0, true);
-    if (freshReturns && freshReturns.overallReturns) {
+    if (freshReturns) {
       setMetrics({ ...freshReturns.overallReturns });
     }
   }
