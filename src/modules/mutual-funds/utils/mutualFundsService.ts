@@ -426,17 +426,12 @@ export function getEarliestInvestmentDate(investments: UserInvestment[]): {
 
   let earliest = investments[0].startDate;
   for (const inv of investments) {
-    const [invDay, invMonth, invYear] = inv.startDate.split("-").map(Number);
-    const [earlyDay, earlyMonth, earlyYear] = earliest.split("-").map(Number);
-
-    const invDate = new Date(invYear, invMonth - 1, invDay);
-    const earlyDate = new Date(earlyYear, earlyMonth - 1, earlyDay);
-
-    if (invDate < earlyDate) {
+    const invDate = moment(inv.startDate, "DD-MM-YYYY");
+    const earlyDate = moment(earliest, "DD-MM-YYYY");
+    if (invDate.isBefore(earlyDate)) {
       earliest = inv.startDate;
     }
   }
-
   const diff = Math.abs(moment(earliest, "DD-MM-YYYY").diff(moment(), "days"));
 
   return { date: earliest, diff };
