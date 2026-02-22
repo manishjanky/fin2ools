@@ -576,10 +576,10 @@ export const calculatePortfolioOneDayChange = (
  * Returns all SIP and lumpsum installments with NAV and units on transaction date
  * Used by UI to display investment history
  */
-export const generateInvestmentInstallments = (
+export const generateInvestmentInstallments = async (
   investmentData: UserInvestmentData,
   navHistory: NAVData[],
-): InvestmentInstallment[] => {
+): Promise<InvestmentInstallment[]> => {
   const installments: InvestmentInstallment[] = [];
   let installmentId = 0;
 

@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import SearchableSelect from '../../components/common/SearchableSelect';
-import { useWatchlistStore } from './store/watchlistStore';
-import { useMutualFundsStore } from './store/mutualFundsStore';
-import type { MutualFundScheme } from './types/mutual-funds';
-import MutualFundCard from './components/MutualFundCard';
-import Loader from '../../components/common/Loader';
+import SearchableSelect from '../../../components/common/SearchableSelect';
+import { useWatchlistStore } from '../store/watchlistStore';
+import { useMutualFundsStore } from '../store/mutualFundsStore';
+import type { MutualFundScheme } from '../types/mutual-funds';
+import MutualFundCard from './MutualFundCard';
+import Loader from '../../../components/common/Loader';
 
 export default function Watchlist() {
   const navigate = useNavigate();

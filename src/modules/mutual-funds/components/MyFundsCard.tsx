@@ -65,7 +65,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
   const handleCardClick = () => {
     if (scheme.schemeCode) {
       // Navigate to the investment details page for this scheme
-      navigate(`/mutual-funds/my-funds/investment/${scheme.schemeCode}`);
+      navigate(`/mutual-funds/my-funds//${scheme.schemeCode}`);
     }
   }
 

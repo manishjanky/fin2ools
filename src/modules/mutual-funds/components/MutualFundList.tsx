@@ -129,7 +129,7 @@ export default function MutualFundList() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:gap-2 mb-8">
         {/* Filter Buttons */}
         <div className="col-span-3 lg:col-span-1">
           <label className="block text-sm font-medium text-text-secondary mb-2 w-full basis-full">
@@ -248,7 +248,7 @@ export default function MutualFundList() {
       {/* Schemes Grid */}
       {!isLoading && paginatedSchemes.length > 0 && (
         <>
-          <div className="grid grid-cols-1 gap-6 mb-8">
+          <div className="grid grid-cols-1 gap-3 mb-8">
             {paginatedSchemes.map((scheme) => (
               <div
                 key={scheme.schemeCode}

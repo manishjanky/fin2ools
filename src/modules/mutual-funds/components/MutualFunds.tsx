@@ -1,7 +1,7 @@
 
 import { lazy, Suspense } from 'react';
-import Loader from '../../components/common/Loader';
-const MutualFundList = lazy(() => import('./components/MutualFundList'));
+import Loader from '../../../components/common/Loader';
+const MutualFundList = lazy(() => import('./MutualFundList'));
 
 
 export default function MutualFunds() {
