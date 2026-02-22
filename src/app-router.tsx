@@ -8,13 +8,14 @@ import Footer from './components/common/Footer';
 import AlertContainer from './components/common/AlertContainer';
 import { PrivacyModal } from './components/common/PrivacyModal';
 import Header from './components/common/Header';
+import MFLayout from './modules/mutual-funds/MFLayout';
 
 // Lazy load pages
 const FD = lazy(() => import('./modules/deposits/FD'));
-const MutualFunds = lazy(() => import('./modules/mutual-funds/MutualFunds'));
-const SchemeDetails = lazy(() => import('./modules/mutual-funds/SchemeDetails'));
-const MyFunds = lazy(() => import('./modules/mutual-funds/MyFunds'));
-const Watchlist = lazy(() => import('./modules/mutual-funds/Watchlist'));
+const MutualFunds = lazy(() => import('./modules/mutual-funds/components/MutualFunds'));
+const SchemeDetails = lazy(() => import('./modules/mutual-funds/components/SchemeDetails'));
+const MyFunds = lazy(() => import('./modules/mutual-funds/components/MyFunds'));
+const Watchlist = lazy(() => import('./modules/mutual-funds/components/Watchlist'));
 const FundInvestmentDetails = lazy(() => import('./modules/mutual-funds/components/FundInvestmentDetails'));
 const PPF = lazy(() => import('./modules/ppf/PPF'));
 const PrivacyNotice = lazy(() => import('./modules/PrivacyNotice'));
@@ -70,6 +71,7 @@ const routes = [
             },
             {
                 path: "mutual-funds",
+                element: <MFLayout />,
                 children: [
                     {
                         index: true,
@@ -99,7 +101,7 @@ const routes = [
                                 ),
                             },
                             {
-                                path: "investment/:schemeCode",
+                                path: ":schemeCode",
                                 element: (
                                     <Suspense fallback={<Loader fullHeight={true} />}>
                                         <FundInvestmentDetails />

@@ -28,7 +28,7 @@ function App() {
     };
 
     initializeApp();
-  }, [initIndexedDB, syncLatestNAV, loadInvestments]);
+  }, []);
 
   return (
     <AlertProvider>

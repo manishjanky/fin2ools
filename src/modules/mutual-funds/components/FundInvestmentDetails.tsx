@@ -28,7 +28,7 @@ const FundInvestmentHistory = lazy(() => import('./FundInvestmentHistory'));
 export default function FundInvestmentDetails() {
   const { schemeCode } = useParams<{ schemeCode: string }>();
   const navigate = useNavigate();
-  const { getSchemeInvestments, addInvestment, updateInvestment, calculatePortFolioRetruns } = useInvestmentStore();
+  const { getSchemeInvestments, addInvestment, updateInvestment, calculatePortFolioRetruns, getAllInvestments } = useInvestmentStore();
   const getOrFetchSchemeHistory = useMutualFundsStore(
     (state) => state.getOrFetchSchemeHistory
   );
@@ -41,28 +41,22 @@ export default function FundInvestmentDetails() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingSIP, setEditingSIP] = useState<UserInvestment | null>(null);
-  // const metrics = investmentMetricSingleFund(navHistory, investmentData);
-  const [metrics, setMetrics] = useState<InvestmentMetrics>({
-    totalInvested: 0,
-    totalCurrentValue: 0,
-    absoluteGain: 0,
-    percentageReturn: 0,
-    xirr: 0,
-    cagr: 0,
-    units: 0,
-    oneDayChange: {
-      absoluteChange: 0,
-      percentageChange: 0,
-    },
-  });
+  const [metrics, setMetrics] = useState<InvestmentMetrics>();
+
+  getAllInvestments();
+
+  const getInstallments = async (invData: UserInvestmentData, history: NAVData[]) => {
+    // Generate installments
+    const installs = await generateInvestmentInstallments(invData, history);
+    setInstallments(installs);
+  }
+
   useEffect(() => {
     const loadData = async () => {
       if (!schemeCode) return;
 
       try {
-        setLoading(true);
         const code = parseInt(schemeCode);
-
         // Get investment data
         const invData = getSchemeInvestments(code);
         if (!invData) {
@@ -89,10 +83,7 @@ export default function FundInvestmentDetails() {
             nav: latestNav?.nav,
             date: latestNav?.date,
           });
-
-          // Generate installments
-          const installs = generateInvestmentInstallments(invData, history.data);
-          setInstallments(installs);
+          getInstallments(invData, history.data)
         }
       } catch (error) {
         console.error('Error loading investment details:', error);
@@ -132,8 +123,7 @@ export default function FundInvestmentDetails() {
         setInvestmentData(updated);
 
         // Regenerate installments with updated data
-        const installs = generateInvestmentInstallments(updated, navHistory);
-        setInstallments(installs);
+        getInstallments(updated, navHistory)
       }
       calculatePortFolioRetruns();
     }
@@ -144,11 +134,11 @@ export default function FundInvestmentDetails() {
 
   useEffect(() => {
     const getFundMetrics = async () => {
-      if(!schemeCode || !investmentData) return;
+      if (!schemeCode || !investmentData) return;
       let investmentMetrics = await getCalculatedReturns(parseInt(schemeCode), false);
       if (investmentMetrics) {
         setMetrics(investmentMetrics.overallReturns);
-      } else if(navHistory.length > 0 && investmentData.investments.length > 0) {
+      } else if (navHistory.length > 0 && investmentData.investments.length > 0) {
         // Fallback to on-the-fly calculation if not available in indexedDb
         const calculatedMetrics = investmentMetricSingleFund(navHistory, investmentData);
         setMetrics(calculatedMetrics);
@@ -187,91 +177,95 @@ export default function FundInvestmentDetails() {
   const currentNav = scheme.nav ? parseFloat(scheme.nav) : 0;
   const investmentDuration = calculateInvestmentDuration(investmentData.investments);
 
-
-
   return (
     <div className="min-h-screen bg-bg-primary">
-      {metrics ? <main className="max-w-7xl mx-auto px-4 py-6">
+      {
+        metrics && <main className="max-w-7xl mx-auto px-4 py-6">
 
-        <FundHeader scheme={scheme} duration={investmentDuration} />
+          <FundHeader scheme={scheme} duration={investmentDuration} />
 
-        <section className="mb-6">
-          <Accordion title="Investment Summary" isOpen={true}>
-            <Suspense fallback={<Loader />}>
-              <FundInvestmentSummary
-                metrics={metrics}
-                currentNav={currentNav}
-                investmentData={investmentData}
-                navHistory={navHistory}
+          <section className="mb-6">
+            <Accordion title="Investment Summary" isOpen={true}>
+              <Suspense fallback={<Loader message='Loading Summary...' />}>
+                <FundInvestmentSummary
+                  metrics={metrics}
+                  currentNav={currentNav}
+                  investmentData={investmentData}
+                  navHistory={navHistory}
+                />
+              </Suspense>
+            </Accordion>
+          </section>
+
+          <section className="mb-6">
+            <Suspense fallback={<Loader message='Visualizing investment...'/>}>
+              <InvestmentPerformanceCurve
+                fundDetails={[
+                  {
+                    investmentData,
+                    scheme
+                  }
+                ]}
+                navHistoryData={
+                  [
+                    { data: navHistory, schemeCode: scheme.schemeCode }
+                  ]
+                }
+                investments={[investmentData]}
               />
             </Suspense>
-          </Accordion>
-        </section>
 
-        <section className="mb-6">
-          <InvestmentPerformanceCurve
-            fundDetails={[
-              {
-                investmentData,
-                scheme
-              }
-            ]}
-            navHistoryData={
-              [
-                { data: navHistory, schemeCode: scheme.schemeCode }
-              ]
-            }
-            investments={[investmentData]}
-          />
-        </section>
+          </section>
 
-        {/* Action Buttons */}
-        <section className="mb-6 flex gap-3 justify-end">
-          <button
-            onClick={handleAddLumpsum}
-            className="rounded-lg transition font-medium bg-secondary-main text-text-inverse hover:opacity-90"
-          >
-            + Add Investment
-          </button>
-
-          {/* Show Edit SIP button only if there's an active SIP */}
-          {investmentData.investments.some((inv) => inv.investmentType === 'sip' && !inv.sipEndDate) && (
+          {/* Action Buttons */}
+          <section className="mb-6 flex gap-3 justify-end">
             <button
-              onClick={() => {
-                const activeSIP = investmentData.investments.find(
-                  (inv) => inv.investmentType === 'sip' && !inv.sipEndDate
-                );
-                if (activeSIP) handleEditSIP(activeSIP);
-              }}
-              className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
+              onClick={handleAddLumpsum}
+              className="rounded-lg transition font-medium bg-secondary-main text-text-inverse hover:opacity-90"
             >
-              Edit SIP
+              + Add Investment
             </button>
-          )}
-        </section>
-        <Suspense fallback={<Loader />}>
-          <FundInvestmentHistory installments={installments} />
-        </Suspense>
-      </main> :
-        <Loader />
+
+            {/* Show Edit SIP button only if there's an active SIP */}
+            {investmentData.investments.some((inv) => inv.investmentType === 'sip' && !inv.sipEndDate) && (
+              <button
+                onClick={() => {
+                  const activeSIP = investmentData.investments.find(
+                    (inv) => inv.investmentType === 'sip' && !inv.sipEndDate
+                  );
+                  if (activeSIP) handleEditSIP(activeSIP);
+                }}
+                className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
+              >
+                Edit SIP
+              </button>
+            )}
+          </section>
+          <Suspense fallback={<Loader message='Loading investment history...'/>}>
+            <FundInvestmentHistory installments={installments} />
+          </Suspense>
+        </main>
       }
 
 
       {/* Investment Modal (Add or Edit) */}
-      <Suspense>
-        <AddInvestmentModal
-          isOpen={showAddModal}
-          onClose={() => {
-            setShowAddModal(false);
-            setEditingSIP(null);
-          }}
-          onSubmit={handleInvestmentSubmit}
-          schemeName={scheme?.schemeName || ''}
-          schemeCode={scheme?.schemeCode || 0}
-          editingInvestment={editingSIP || undefined}
-          mode={modalMode}
-        />
-      </Suspense>
+      {
+        showAddModal && <Suspense>
+          <AddInvestmentModal
+            isOpen={showAddModal}
+            onClose={() => {
+              setShowAddModal(false);
+              setEditingSIP(null);
+            }}
+            onSubmit={handleInvestmentSubmit}
+            schemeName={scheme?.schemeName || ''}
+            schemeCode={scheme?.schemeCode || 0}
+            editingInvestment={editingSIP || undefined}
+            mode={modalMode}
+          />
+        </Suspense>
+      }
+
 
     </div>
   );

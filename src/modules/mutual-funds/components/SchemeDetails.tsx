@@ -1,15 +1,15 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import type { MutualFundScheme, SchemeHistoryResponse } from './types/mutual-funds';
-import { useMutualFundsStore } from './store/mutualFundsStore';
-import Accordion from '../../components/common/Accordion';
-import FundHeader from './components/FundHeader';
-import Loader from '../../components/common/Loader';
-import { isNavDataStale } from './utils';
+import type { MutualFundScheme, SchemeHistoryResponse } from '../types/mutual-funds';
+import { useMutualFundsStore } from '../store/mutualFundsStore';
+import Accordion from '../../../components/common/Accordion';
+import FundHeader from '../components/FundHeader';
+import Loader from '../../../components/common/Loader';
+import { isNavDataStale } from '../utils';
 
-const SchemeReturns = lazy(() => import('./components/SchemeReturns'));
-const SchemeInformation = lazy(() => import('./components/SchemeInformation'));
-const SimilarFunds = lazy(() => import('./components/SimilarFunds'));
+const SchemeReturns = lazy(() => import('./SchemeReturns'));
+const SchemeInformation = lazy(() => import('./SchemeInformation'));
+const SimilarFunds = lazy(() => import('./SimilarFunds'));
 
 export default function SchemeDetails() {
     const { schemeCode } = useParams<{ schemeCode: string }>();

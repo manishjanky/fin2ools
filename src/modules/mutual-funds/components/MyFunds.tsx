@@ -1,25 +1,24 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
-import { useInvestmentStore } from './store';
-import { useMutualFundsStore } from './store/mutualFundsStore';
-import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentData } from './types/mutual-funds';
-import Accordion from '../../components/common/Accordion';
-import Loader from '../../components/common/Loader';
+import { useInvestmentStore } from '../store';
+import { useMutualFundsStore } from '../store/mutualFundsStore';
+import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentData } from '../types/mutual-funds';
+import Accordion from '../../../components/common/Accordion';
+import Loader from '../../../components/common/Loader';
 import { useNavigate } from 'react-router';
-import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from './utils/mutualFundsService';
+import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils/mutualFundsService';
 import moment from 'moment';
-import { calculatePortfolioMetrics } from './utils/investmentCalculations';
+import { calculatePortfolioMetrics } from '../utils/investmentCalculations';
 
-const MyFundsCard = lazy(() => import('./components/MyFundsCard'));
-const MyFundsSummary = lazy(() => import('./components/MyFundsSummary'));
+const MyFundsCard = lazy(() => import('./MyFundsCard'));
+const MyFundsSummary = lazy(() => import('./MyFundsSummary'));
 const InvestmentPerformanceCurve = lazy(
-  () => import('./components/InvestmentPerformanceCurve')
+  () => import('./InvestmentPerformanceCurve')
 );
 
 export default function MyFunds() {
   const navigate = useNavigate();
   const loadInvestments = useInvestmentStore((state) => state.loadInvestments);
-  const investments = useInvestmentStore((state) => state.investments);
-  // const loadSchemes = useMutualFundsStore((state) => state.loadSchemes);
+  const getAllInvestments = useInvestmentStore((state) => state.getAllInvestments);
   const getOrFetchSchemeDetails = useMutualFundsStore((state) => state.getOrFetchSchemeDetails);
   const getOrFetchSchemeHistory = useMutualFundsStore((state) => state.getOrFetchSchemeHistory);
   const calculatePortfolioReturns = useInvestmentStore((state) => state.calculatePortFolioRetruns);
@@ -37,7 +36,7 @@ export default function MyFunds() {
 
   const [loading, setLoading] = useState(true);
   const [metricsLoading, setMetricsLoading] = useState(false);
-  const [userInvestments, setUserInvestments] = useState<UserInvestmentData[]>();
+  const [userInvestments, setUserInvestments] = useState<UserInvestmentData[]>(getAllInvestments());
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
   const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
 
@@ -63,7 +62,14 @@ export default function MyFunds() {
   }
 
   useEffect(() => {
-    loadInvestments();
+    const loadUserInvestments = async () => {
+      await loadInvestments();
+      const invs = getAllInvestments();
+      setUserInvestments(invs);
+    }
+    if (!userInvestments || userInvestments.length === 0) {
+      loadUserInvestments();
+    }
   }, []);
 
 
@@ -83,9 +89,9 @@ export default function MyFunds() {
 
   useEffect(() => {
     const loadFundDetails = async () => {
-      setUserInvestments(investments);
+      setUserInvestments(userInvestments);
 
-      if (investments.length === 0) {
+      if (userInvestments.length === 0) {
         setFundsWithDetails([]);
         setLoading(false);
         return;
@@ -93,7 +99,7 @@ export default function MyFunds() {
 
       try {
         const fundDetails = await Promise.all(
-          investments.map(async (investmentData) => {
+          userInvestments.map(async (investmentData) => {
             const scheme = await getOrFetchSchemeDetails(investmentData.schemeCode);
             return {
               scheme: scheme || {
@@ -114,7 +120,7 @@ export default function MyFunds() {
     };
 
     loadFundDetails();
-  }, []);
+  }, [userInvestments]);
 
   useEffect(() => {
     if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {

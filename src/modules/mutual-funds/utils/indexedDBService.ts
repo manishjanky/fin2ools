@@ -1,3 +1,4 @@
+import moment from "moment";
 import type {
   UserInvestmentData,
   NAVData,
@@ -23,8 +24,6 @@ interface SyncMetadata {
   lastUpdated: number; // timestamp
   dataType: "nav" | "scheme-info";
 }
-
-
 
 export class IndexedDBService {
   private static db: IDBDatabase | null = null;
@@ -450,8 +449,8 @@ export class IndexedDBService {
         }
         // Return the one with the most recent date
         if (filtered.length > 0) {
-          filtered.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          filtered.sort((a, b) =>
+            moment(b.date, "DD-MM-YYYY").diff(moment(a.date, "DD-MM-YYYY")),
           );
           resolve(filtered[0]);
         } else {
