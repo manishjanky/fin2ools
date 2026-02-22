@@ -43,16 +43,16 @@ export default function FDForm() {
 
   return (
     <div
-      className="rounded-lg p-4 bg-bg-primary border border-primary-lighter"
+      className="rounded-lg p-3 bg-bg-primary border border-primary-lighter"
     >
       <h2
-        className="text-2xl font-bold mb-5 text-text-primary"
+        className="text-xl font-bold mb-3 text-text-primary"
       >
         FD Calculator
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid md:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid md:grid-cols-3 gap-4">
           {/* Start Date */}
           <div>
             <label
@@ -127,10 +127,10 @@ export default function FDForm() {
         </div>
 
         <div
-          className="rounded-lg p-3 bg-bg-secondary border border-border-light"
+          className="rounded-lg p-2 bg-bg-secondary border border-border-light"
         >
           <label
-            className="block font-semibold mb-4 text-text-secondary"
+            className="block font-semibold mb-2 text-text-secondary"
           >
             Tenure
           </label>

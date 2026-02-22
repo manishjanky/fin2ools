@@ -253,10 +253,10 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
 
   return (
     <div
-      className="rounded-lg p-8 bg-bg-primary border border-primary-lighter"
+      className="rounded-lg p-4 bg-bg-primary border border-primary-lighter"
     >
       <h2
-        className="text-2xl font-bold mb-6 text-text-primary"
+        className="text-xl font-bold mb-4 text-text-primary"
       >
         PPF Calculator
       </h2>
@@ -367,7 +367,7 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
             disabled={!startYear}
             className={`my-2 font-bold py-3 px-6 bg-primary-main rounded-lg transition transform hover:scale-105 text-lg text-text-inverse ${
               startYear
-                ? 'bg-gradient-to-r from-primary-main to-secondary-main cursor-pointer opacity-100'
+                ? 'bg-linear-to-r from-primary-main to-secondary-main cursor-pointer opacity-100'
                 : 'bg-border-main cursor-not-allowed opacity-50'
             }`}
           >
