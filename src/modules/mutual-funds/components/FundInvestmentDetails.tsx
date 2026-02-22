@@ -182,7 +182,7 @@ export default function FundInvestmentDetails() {
       {
         metrics && <main className="max-w-7xl mx-auto px-4 py-6">
 
-          <FundHeader scheme={scheme} duration={investmentDuration} />
+          <FundHeader scheme={scheme} />
 
           <section className="mb-6">
             <Accordion title="Investment Summary" isOpen={true}>
@@ -192,13 +192,14 @@ export default function FundInvestmentDetails() {
                   currentNav={currentNav}
                   investmentData={investmentData}
                   navHistory={navHistory}
+                  duration={investmentDuration}
                 />
               </Suspense>
             </Accordion>
           </section>
 
           <section className="mb-6">
-            <Suspense fallback={<Loader message='Visualizing investment...'/>}>
+            <Suspense fallback={<Loader message='Visualizing investment...' />}>
               <InvestmentPerformanceCurve
                 fundDetails={[
                   {
@@ -241,7 +242,7 @@ export default function FundInvestmentDetails() {
               </button>
             )}
           </section>
-          <Suspense fallback={<Loader message='Loading investment history...'/>}>
+          <Suspense fallback={<Loader message='Loading investment history...' />}>
             <FundInvestmentHistory installments={installments} />
           </Suspense>
         </main>
