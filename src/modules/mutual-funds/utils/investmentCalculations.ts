@@ -467,7 +467,7 @@ export const calculateInvestmentDuration = (
 };
 
 /**
- * Calculate 1-day change in value for a single fund
+ * Calculate 1-day change in value for a single fund investment
  * Compares latest NAV with previous NAV
  */
 export const calculateOneDayChange = (
