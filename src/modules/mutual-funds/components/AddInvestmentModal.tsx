@@ -3,6 +3,7 @@ import moment from 'moment';
 import type { UserInvestment } from '../types/mutual-funds';
 import Modal from '../../../components/common/Modal';
 import { useAlert } from '../../../context/AlertContext';
+import { useInvestmentStore } from '../store';
 
 /**
  * Convert HTML date input format (YYYY-MM-DD) to DD-MM-YYYY format
@@ -55,7 +56,8 @@ export default function AddInvestmentModal({
   const [sipEndDate, setSipEndDate] = useState('');
   const [sipAmountChangeDate, setSipAmountChangeDate] = useState(moment().format('YYYY-MM-DD'));
   const [isChangingAmount, setIsChangingAmount] = useState(false);
-  const [oldSipAmount, setOldSipAmount] = useState('')
+  const [oldSipAmount, setOldSipAmount] = useState('');
+  const { calculatePortFolioRetruns, calculateSchemeReturns } = useInvestmentStore();
 
   // Initialize form when editing
   useEffect(() => {
@@ -158,6 +160,8 @@ export default function AddInvestmentModal({
     }
 
     onSubmit(investment);
+    calculatePortFolioRetruns();
+    calculateSchemeReturns(schemeCode)
     resetForm();
   };
 
