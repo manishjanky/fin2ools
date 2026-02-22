@@ -7,13 +7,12 @@ export default function AddToMyFunds({ scheme, label, onClose }: { scheme: Mutua
 
     const [showModal, setShowModal] = useState(false);
 
-    const { addInvestment, calculatePortFolioRetruns } = useInvestmentStore();
+    const { addInvestment } = useInvestmentStore();
 
     const handleAddInvestment = (investment: any) => {
         addInvestment(scheme.schemeCode, investment);
         setShowModal(false);
         onClose && onClose();
-        calculatePortFolioRetruns();
     };
     const add = ($event: React.MouseEvent) => {
         $event.stopPropagation();

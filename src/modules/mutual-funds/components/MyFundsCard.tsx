@@ -42,7 +42,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
       if (navHistory.length === 0 || investmentDataState.investments.length === 0) {
         return;
       }
-      let investmentMetrics = await getCalculatedReturns(scheme.schemeCode, true);
+      let investmentMetrics = await getCalculatedReturns(scheme.schemeCode, false);
       if (investmentMetrics) {
         setInvestmentMetrics(investmentMetrics.overallReturns);
       } else {
