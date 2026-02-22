@@ -103,19 +103,30 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await fetchMutualFunds(1000, 0);
-      const sortedData = data.sort((a, b) =>
-        a.schemeName > b.schemeName &&
+      const staleNavs = data.filter((scheme) =>
         isNavDataStale([
           {
-            nav: a.nav!,
-            date: a.date!,
+            nav: scheme.nav!,
+            date: scheme.date!,
           },
-        ])
-          ? 1
-          : -1,
+        ]),
       );
+      const nonStaleNavs = data.filter(
+        (scheme) =>
+          !isNavDataStale([
+            {
+              nav: scheme.nav!,
+              date: scheme.date!,
+            },
+          ]),
+      );
+      
+      const sortedData = nonStaleNavs.sort((a, b) =>
+        a.schemeName > b.schemeName ? 1 : -1,
+      );
+
       set({
-        schemes: sortedData,
+        schemes: [...nonStaleNavs, ...staleNavs],
         filteredSchemes: sortedData,
         hasLoaded: true,
         isLoading: false,
