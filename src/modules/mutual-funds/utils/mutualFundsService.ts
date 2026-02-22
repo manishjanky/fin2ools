@@ -174,7 +174,8 @@ export async function getOrFetchSchemeHistoryWithCache(
   forceFresh: boolean = false, // Force fresh fetch from API
 ): Promise<SchemeHistoryResponse | null> {
   const apiDays =
-    days || moment().diff(moment(startDate, "DD-MM-YYYY"), "days"); // Request a large range
+    days ||
+    moment().diff(moment(startDate, "DD-MM-YYYY").subtract(1, "day"), "days"); // Request a large range
 
   try {
     // If forceFresh is true, skip cache and fetch from API
@@ -182,7 +183,7 @@ export async function getOrFetchSchemeHistoryWithCache(
       // First, try to get from IndexedDB
       let cachedNav = await IndexedDBService.getNavHistory(schemeCode);
       cachedNav = cachedNav.sort((a, b) =>
-        moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+        moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"), "days"),
       );
 
       if (cachedNav && cachedNav.length >= apiDays - 3) {

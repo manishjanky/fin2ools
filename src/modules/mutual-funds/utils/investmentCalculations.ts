@@ -40,23 +40,23 @@ export const findClosestNav = (
 ): NAVData | null => {
   if (!navHistory || navHistory.length === 0) return null;
 
-  const target = moment(targetDate, "DD-MM-YYYY");
+  const target = moment(targetDate, "DD-MM-YYYY").startOf("day");
   const sorted = [...navHistory].sort((a, b) =>
-    moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+    moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY"), "days"),
   );
 
   // 1. Try exact match
   for (const nav of sorted) {
-    const navDate = moment(nav.date, "DD-MM-YYYY");
-    if (navDate.isSame(target)) {
+    const navDate = moment(nav.date, "DD-MM-YYYY").startOf("day");
+    if (navDate.isSame(target, "day")) {
       return nav;
     }
   }
 
   // 2. Find next available NAV after target date
   for (const nav of sorted) {
-    const navDate = moment(nav.date, "DD-MM-YYYY");
-    if (navDate.isAfter(target)) {
+    const navDate = moment(nav.date, "DD-MM-YYYY").startOf('day');
+    if (navDate.isAfter(target, 'day')) {
       return nav;
     }
   }
