@@ -7,11 +7,13 @@ interface FundInvestmentSummaryProps {
   currentNav: number;
   investmentData: UserInvestmentData;
   navHistory: Array<{ date: string; nav: string }>;
+  duration: string
 }
 
 export default function FundInvestmentSummary({
   metrics,
   currentNav,
+  duration
 }: FundInvestmentSummaryProps) {
   const isPositive = (metrics.absoluteGain || 0) >= 0;
   const oneDayChange = metrics.oneDayChange || { absoluteChange: 0, percentageChange: 0 };
@@ -66,6 +68,13 @@ export default function FundInvestmentSummary({
           value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey={isOneDayPositive ? 'success' : 'error'}
           subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(2)}%`}
+        />
+
+        <MetricCard 
+          label='Invested since'
+          value={duration}
+          colorKey='primary'
+          
         />
       </Suspense>
 
