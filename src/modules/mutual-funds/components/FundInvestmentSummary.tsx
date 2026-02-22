@@ -18,7 +18,7 @@ export default function FundInvestmentSummary({
   const isOneDayPositive = (oneDayChange.absoluteChange || 0) >= 0;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
       <Suspense>
         <MetricCard
           label="Total Invested"
@@ -47,13 +47,6 @@ export default function FundInvestmentSummary({
         />
 
         <MetricCard
-          label="1D Change"
-          value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
-          colorKey={isOneDayPositive ? 'success' : 'error'}
-          subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(2)}%`}
-        />
-
-        <MetricCard
           label="Total Units"
           value={metrics.units?.toFixed(4) || '0'}
           colorKey="secondary"
@@ -66,6 +59,13 @@ export default function FundInvestmentSummary({
           suffix="%"
           colorKey="warning"
           subtext="Extended Internal Rate of Return"
+        />
+
+        <MetricCard
+          label="1D Change"
+          value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          colorKey={isOneDayPositive ? 'success' : 'error'}
+          subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(2)}%`}
         />
       </Suspense>
 

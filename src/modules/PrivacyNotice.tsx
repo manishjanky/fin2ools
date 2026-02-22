@@ -1,9 +1,7 @@
-import Header from '../components/common/Header';
 
 export default function PrivacyNotice() {
     return (
         <div className="min-h-screen bg-bg-primary">
-            <Header />
             <main className="max-w-4xl mx-auto px-4 py-12">
                 <div className="bg-bg-secondary border border-border-main rounded-lg p-8">
 

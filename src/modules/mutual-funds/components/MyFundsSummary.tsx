@@ -14,10 +14,10 @@ export default function MyFundsSummary({
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    if(metrics && metrics.totalInvested !== undefined)
-    setLoading(false);
-  },[metrics])
+  useEffect(() => {
+    if (metrics && metrics.totalInvested !== undefined)
+      setLoading(false);
+  }, [metrics])
 
   const isPositiveGain = metrics.absoluteGain >= 0;
   const isPositiveOneDayChange = (metrics.oneDayChange?.percentageChange ?? 0) >= 0;
@@ -29,7 +29,7 @@ export default function MyFundsSummary({
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
       <Suspense>
         <MetricCard
           label="Total Invested"
@@ -50,6 +50,14 @@ export default function MyFundsSummary({
         />
 
         <MetricCard
+          label="Returns (%)"
+          value={metrics.percentageReturn.toFixed(2)}
+          suffix="%"
+          colorKey={isPositiveGain ? 'success' : 'error'}
+        />
+
+
+        <MetricCard
           label="1D Change"
           value={metrics.oneDayChange?.percentageChange.toFixed(2) ?? '0.00'}
           suffix="%"
@@ -57,12 +65,6 @@ export default function MyFundsSummary({
           subtext={`${isPositiveOneDayChange ? '+' : ''}₹${(metrics.oneDayChange?.absoluteChange ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
         />
 
-        <MetricCard
-          label="Returns (%)"
-          value={metrics.percentageReturn.toFixed(2)}
-          suffix="%"
-          colorKey={isPositiveGain ? 'success' : 'error'}
-        />
 
         <MetricCard
           label="XIRR"

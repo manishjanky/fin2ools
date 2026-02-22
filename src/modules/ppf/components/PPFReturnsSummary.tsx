@@ -38,7 +38,7 @@ export default function PPFReturnsSummary({ result }: PPFReturnsSummaryProps) {
               Total Invested
             </p>
             <p
-              className="text-3xl font-bold text-secondary-main"
+              className="text-2xlfont-bold text-secondary-main"
             >
               ₹{result.totalInvested.toFixed(2)}
             </p>
@@ -54,7 +54,7 @@ export default function PPFReturnsSummary({ result }: PPFReturnsSummaryProps) {
               Interest Earned
             </p>
             <p
-              className="text-3xl font-bold text-success"
+              className="text-2xlfont-bold text-success"
             >
               ₹{result.totalInterestEarned.toFixed(3)}
             </p>
@@ -70,7 +70,7 @@ export default function PPFReturnsSummary({ result }: PPFReturnsSummaryProps) {
               Maturity Amount
             </p>
             <p
-              className="text-3xl font-bold text-primary-main"
+              className="text-2xlfont-bold text-primary-main"
             >
               ₹{result.maturityAmount.toFixed(3)}
             </p>
@@ -86,7 +86,7 @@ export default function PPFReturnsSummary({ result }: PPFReturnsSummaryProps) {
               Absolute Returns Percentage
             </p>
             <p
-              className="text-3xl font-bold text-secondary-light"
+              className="text-2xlfont-bold text-secondary-light"
             >
               {result.absolutReturnPercentage.toFixed(2)}%
             </p>

@@ -72,17 +72,17 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
 
   return (
     <div
-      className="rounded-lg p-4 hover:shadow-lg transition border cursor-pointer bg-bg-primary border-primary-lighter hover:border-primary-main"
+      className="rounded-lg p-2.5 hover:shadow-lg transition border cursor-pointer bg-bg-primary border-primary-lighter hover:border-primary-main"
       onClick={handleCardClick}
     >
       <div className="grid md:grid-cols-3 gap-4 items-start">
         {/* Scheme Info */}
         <div className="md:col-span-2">
-          <h3
-            className="text-lg font-bold mb-2 line-clamp-2 text-text-primary"
+          <h4
+            className="text-lg font-bold mb-1 line-clamp-2 text-text-primary"
           >
             {scheme.schemeName}
-          </h3>
+          </h4>
           {scheme.schemeCategory && (
             <p className="text-sm text-text-secondary">
               <span className="font-semibold">Category:</span> {scheme.schemeCategory}
@@ -104,13 +104,13 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
 
       {/* Investment Metrics */}
       <div
-        className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-4 pt-4 border-t border-border-light"
+        className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-2 pt-2 border-t border-border-light"
       >
         <div>
           <p className="text-xs mb-1 text-text-tertiary">
             Amount Invested
           </p>
-          <p className="text-lg font-semibold text-text-primary">
+          <p className="text-md font-semibold text-text-primary">
             ₹{investmentMetrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           <p className="text-xs mb-1 text-text-tertiary">
             Current Value
           </p>
-          <p className="text-lg font-semibold text-text-primary">
+          <p className="text-md font-semibold text-text-primary">
             ₹{investmentMetrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             Gain / Loss
           </p>
           <p
-            className={`text-lg font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
+            className={`text-md font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
           >
             {investmentMetrics.absoluteGain >= 0 ? '+' : ''}
             ₹{(investmentMetrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
@@ -138,7 +138,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             Return %
           </p>
           <p
-            className={`text-lg font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
+            className={`text-md font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
           >
             {investmentMetrics.percentageReturn >= 0 ? '+' : ''}
             {investmentMetrics.percentageReturn.toFixed(2)}%
@@ -149,7 +149,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             1D Change
           </p>
           <p
-            className={`text-lg font-semibold ${isOneDayPositive ? 'text-success' : 'text-error'}`}
+            className={`text-md font-semibold ${isOneDayPositive ? 'text-success' : 'text-error'}`}
           >
             {(investmentMetrics.oneDayChange?.absoluteChange || 0) >= 0 ? '+' : ''}
             ₹{(investmentMetrics.oneDayChange?.absoluteChange || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
@@ -160,7 +160,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             Units Held
           </p>
           <p
-            className="text-lg font-semibold text-secondary-main"
+            className="text-md font-semibold text-secondary-main"
           >
             {investmentMetrics.units?.toFixed(4)}
           </p>

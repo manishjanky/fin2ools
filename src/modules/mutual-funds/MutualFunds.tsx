@@ -1,6 +1,5 @@
 
 import { lazy, Suspense } from 'react';
-import Header from '../../components/common/Header';
 import Loader from '../../components/common/Loader';
 const MutualFundList = lazy(() => import('./components/MutualFundList'));
 
@@ -8,15 +7,14 @@ const MutualFundList = lazy(() => import('./components/MutualFundList'));
 export default function MutualFunds() {
   return (
     <div className="min-h-screen bg-bg-primary">
-      <Header />
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Page Header */}
-        <section className="mb-12">
+        <section className="mb-6">
           <h1
-            className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
+            className="text-2xl md:text-4xl font-bold mb-4 text-text-primary"
           >
             Mutual{' '}
-            <span className="text-secondary-main">
+            <span className="text-primary-main">
               Funds
             </span>
           </h1>

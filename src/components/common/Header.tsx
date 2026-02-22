@@ -18,7 +18,7 @@ export default function Header() {
           </div>
         </div>
       </header>
-      <div className="max-w-7xl mx-auto px-4 pt-2">
+      <div className="max-w-7xl mx-auto px-4 pt-2 bg-transparent">
         <Back navigate={navigate} />
       </div>
     </>
