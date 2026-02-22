@@ -11,6 +11,7 @@ import {
   getOrFetchSchemeHistoryWithCache,
   getOrFetchSchemeDetailsWithCache,
   syncLatestNAVForInvestedSchemes,
+  isNavDataStale,
 } from "../utils/mutualFundsService";
 import moment from "moment";
 
@@ -60,7 +61,7 @@ interface MutualFundsStore {
   getOrFetchSchemeHistory: (
     schemeCode: number,
     daysOrStartDate: number | string, // number for days, string for DD-MM-YYYY date
-    forceFresh?: boolean // Force fresh fetch from API
+    forceFresh?: boolean, // Force fresh fetch from API
   ) => Promise<SchemeHistoryResponse>;
   getOrFetchSchemeDetails: (schemeCode: number) => Promise<MutualFundScheme>;
   syncLatestNAV: () => Promise<void>;
@@ -102,7 +103,17 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const data = await fetchMutualFunds(1000, 0);
-      const sortedData = data.sort((a, b) => (a.schemeName > b.schemeName ? 1 : -1));
+      const sortedData = data.sort((a, b) =>
+        a.schemeName > b.schemeName &&
+        isNavDataStale([
+          {
+            nav: a.nav!,
+            date: a.date!,
+          },
+        ])
+          ? 1
+          : -1,
+      );
       set({
         schemes: sortedData,
         filteredSchemes: sortedData,
@@ -249,18 +260,18 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     forceFresh: boolean = false,
   ): Promise<SchemeHistoryResponse> => {
     const { schemeHistoryCache, inFlightRequests } = get();
-    
+
     // Convert days to start date if needed
     let startDate: string;
-    if (typeof daysOrStartDate === 'number') {
+    if (typeof daysOrStartDate === "number") {
       // It's a number of days, convert to date
-      const startMoment = moment().subtract(daysOrStartDate, 'days');
-      startDate = startMoment.format('DD-MM-YYYY');
+      const startMoment = moment().subtract(daysOrStartDate, "days");
+      startDate = startMoment.format("DD-MM-YYYY");
     } else {
       // It's already a date string
       startDate = daysOrStartDate;
     }
-    const days = moment().diff(moment(startDate, 'DD-MM-YYYY'), 'days');
+    const days = moment().diff(moment(startDate, "DD-MM-YYYY"), "days");
 
     const cacheKey = `${schemeCode}-${startDate}`;
 
@@ -279,7 +290,7 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
       schemeCode,
       startDate,
       days - 1,
-      forceFresh
+      forceFresh,
     );
 
     // Track this request as in-flight

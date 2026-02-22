@@ -24,8 +24,8 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
         const fetch1DChange = async () => {
             try {
                 setIsLoadingChange(true);
-                // Fetch 2 days of data to calculate 1D change
-                const historyData = await getOrFetchSchemeHistory(scheme.schemeCode, 2);
+                // Fetch 5 days of data to calculate 1D change accounting for market close and holidays
+                const historyData = await getOrFetchSchemeHistory(scheme.schemeCode, 5);
 
                 if (historyData?.data && historyData.data.length >= 2) {
                     const previousNav = parseFloat(historyData.data[0].nav);
@@ -96,16 +96,16 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                                     <h3
                                         className="text-lg font-bold lg:line-clamp-3 text-text-primary"
                                     >
-                                        {scheme.schemeName}
+                                        {scheme.schemeName.trim()}
                                     </h3>
                                     {/* Fund House and Category */}
                                     {scheme.fundHouse && (
-                                        <p className="text-sm mb-1 text-primary-main">
-                                            AMC: <b>{scheme.fundHouse}</b>
+                                        <p className="text-sm mb-1 text-secondary-main">
+                                            AMC: <b>{scheme.fundHouse.trim()}</b>
                                         </p>
                                     )}
                                     {scheme.schemeCategory && (
-                                        <p className="text-xs text-text-secondary">
+                                        <p className="text-xs text-secondary-main">
                                             Category: <b>{scheme.schemeCategory}</b>
                                         </p>
                                     )}
@@ -113,8 +113,8 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                                     {/* 1D Change */}
                                     {!isLoadingChange && oneDayChange !== null && (
                                         <div className="mt-1">
-                                            <span className="text-xs text-text-secondary">1D Change: </span>
-                                            <span className={`text-sm font-semibold ${oneDayChange >= 0 ? 'text-success' : 'text-error'}`}>
+                                            <span className="text-sm text-secondary-main">1D Change: </span>
+                                            <span className={`text-md font-bold ${oneDayChange >= 0 ? 'text-success' : 'text-error'}`}>
                                                 {oneDayChange >= 0 ? '+' : ''}{oneDayChange.toFixed(2)}%
                                             </span>
                                         </div>
