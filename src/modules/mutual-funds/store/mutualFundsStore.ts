@@ -304,7 +304,7 @@ export const useMutualFundsStore = create<MutualFundsStore>((set, get) => ({
     const promise = getOrFetchSchemeHistoryWithCache(
       schemeCode,
       startDate,
-      days - 1,
+      days,
       forceFresh,
     );
 
