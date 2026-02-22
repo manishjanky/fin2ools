@@ -92,49 +92,49 @@
   :root,:host {
     @variant dark {
     /* Primary Colors */
-    --color-primary-main: #818CF8;
-    --color-primary-light: #A5B4FC;
-    --color-primary-lighter: #C7D2FE;
-    --color-primary-dark: #6366F1;
-    --color-primary-darker: #4F46E5;
+    --color-primary-main: #007acc;
+    --color-primary-light: #1e9ad6;
+    --color-primary-lighter: #4fc1ff;
+    --color-primary-dark: #005a9e;
+    --color-primary-darker: #004578;
 
     /* Secondary Colors */
-    --color-secondary-main: #06B6D4;
-    --color-secondary-light: #22D3EE;
-    --color-secondary-lighter: #CFFAFE;
-    --color-secondary-dark: #0891B2;
+    --color-secondary-main: #4ec9b0;
+    --color-secondary-light: #6dd4bb;
+    --color-secondary-lighter: #a5f3e0;
+    --color-secondary-dark: #3ba78f;
 
     /* Accent Colors */
-    --color-accent-blue: #60A5FA;
-    --color-accent-cyan: #22D3EE;
-    --color-accent-purple: #C084FC;
-    --color-accent-green: #34D399;
-    --color-accent-red: #F87171;
-    --color-accent-orange: #FB923C;
-    --color-accent-yellow: #FBBF24;
+    --color-accent-blue: #569cd6;
+    --color-accent-cyan: #4fc1ff;
+    --color-accent-purple: #c586c0;
+    --color-accent-green: #6a9955;
+    --color-accent-red: #f48771;
+    --color-accent-orange: #ce9178;
+    --color-accent-yellow: #dcdcaa;
 
     /* Background Colors */
-    --color-bg-primary: #0F172A;
-    --color-bg-secondary: #1E293B;
-    --color-bg-tertiary: #334155;
-    --color-bg-surface: #475569;
+    --color-bg-primary: #1e1e1e;
+    --color-bg-secondary: #252526;
+    --color-bg-tertiary: #2d2d30;
+    --color-bg-surface: #3e3e42;
 
     /* Text Colors */
-    --color-text-primary: #F1F5F9;
-    --color-text-secondary: #CBD5E1;
-    --color-text-tertiary: #94A3B8;
-    --color-text-inverse: #0F172A;
+    --color-text-primary: #cccccc;
+    --color-text-secondary: #9cdcfe;
+    --color-text-tertiary: #808080;
+    --color-text-inverse: #1e1e1e;
 
     /* Border Colors */
-    --color-border-light: #334155;
-    --color-border-main: #475569;
-    --color-border-dark: #64748B;
+    --color-border-light: #3e3e42;
+    --color-border-main: #454545;
+    --color-border-dark: #555555;
 
     /* Status Colors */
-    --color-success: #34D399;
-    --color-error: #F87171;
-    --color-warning: #FBBF24;
-    --color-info: #60A5FA;
+    --color-success: #89d185;
+    --color-error: #f48771;
+    --color-warning: #cca700;
+    --color-info: #007acc;
     }
   }
 }

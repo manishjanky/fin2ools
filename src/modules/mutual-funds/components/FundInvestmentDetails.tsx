@@ -15,7 +15,6 @@ import {
 } from '../utils/investmentCalculations';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
 import { useInvestmentStore } from '../store';
-import Header from '../../../components/common/Header';
 import FundHeader from './FundHeader';
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
@@ -161,7 +160,6 @@ export default function FundInvestmentDetails() {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-primary">
-        <Header />
         <main className="max-w-7xl mx-auto px-4 py-6">
           <Loader message='Loading your investment details...' />
         </main>
@@ -172,11 +170,10 @@ export default function FundInvestmentDetails() {
   if (!scheme || !investmentData) {
     return (
       <div className="min-h-screen bg-bg-primary">
-        <Header />
         <main className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-center flex-col">
           <button
             onClick={() => navigate('/mutual-funds/my-funds')}
-            className="mb-4 px-4 py-2 rounded-lg bg-primary-main text-text-inverse"
+            className="mb-2 px-4 rounded-lg bg-primary-main text-text-inverse"
           >
             ← Back to My Funds
           </button>
@@ -194,7 +191,6 @@ export default function FundInvestmentDetails() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <Header />
       {metrics ? <main className="max-w-7xl mx-auto px-4 py-6">
 
         <FundHeader scheme={scheme} duration={investmentDuration} />

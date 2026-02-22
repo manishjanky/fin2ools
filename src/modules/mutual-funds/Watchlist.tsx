@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import Header from '../../components/common/Header';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { useWatchlistStore } from './store/watchlistStore';
 import { useMutualFundsStore } from './store/mutualFundsStore';
@@ -94,13 +93,12 @@ export default function Watchlist() {
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <Header />
       <header className="backdrop-blur-sm py-4 bg-bg-primary">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-4 items-center mb-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-text-primary">
+            <h1 className="text-2xl md:text-4xl font-bold text-text-primary">
               My{' '}
-              <span className="text-secondary-main">
+              <span className="text-primary-main">
                 Watchlist({filteredSchemes.length})
               </span>
             </h1>

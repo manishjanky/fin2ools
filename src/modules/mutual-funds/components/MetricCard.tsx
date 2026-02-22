@@ -27,12 +27,12 @@ export default function MetricCard({
   };
 
   return (
-    <div className="rounded-lg p-4 border bg-bg-secondary border-border-light"
+    <div className="rounded-lg p-2.5 border bg-bg-secondary border-border-light"
     >
       <p className="text-sm font-medium mb-2 text-text-secondary">
         {label}
       </p>
-      <p className={`text-2xl font-bold ${getColorClass()}`}>
+      <p className={`text-lg md:text-xl font-bold ${getColorClass()}`}>
         {value}
         {suffix && <span className="text-lg ml-1">{suffix}</span>}
       </p>

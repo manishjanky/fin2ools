@@ -7,6 +7,7 @@ import Loader from './components/common/Loader';
 import Footer from './components/common/Footer';
 import AlertContainer from './components/common/AlertContainer';
 import { PrivacyModal } from './components/common/PrivacyModal';
+import Header from './components/common/Header';
 
 // Lazy load pages
 const FD = lazy(() => import('./modules/deposits/FD'));
@@ -22,9 +23,11 @@ const RD = lazy(() => import('./modules/deposits/RD'))
 const Layout = () => {
     return (
         <>
+        
             <ScrollRestoration />
             <AlertContainer />
             <PrivacyModal />
+            <Header />
             <Outlet />
             <Footer />
         </>

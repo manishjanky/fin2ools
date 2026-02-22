@@ -68,7 +68,7 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
         <>
             <div
                 onClick={handleCardClick}
-                className="rounded-lg p-3 hover:shadow-lg transition transform h-full border cursor-pointer bg-bg-secondary border-primary-lighter hover:border-primary-main"
+                className="rounded-lg p-2 hover:shadow-lg transition transform h-full border cursor-pointer bg-bg-secondary border-primary-lighter hover:border-primary-main"
             >
                 <div className="flex flex-col h-full justify-between">
                     {/* Header: Scheme Name + NAV */}

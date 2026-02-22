@@ -1,14 +1,11 @@
 import { useNavigate } from 'react-router';
 import FeatureTile from '../components/common/FeatureTile';
-import Header from '../components/common/Header';
 
 export default function Home() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-bg-primary">
-      <Header />
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Welcome Section */}

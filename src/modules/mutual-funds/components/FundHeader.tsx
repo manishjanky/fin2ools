@@ -4,15 +4,15 @@ import AddToMyFunds from "./AddToMyFunds";
 
 export default function FundHeader({ scheme, duration }: { scheme: MutualFundScheme; duration?: string }) {
     return (
-        <section className="mb-4 border border-primary-lighter/30 rounded-lg p-4" >
+        <section className="mb-6 border border-primary-lighter/30 rounded-lg p-2.5" >
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div className="flex-1">
-                    <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-4">
+                    <h1 className="text-xl font-bold text-text-primary mb-1">
                         {scheme.schemeName}
                     </h1>
 
                     {scheme.fundHouse && (
-                        <p className="text-info text-lg mb-2">
+                        <p className="text-info">
                             <span className="text-info font-semibold">Fund House:</span> {scheme.fundHouse}
                         </p>
                     )}
@@ -23,7 +23,7 @@ export default function FundHeader({ scheme, duration }: { scheme: MutualFundSch
                     )}
                     {
                         duration && (
-                            <p className="text-info text-lg">
+                            <p className="text-info">
                                 <span className="text-info font-semibold">Investment Duration:</span> {duration}
                             </p>
 

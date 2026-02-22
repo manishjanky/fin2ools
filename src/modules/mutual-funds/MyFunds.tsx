@@ -1,5 +1,4 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
-import Header from '../../components/common/Header';
 import { useInvestmentStore } from './store';
 import { useMutualFundsStore } from './store/mutualFundsStore';
 import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentData } from './types/mutual-funds';
@@ -163,17 +162,16 @@ export default function MyFunds() {
     <div
       className="min-h-screen bg-bg-primary"
     >
-      <Header />
       <header
         className="backdrop-blur-sm py-4 bg-bg-primary"
       >
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-4 items-center mb-4">
           <div>
             <h1
-              className="text-4xl md:text-5xl font-bold text-text-primary"
+              className="text-2xl md:text-4xl font-bold text-text-primary"
             >
               My{' '}
-              <span className="text-secondary-main">
+              <span className="text-primary-main">
                 Funds({fundsWithDetails.length})
               </span>
             </h1>

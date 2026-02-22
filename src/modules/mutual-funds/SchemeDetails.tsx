@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import type { MutualFundScheme, SchemeHistoryResponse } from './types/mutual-funds';
 import { useMutualFundsStore } from './store/mutualFundsStore';
-import Header from '../../components/common/Header';
 import Accordion from '../../components/common/Accordion';
 import FundHeader from './components/FundHeader';
 import Loader from '../../components/common/Loader';
@@ -47,7 +46,7 @@ export default function SchemeDetails() {
 
                 if (historyData) {
                     setHistory(historyData);
-                    
+
                     // Check if NAV data is stale (not from today or yesterday)
                     const isStale = isNavDataStale(historyData.data);
                     setIsNavStale(isStale);
@@ -68,14 +67,8 @@ export default function SchemeDetails() {
     if (loading) {
         return (
             <div className="min-h-screen bg-bg-secondary">
-                <Header />
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="text-center">
-                        <div
-                            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 border-primary-main"
-                        />
-                        <p className="text-text-secondary">Loading scheme details...</p>
-                    </div>
+                    <Loader message='Loading scheme information...' />
                 </main>
             </div>
         );
@@ -84,7 +77,6 @@ export default function SchemeDetails() {
     if (error || !scheme) {
         return (
             <div className="min-h-screen bg-bg-secondary">
-                <Header />
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div
                         className="rounded-lg p-6 mb-6 border bg-error/20 border-error text-error"
@@ -100,8 +92,6 @@ export default function SchemeDetails() {
 
     return (
         <div className="min-h-screen bg-bg-primary">
-            <Header />
-
             <main className="max-w-7xl mx-auto px-4 py-4 mt-0 grid grid-cols-1 gap-6">
                 <FundHeader scheme={scheme} />
 

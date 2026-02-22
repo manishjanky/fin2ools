@@ -18,7 +18,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
           </h3>
           <span className="text-2xl">💰</span>
         </div>
-        <p className="text-3xl font-bold text-text-primary">
+        <p className="text-2xlfont-bold text-text-primary">
           ₹{principal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
         </p>
       </div>
@@ -33,7 +33,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
           </h3>
           <span className="text-2xl">📈</span>
         </div>
-        <p className="text-3xl font-bold text-text-primary">
+        <p className="text-2xlfont-bold text-text-primary">
           ₹{summary.totalInterestEarned.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
         </p>
       </div>
@@ -48,7 +48,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
           </h3>
           <span className="text-2xl">🎯</span>
         </div>
-        <p className="text-3xl font-bold text-text-primary">
+        <p className="text-2xlfont-bold text-text-primary">
           ₹{summary.maturityAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
         </p>
       </div>

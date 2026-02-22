@@ -2,7 +2,6 @@ import { useState } from 'react';
 import PPFForm from './components/PPFForm';
 import PPFReturnsSummary from './components/PPFReturnsSummary';
 import FYSummaryTable from '../../components/common/FYSummaryTable';
-import Header from '../../components/common/Header';
 import type { PPFCalculationResult } from './types/ppf';
 import { generateFinancialYearData } from './utils/ppfCalculator';
 
@@ -15,16 +14,14 @@ const PPF = () => {
 
     return (
         <div className="min-h-screen bg-bg-primary">
-            <Header />
-
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {/* Page Header */}
                 <section className="mb-12">
                     <h1 
-                        className="text-4xl md:text-5xl font-bold mb-4 text-text-primary"
+                        className="text-2xl md:text-4xl font-bold mb-4 text-text-primary"
                     >
                         PPF{' '}
-                        <span className="text-secondary-main">
+                        <span className="text-primary-main">
                             Projections
                         </span>
                     </h1>
