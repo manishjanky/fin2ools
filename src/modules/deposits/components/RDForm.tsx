@@ -38,15 +38,15 @@ export default function RDForm() {
     };
 
     return (
-        <div className="border border-primary-lighter p-4 rounded-lg">
+        <div className="border border-primary-lighter p-3 rounded-lg">
             <h2
-                className="text-2xl font-bold text-text-primary "
+                className="text-xl font-bold text-text-primary mb-3"
             >
                 RD Calculator
             </h2>
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="grid md:grid-cols-3 gap-6 pt-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="grid md:grid-cols-3 gap-6">
                     <div className="">
                         <label
                             className="block font-medium mb-2 text-text-secondary"
@@ -113,10 +113,10 @@ export default function RDForm() {
                         />
                     </div>
                     <div
-                        className="rounded-lg p-3 bg-bg-secondary border border-border-light md:col-span-3"
+                        className="rounded-lg p-2 bg-bg-secondary border border-border-light md:col-span-3"
                     >
                         <label
-                            className="block font-semibold mb-4 text-text-secondary"
+                            className="block font-semibold mb-2 text-text-secondary"
                         >
                             Tenure
                         </label>

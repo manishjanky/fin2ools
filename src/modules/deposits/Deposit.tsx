@@ -9,7 +9,7 @@ export default function Deposit({ children, type }: {children: React.ReactNode, 
                 <section className="mb-6">
                     <h1 className="text-2xl md:text-4xl font-bold mb-4 text-text-primary">
                         {type}{' '}
-                        <span className="text-primary-main">
+                        <span className="text-secondary-dark">
                             Projections
                         </span>
                     </h1>

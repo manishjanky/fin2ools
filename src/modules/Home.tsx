@@ -30,7 +30,6 @@ export default function Home() {
               title="Mutual Funds"
               description="Explore mutual fund options, compare returns, and analyze your portfolio performance. Make informed investment decisions."
               icon="📈"
-              gradient="from-blue-500 to-cyan-600"
               onClick={() => navigate('mutual-funds/explore-funds')}
             />
           </div>
@@ -39,7 +38,6 @@ export default function Home() {
               title="My Mutual Funds"
               description="View and analyze your mutual fund investments in one place."
               icon="📈"
-              gradient="from-blue-500 to-cyan-600"
               onClick={() => navigate('mutual-funds/my-funds')}
             />
           </div>
@@ -48,7 +46,6 @@ export default function Home() {
               title="Public Provident Fund"
               description="Calculate and analyze your Public Provident Fund returns with detailed year-wise breakdowns."
               icon="💰"
-              gradient="from-blue-500 to-cyan-600"
               onClick={() => navigate('ppf')}
             />
           </div>
@@ -57,7 +54,6 @@ export default function Home() {
               title="FD Projections"
               description="Calculate and project your Fixed Deposit returns with detailed maturity amounts and interest earnings."
               icon="📊"
-              gradient="from-purple-500 to-blue-600"
               onClick={() => navigate('deposits/fd')}
             />
           </div>
@@ -66,7 +62,6 @@ export default function Home() {
               title="RD Projections"
               description="Calculate and project your Recurring Deposit returns with detailed maturity amounts and interest earnings."
               icon="📊"
-              gradient="from-purple-500 to-blue-600"
               onClick={() => navigate('deposits/rd')}
             />
           </div>

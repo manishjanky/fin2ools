@@ -14,7 +14,7 @@ export default function MutualFunds() {
             className="text-2xl md:text-4xl font-bold mb-4 text-text-primary"
           >
             Mutual{' '}
-            <span className="text-primary-main">
+            <span className="text-secondary-dark">
               Funds
             </span>
           </h1>

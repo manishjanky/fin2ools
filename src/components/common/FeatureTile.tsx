@@ -3,7 +3,6 @@ interface FeatureTileProps {
   description: string;
   icon: string;
   onClick?: () => void;
-  gradient: string;
 }
 
 export default function FeatureTile({
@@ -11,14 +10,11 @@ export default function FeatureTile({
   description,
   icon,
   onClick,
-  gradient,
 }: FeatureTileProps) {
-  const outerGradient = gradient;
-
   return (
     <div
       onClick={onClick}
-      className={`w-full h-full text-left bg-linear-to-br ${outerGradient} px-2 py-1 rounded-lg hover:shadow-lg transition transform hover:scale-105 group bg-bg-primary`}
+      className={`w-full h-full text-left px-2 py-1 rounded-lg hover:shadow-lg transition transform hover:scale-105 group bg-bg-tertiary`}
     >
       <div
         className="rounded-lg p-4 h-full flex flex-col justify-between transition bg-bg-primary hover:bg-bg-secondary"

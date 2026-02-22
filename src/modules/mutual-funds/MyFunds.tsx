@@ -171,7 +171,7 @@ export default function MyFunds() {
               className="text-2xl md:text-4xl font-bold text-text-primary"
             >
               My{' '}
-              <span className="text-primary-main">
+              <span className="text-secondary-dark">
                 Funds({fundsWithDetails.length})
               </span>
             </h1>

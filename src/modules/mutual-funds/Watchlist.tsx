@@ -98,7 +98,7 @@ export default function Watchlist() {
           <div>
             <h1 className="text-2xl md:text-4xl font-bold text-text-primary">
               My{' '}
-              <span className="text-primary-main">
+              <span className="text-secondary-dark">
                 Watchlist({filteredSchemes.length})
               </span>
             </h1>
