@@ -9,7 +9,6 @@ import type {
   InvestmentMetrics,
 } from '../types/mutual-funds';
 import {
-  investmentMetricSingleFund,
   generateInvestmentInstallments,
   calculateInvestmentDuration,
 } from '../utils/investmentCalculations';
@@ -28,7 +27,7 @@ const FundInvestmentHistory = lazy(() => import('./FundInvestmentHistory'));
 export default function FundInvestmentDetails() {
   const { schemeCode } = useParams<{ schemeCode: string }>();
   const navigate = useNavigate();
-  const { getSchemeInvestments, addInvestment, updateInvestment, calculatePortFolioRetruns, getAllInvestments } = useInvestmentStore();
+  const { getSchemeInvestments, addInvestment, updateInvestment, calculatePortFolioRetruns, getAllInvestments, calculateSchemeReturns } = useInvestmentStore();
   const getOrFetchSchemeHistory = useMutualFundsStore(
     (state) => state.getOrFetchSchemeHistory
   );
@@ -140,8 +139,11 @@ export default function FundInvestmentDetails() {
         setMetrics(investmentMetrics.overallReturns);
       } else if (navHistory.length > 0 && investmentData.investments.length > 0) {
         // Fallback to on-the-fly calculation if not available in indexedDb
-        const calculatedMetrics = investmentMetricSingleFund(navHistory, investmentData);
-        setMetrics(calculatedMetrics);
+        await calculateSchemeReturns(parseInt(schemeCode))
+        investmentMetrics = await getCalculatedReturns(parseInt(schemeCode), false);
+        if (investmentMetrics) {
+          setMetrics(investmentMetrics.overallReturns);
+        }
       }
     }
     getFundMetrics();
