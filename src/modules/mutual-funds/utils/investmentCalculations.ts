@@ -407,7 +407,7 @@ export function investmentMetricSingleFund(
     const value = calculateInvestmentValue(investment, navHistory);
     totalInvested += value.investedAmount;
     totalCurrentValue += value.currentValue;
-    units = value.units;
+    units += value.units;
   }
 
   const absoluteGain = totalCurrentValue - totalInvested;
