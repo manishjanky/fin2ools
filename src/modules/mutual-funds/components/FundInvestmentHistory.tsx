@@ -1,7 +1,7 @@
-import moment from "moment";
 import type { InvestmentInstallment } from "../types/mutual-funds";
 import Pagination from "../../../components/common/Pagination";
 import { useEffect, useMemo, useState } from "react";
+import moment from "moment";
 
 export default function FundInvestmentHistory({ installments }: { installments: InvestmentInstallment[] }) {
     const PAGE_SIZE = 20;
@@ -41,6 +41,9 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                             <th className="px-6 py-4 text-left font-semibold text-text-secondary">
                                 Investment Date
                             </th>
+                            <th className="px-6 py-4 text-left font-semibold text-text-secondary">
+                                NAV Date
+                            </th>
                             <th className="px-6 py-4 text-right font-semibold text-text-secondary">
                                 Amount
                             </th>
@@ -65,7 +68,10 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-text-primary">
-                                    {moment(inst.installmentDate, 'DD-MM-YYYY').format('DD MMM YYYY')}
+                                    {moment(inst.installmentDate,'DD-MM-YYYY').format('DD MMM YYYY')}
+                                </td>
+                                <td className="px-6 py-4 text-text-primary">
+                                    {moment(inst.navDate,'DD-MM-YYYY').format('DD MMM YYYY')}
                                 </td>
                                 <td className="px-6 py-4 text-right text-secondary-main">
                                     ₹{inst.amount.toFixed(3)}

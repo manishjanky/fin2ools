@@ -201,23 +201,20 @@ export default function FundInvestmentDetails() {
           </section>
 
           <section className="mb-6">
-            <Suspense fallback={<Loader message='Visualizing investment...' />}>
-              <InvestmentPerformanceCurve
-                fundDetails={[
-                  {
-                    investmentData,
-                    scheme
-                  }
-                ]}
-                navHistoryData={
-                  [
-                    { data: navHistory, schemeCode: scheme.schemeCode }
-                  ]
+            <InvestmentPerformanceCurve
+              fundDetails={[
+                {
+                  investmentData,
+                  scheme
                 }
-                investments={[investmentData]}
-              />
-            </Suspense>
-
+              ]}
+              navHistoryData={
+                [
+                  { data: navHistory, schemeCode: scheme.schemeCode }
+                ]
+              }
+              investments={[investmentData]}
+            />
           </section>
 
           {/* Action Buttons */}
