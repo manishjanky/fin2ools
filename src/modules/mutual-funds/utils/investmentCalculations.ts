@@ -68,9 +68,9 @@ export const findClosestNav = (
 /**
  * Calculate NAV value on a specific date
  */
-const getNavValueOnDate = (navHistory: NAVData[], dateStr: string): number => {
+const getNavValueOnDate = (navHistory: NAVData[], dateStr: string): NAVData => {
   const nav = findClosestNav(navHistory, dateStr);
-  return nav ? parseFloat(nav.nav) : 0;
+  return nav && nav.nav ? nav : { nav: "0", date: "" };
 };
 
 /**
@@ -185,7 +185,7 @@ export const calculateInvestmentValue = (
     const navValue = getNavValueOnDate(navHistory, investment.startDate);
     const { units, stampDuty } = calculateUnitsFromAmount(
       investment.amount,
-      navValue,
+      parseFloat(navValue.nav),
     );
 
     const currentValue = currentNavValue > 0 ? units * currentNavValue : 0;
@@ -214,7 +214,7 @@ export const calculateInvestmentValue = (
       // Calculate units
       const { units, stampDuty } = calculateUnitsFromAmount(
         grossAmount,
-        navValue,
+        parseFloat(navValue.nav),
       );
 
       totalUnits += units;
@@ -594,7 +594,7 @@ export const generateInvestmentInstallments = async (
         const navValue = getNavValueOnDate(navHistory, investment.startDate);
         const { units, stampDuty } = calculateUnitsFromAmount(
           investment.amount,
-          navValue,
+          parseFloat(navValue.nav),
         );
 
         installments.push({
@@ -602,8 +602,9 @@ export const generateInvestmentInstallments = async (
           type: "lumpsum",
           originalStartDate: investment.startDate,
           installmentDate: investment.startDate,
+          navDate: navValue.date || investment.startDate,
           amount: investment.amount,
-          nav: navValue,
+          nav: parseFloat(navValue.nav),
           units,
           stampDuty,
         });
@@ -617,7 +618,7 @@ export const generateInvestmentInstallments = async (
         const navValue = getNavValueOnDate(navHistory, sipDateStr);
         const { units, stampDuty } = calculateUnitsFromAmount(
           grossAmount,
-          navValue,
+          parseFloat(navValue.nav),
         );
 
         // Check if this SIP is cancelled (after sipEndDate)
@@ -630,8 +631,9 @@ export const generateInvestmentInstallments = async (
           type: "sip-installment",
           originalStartDate: investment.startDate,
           installmentDate: sipDateStr,
+          navDate: navValue.date || sipDateStr,
           amount: grossAmount,
-          nav: navValue,
+          nav: parseFloat(navValue.nav),
           units,
           stampDuty,
           isCancelled,

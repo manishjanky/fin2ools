@@ -94,6 +94,7 @@ export interface InvestmentInstallment {
   type: "lumpsum" | "sip-installment";
   originalStartDate: string;
   installmentDate: string;
+  navDate: string;
   amount: number;
   nav: number;
   units: number;
