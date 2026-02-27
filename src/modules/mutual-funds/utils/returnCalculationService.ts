@@ -1,13 +1,12 @@
 import type { UserInvestment, NAVData } from "../types/mutual-funds";
 import {
   calculateInvestmentValue,
-  calculateXIRR,
-  calculateCAGRForInvestments,
   calculatePortfolioOneDayChange,
   investmentMetricSingleFund,
+  caclulatePortfolioXIRR,
+  calculatePortfolioCagr,
 } from "./investmentCalculations";
 import { storeCalculatedReturns } from "./mutualFundsService";
-import moment from "moment";
 
 /**
  * SIMPLIFIED Return Calculation Service
@@ -57,47 +56,30 @@ export class ReturnCalculationService {
   ): Promise<void> {
     if (allInvestments.size === 0) return;
 
-    // Collect all investments and merge NAV histories
-    const allInvArray: Array<UserInvestment & { schemeCode?: number }> = [];
-    const mergedNavHistory: NAVData[] = [];
-
-    for (const [schemeCode, investments] of allInvestments) {
-      const navHistory = schemeNavHistories.get(schemeCode);
-      if (navHistory) {
-        for (const inv of investments) {
-          allInvArray.push({ ...inv, schemeCode });
-        }
-        // Merge NAV histories (remove duplicates)
-        for (const nav of navHistory) {
-          const exists = mergedNavHistory.some((n) => n.date === nav.date);
-          if (!exists) {
-            mergedNavHistory.push(nav);
-          }
-        }
-      }
-    }
-
-    if (allInvArray.length === 0 || mergedNavHistory.length === 0) return;
-
-    // Sort merged NAV history
-    mergedNavHistory.sort((a, b) =>
-      moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
-    );
-
-    // Calculate overall portfolio returns
     let portfolioTotalInvested = 0;
     let portfolioTotalCurrentValue = 0;
 
-    for (const inv of allInvArray) {
-      const value = calculateInvestmentValue(inv, mergedNavHistory);
-      portfolioTotalInvested += value.investedAmount;
-      portfolioTotalCurrentValue += value.currentValue;
+    for (const [schemeCode, investments] of allInvestments) {
+      const navHistory = schemeNavHistories.get(schemeCode);
+      if (!navHistory || navHistory.length === 0) continue;
+
+      for (const inv of investments) {
+        const value = calculateInvestmentValue(inv, navHistory);
+        portfolioTotalCurrentValue += value.currentValue;
+        portfolioTotalInvested += value.investedAmount;
+      }
     }
 
-    const portfolioXirr = calculateXIRR(allInvArray, mergedNavHistory);
-    const portfolioCagr = calculateCAGRForInvestments(
-      allInvArray,
-      mergedNavHistory,
+    const portfolioXirr = caclulatePortfolioXIRR(
+      allInvestments,
+      schemeNavHistories,
+    );
+
+    const portfolioCagr = calculatePortfolioCagr(
+      portfolioTotalInvested,
+      portfolioTotalCurrentValue,
+      allInvestments,
+      schemeNavHistories,
     );
 
     // Calculate portfolio-level 1-day change

@@ -679,9 +679,10 @@ export const calculatePortfolioMetrics = async (
   }
   let totalInvested = 0;
   let totalCurrentValue = 0;
-  const allInvestments: UserInvestment[] = [];
-  const navHistories: NAVData[][] = [];
+
   const allNavHistories: Array<{ schemeCode: number; data: NAVData[] }> = [];
+  const schemeNavMap = new Map<number, NAVData[]>();
+  const investmentsByScheme = new Map<number, UserInvestment[]>();
 
   await Promise.all(
     fundsWithDetails.map(async ({ scheme, investmentData }) => {
@@ -696,13 +697,13 @@ export const calculatePortfolioMetrics = async (
           const value = calculateInvestmentValue(investment, navHistory.data);
           totalInvested += value.investedAmount;
           totalCurrentValue += value.currentValue;
-          allInvestments.push(investment);
         }
-        navHistories.push(navHistory.data);
         allNavHistories.push({
           schemeCode: scheme.schemeCode,
           data: navHistory.data,
         });
+        schemeNavMap.set(scheme.schemeCode, navHistory.data);
+        investmentsByScheme.set(scheme.schemeCode, investmentData.investments);
       } else {
         allNavHistories.push({ schemeCode: scheme.schemeCode, data: [] });
       }
@@ -713,34 +714,21 @@ export const calculatePortfolioMetrics = async (
   const percentageReturn =
     totalInvested > 0 ? (absoluteGain / totalInvested) * 100 : 0;
 
-  const mergedNavHistory: NAVData[] = [];
-  if (navHistories.length > 0) {
-    navHistories.flat().forEach((nav) => {
-      const exists = mergedNavHistory.some((n) => n.date === nav.date);
-      if (!exists) {
-        mergedNavHistory.push(nav);
-      }
-    });
-
-    mergedNavHistory.sort((a, b) =>
-      moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
-    );
-  }
+  const xirr = caclulatePortfolioXIRR(investmentsByScheme, schemeNavMap) || 0;
 
   const cagr =
-    calculateCAGRForInvestments(allInvestments, mergedNavHistory) || 0;
-  const xirr = calculateXIRR(allInvestments, mergedNavHistory) || 0;
+    calculatePortfolioCagr(
+      totalInvested,
+      totalCurrentValue,
+      investmentsByScheme,
+      schemeNavMap,
+    ) || 0;
   let oneDayChange = { absoluteChange: 0, percentageChange: 0 };
 
   if (allNavHistories.length > 0) {
     oneDayChange = calculatePortfolioOneDayChange(
       new Map(allNavHistories.map((nav) => [nav.schemeCode, nav.data])),
-      new Map(
-        fundsWithDetails.map((fund) => [
-          fund.scheme.schemeCode,
-          fund.investmentData.investments,
-        ]),
-      ),
+      investmentsByScheme,
     );
   }
 
@@ -757,3 +745,97 @@ export const calculatePortfolioMetrics = async (
     navHistoryData: allNavHistories,
   };
 };
+
+export function caclulatePortfolioXIRR(
+  allInvestmentsByScheme: Map<number, UserInvestment[]>,
+  schemeNavHistories: Map<number, NAVData[]>,
+): number {
+  const cashflows: Array<{ date: Date; amount: number }> = [];
+  let totalCurrentValue = 0;
+  for (const [schemeCode, investments] of allInvestmentsByScheme) {
+    const navHistory = schemeNavHistories.get(schemeCode);
+    if (!navHistory || navHistory.length === 0) continue;
+
+    for (const investment of investments) {
+      if (investment.investmentType === "lumpsum") {
+        const investmentDate = moment(investment.startDate, "DD-MM-YYYY");
+        const today = moment().startOf("day");
+
+        if (investmentDate.isBefore(today)) {
+          const stampDuty = investment.amount * STAMP_DUTY_RATE;
+          const effectiveAmount = investment.amount - stampDuty;
+          cashflows.push({
+            date: investmentDate.toDate(),
+            amount: -effectiveAmount,
+          });
+        }
+      } else {
+        const sipDates = getSipScheduleDates(investment);
+        const today = moment().startOf("day");
+        for (const date of sipDates) {
+          if (date.isAfter(today) || date.isSame(today)) continue;
+          const sipDateStr = date.format("DD-MM-YYYY");
+          const grossAmount = getSipAmountForDate(investment, sipDateStr);
+          const stampDuty = grossAmount * STAMP_DUTY_RATE;
+          const effectiveAmount = grossAmount - stampDuty;
+          cashflows.push({
+            date: date.toDate(),
+            amount: -effectiveAmount,
+          });
+        }
+      }
+
+      const value = calculateInvestmentValue(investment, navHistory);
+      totalCurrentValue += value.currentValue;
+    }
+  }
+  if (cashflows.length === 0) return 0;
+
+  cashflows.push({
+    date: new Date(),
+    amount: totalCurrentValue,
+  });
+
+  cashflows.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return calculateIRRFromCashFlows(cashflows);
+}
+
+export function calculatePortfolioCagr(
+  totalInvested: number,
+  totalCurrentValue: number,
+  allInvestmentsByScheme: Map<number, UserInvestment[]>,
+  schemeNavHistories: Map<number, NAVData[]>,
+) {
+  if (totalInvested <= 0 || totalCurrentValue <= 0) return 0;
+
+  let earliestDate: moment.Moment | null = null;
+
+  for (const [, investments] of allInvestmentsByScheme) {
+    for (const inv of investments) {
+      const invDate = moment(inv.startDate, "DD-MM-YYYY");
+      if (!earliestDate || invDate.isBefore(earliestDate)) {
+        earliestDate = invDate;
+      }
+    }
+  }
+
+  if (!earliestDate) return 0;
+
+  let latestDate: moment.Moment | null = null;
+  for (const [, navHistory] of schemeNavHistories) {
+    if (navHistory.length === 0) continue;
+    const lastestNav = navHistory[navHistory.length - 1];
+    const navDate = moment(lastestNav.date, "DD-MM-YYYY");
+    if (!latestDate || navDate.isAfter(latestDate)) {
+      latestDate = navDate;
+    }
+  }
+
+  if (!latestDate) return 0;
+
+  const years = latestDate.diff(earliestDate, "years", true);
+  if (years <= 0) return 0;
+
+  return (Math.pow(totalCurrentValue / totalInvested, 1 / years) - 1) * 100;
+}
