@@ -1,21 +1,39 @@
-import type { InvestmentInstallment, UserInvestmentData } from "../types/mutual-funds";
+import type { InvestmentInstallment, NAVData, UserInvestmentData } from "../types/mutual-funds";
 import Pagination from "../../../components/common/Pagination";
 import { useEffect, useMemo, useState } from "react";
 import moment from "moment";
 import { useInvestmentStore } from "../store";
 import { useAlert } from "../../../context/AlertContext";
+import { generateInvestmentInstallments } from "../utils/investmentCalculations";
 
-export default function FundInvestmentHistory({ installments, investmentData }: { installments: InvestmentInstallment[], investmentData: UserInvestmentData }) {
+export default function FundInvestmentHistory({ schemeCode, navHistory }: { schemeCode: string; navHistory: NAVData[] }) {
     const PAGE_SIZE = 20;
     const [currentPage, setCurrentPage] = useState(1);
+    const [installments, setInstallments] = useState<InvestmentInstallment[]>([]);
+    const [investmentData, setInvestmentData] = useState<UserInvestmentData | null>(null);
+
+
     const {
-        updateInvestment
+        updateInvestment,
+        removeInvestment,
+        getSchemeInvestments
     } = useInvestmentStore();
     const { showAlert } = useAlert()
+
+    const getInvestmentData = () => {
+        const invData = getSchemeInvestments(parseInt(schemeCode));
+        setInvestmentData(invData);
+    }
+
+    useEffect(() => {
+        getInvestmentData();
+    }, [schemeCode])
+
 
     useEffect(() => {
         setCurrentPage(1);
     }, [installments])
+
     const onPageChange = (page: number) => {
         setCurrentPage(page)
     };
@@ -25,18 +43,43 @@ export default function FundInvestmentHistory({ installments, investmentData }: 
         return installments?.slice(start, start + PAGE_SIZE) || [];
     }, [installments, currentPage]);
 
-    const handleSkipInstallment = (installment: InvestmentInstallment) => {
-        const investment = investmentData.investments.find((inv) => inv.id === installment.investmentId)
-        const installmentDat = installment.installmentDate;
-        if (investment) {
+    const handleSkipInstallment = async (installment: InvestmentInstallment) => {
+        const investment = investmentData?.investments.find((inv) => inv.id === installment.investmentId)
+        if (!investment) {
+            showAlert('No such invested found!', 'warning');
+            return;
+        }
+        if (installment.type === 'lumpsum' && investment) {
+            const index = investmentData?.investments.findIndex((inv) => inv.id === installment.investmentId)
+            await removeInvestment(investment.schemeCode, index!)
+            showAlert('Lumpsum investment removed!', 'success');
+            return;
+        }
+        if (investment && installment.type === 'sip-installment') {
+            const installmentDate = installment.installmentDate;
             if (!investment.skippedInstallments) {
                 investment.skippedInstallments = [];
             }
-            investment.skippedInstallments.push(installmentDat)
-            updateInvestment(investment.schemeCode, investment);
-            showAlert(`Skipped installment for ${installmentDat}`, 'success');
+            investment.skippedInstallments.push(installmentDate)
+            await updateInvestment(investment.schemeCode, investment);
+            showAlert(`Skipped installment for ${installmentDate}`, 'success');
         }
+        getInvestmentData();
     }
+
+    const getInstallments = async (invData: UserInvestmentData, history: NAVData[]) => {
+        if (!history || history.length === 0) return;
+        // Generate installments
+        const installs = await generateInvestmentInstallments(invData, history);
+        setInstallments(installs);
+    }
+
+
+    useEffect(() => {
+        if (investmentData) {
+            getInstallments(investmentData, navHistory)
+        }
+    }, [investmentData, navHistory])
 
     return (
         <section className="rounded-lg overflow-hidden border bg-bg-secondary border-border-light"
@@ -106,7 +149,9 @@ export default function FundInvestmentHistory({ installments, investmentData }: 
                                     {inst.units.toFixed(4)}
                                 </td>
                                 <td>
-                                    <span className="cursor-pointer p-1 text-accent-orange" onClick={() => handleSkipInstallment(inst)}>Skip</span>
+                                    <span className="cursor-pointer p-1 text-accent-orange" onClick={() => handleSkipInstallment(inst)}>{
+                                        inst.type === 'lumpsum' ? 'Remove' : 'Skip'
+                                    }</span>
                                 </td>
                             </tr>
                         ))}
