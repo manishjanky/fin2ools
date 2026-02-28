@@ -45,7 +45,6 @@ export default function FundInvestmentSummary({
           value={metrics.percentageReturn.toFixed(2)}
           suffix="%"
           colorKey={isPositive ? 'success' : 'error'}
-          subtext={isPositive ? 'Positive return' : 'Negative return'}
         />
 
         <MetricCard
