@@ -5,7 +5,7 @@ import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentDat
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
 import { useNavigate } from 'react-router';
-import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils/mutualFundsService';
+import { exportUserInevestments, getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils/mutualFundsService';
 import moment from 'moment';
 
 const MyFundsCard = lazy(() => import('./MyFundsCard'));
@@ -58,6 +58,10 @@ export default function MyFunds() {
       })
     );
     setNavHistoryData(historyData);
+  }
+
+  const handleExportInvestments = () => {
+    exportUserInevestments(userInvestments);
   }
 
   useEffect(() => {
@@ -167,7 +171,7 @@ export default function MyFunds() {
       <header
         className="backdrop-blur-sm py-4 bg-bg-primary"
       >
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-4 items-center mb-4">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-3 items-center mb-4">
           <div>
             <h1
               className="text-2xl md:text-4xl font-bold text-text-primary"
@@ -183,15 +187,26 @@ export default function MyFunds() {
               </p>
             )}
           </div>
+          <div className='flex gap-2 justify-end'>
+            <button
+              title='Export your investment(s) info'
+              onClick={handleExportInvestments}
+              className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
+            >
+              Export
+            </button>
 
-          <button
-            onClick={() => navigate('/mutual-funds/explore-funds')}
-            className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
-          >
-            Explore Funds
-          </button>
+            <button
+              onClick={() => navigate('/mutual-funds/explore-funds')}
+              className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
+            >
+              Explore Funds
+            </button>
+          </div>
+
+
         </div>
-      </header>
+      </header >
 
       <main className="max-w-7xl mx-auto px-4">
         {/* Stale NAV Alert */}
@@ -216,12 +231,20 @@ export default function MyFunds() {
             <p className="text-lg mb-6 text-text-secondary">
               You haven't added any mutual funds yet.
             </p>
-            <button
-              onClick={() => navigate('/mutual-funds/explore-funds')}
-              className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
-            >
-              Explore Mutual Funds
-            </button>
+            <div className='flex gap-3 justify-center'>
+              <button
+                onClick={() => navigate('/mutual-funds/explore-funds')}
+                className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
+              >
+                Explore Mutual Funds
+              </button>
+              <button
+                onClick={() => navigate('/mutual-funds/explore-funds')}
+                className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
+              >
+                Import Investments
+              </button>
+            </div>
 
 
           </div>
@@ -287,6 +310,6 @@ export default function MyFunds() {
           </>
         )}
       </main>
-    </div>
+    </div >
   );
 }

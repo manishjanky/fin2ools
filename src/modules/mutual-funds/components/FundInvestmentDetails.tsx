@@ -120,9 +120,6 @@ export default function FundInvestmentDetails() {
       const updated = getSchemeInvestments(scheme.schemeCode);
       if (updated) {
         setInvestmentData(updated);
-
-        // Regenerate installments with updated data
-        getInstallments(updated, navHistory)
       }
       calculatePortFolioRetruns();
     }
@@ -130,6 +127,12 @@ export default function FundInvestmentDetails() {
     setShowAddModal(false);
     setEditingSIP(null);
   };
+
+  useEffect(() => {
+    if (investmentData) {
+      getInstallments(investmentData, navHistory)
+    }
+  }, [investmentData])
 
   useEffect(() => {
     const getFundMetrics = async () => {
