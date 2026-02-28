@@ -245,7 +245,7 @@ export default function FundInvestmentDetails() {
             )}
           </section>
           <Suspense fallback={<Loader message='Loading investment history...' />}>
-            <FundInvestmentHistory installments={installments} />
+            <FundInvestmentHistory installments={installments} investmentData={investmentData}/>
           </Suspense>
         </main>
       }

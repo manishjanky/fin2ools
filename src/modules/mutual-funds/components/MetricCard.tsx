@@ -37,7 +37,7 @@ export default function MetricCard({
         {suffix && <span className="text-lg ml-1">{suffix}</span>}
       </p>
       {subtext && (
-        <p className="text-xs mt-2 text-text-secondary">
+        <p className="text-xs mt-2 text-text-secondary font-bold">
           {subtext}
         </p>
       )}

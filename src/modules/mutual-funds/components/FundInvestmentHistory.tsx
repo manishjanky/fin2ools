@@ -1,11 +1,17 @@
-import type { InvestmentInstallment } from "../types/mutual-funds";
+import type { InvestmentInstallment, UserInvestmentData } from "../types/mutual-funds";
 import Pagination from "../../../components/common/Pagination";
 import { useEffect, useMemo, useState } from "react";
 import moment from "moment";
+import { useInvestmentStore } from "../store";
+import { useAlert } from "../../../context/AlertContext";
 
-export default function FundInvestmentHistory({ installments }: { installments: InvestmentInstallment[] }) {
+export default function FundInvestmentHistory({ installments, investmentData }: { installments: InvestmentInstallment[], investmentData: UserInvestmentData }) {
     const PAGE_SIZE = 20;
     const [currentPage, setCurrentPage] = useState(1);
+    const {
+        updateInvestment
+    } = useInvestmentStore();
+    const { showAlert } = useAlert()
 
     useEffect(() => {
         setCurrentPage(1);
@@ -18,6 +24,19 @@ export default function FundInvestmentHistory({ installments }: { installments: 
         const start = (currentPage - 1) * PAGE_SIZE;
         return installments?.slice(start, start + PAGE_SIZE) || [];
     }, [installments, currentPage]);
+
+    const handleSkipInstallment = (installment: InvestmentInstallment) => {
+        const investment = investmentData.investments.find((inv) => inv.id === installment.investmentId)
+        const installmentDat = installment.installmentDate;
+        if (investment) {
+            if (!investment.skippedInstallments) {
+                investment.skippedInstallments = [];
+            }
+            investment.skippedInstallments.push(installmentDat)
+            updateInvestment(investment.schemeCode, investment);
+            showAlert(`Skipped installment for ${installmentDat}`, 'success');
+        }
+    }
 
     return (
         <section className="rounded-lg overflow-hidden border bg-bg-secondary border-border-light"
@@ -57,6 +76,7 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                             <th className="px-6 py-4 text-right font-semibold text-text-secondary">
                                 Units
                             </th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,10 +88,10 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-text-primary">
-                                    {moment(inst.installmentDate,'DD-MM-YYYY').format('DD MMM YYYY')}
+                                    {moment(inst.installmentDate, 'DD-MM-YYYY').format('DD MMM YYYY')}
                                 </td>
                                 <td className="px-6 py-4 text-text-primary">
-                                    {moment(inst.navDate,'DD-MM-YYYY').format('DD MMM YYYY')}
+                                    {moment(inst.navDate, 'DD-MM-YYYY').format('DD MMM YYYY')}
                                 </td>
                                 <td className="px-6 py-4 text-right text-secondary-main">
                                     ₹{inst.amount.toFixed(3)}
@@ -84,6 +104,9 @@ export default function FundInvestmentHistory({ installments }: { installments: 
                                 </td>
                                 <td className="px-6 py-4 text-right font-semibold text-secondary-main">
                                     {inst.units.toFixed(4)}
+                                </td>
+                                <td>
+                                    <span className="cursor-pointer p-1 text-accent-orange" onClick={() => handleSkipInstallment(inst)}>Skip</span>
                                 </td>
                             </tr>
                         ))}

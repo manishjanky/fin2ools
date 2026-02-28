@@ -56,16 +56,13 @@ export default function MyFundsSummary({
           colorKey={isPositiveGain ? 'success' : 'error'}
         />
 
-
         <MetricCard
           label="1D Change"
-          value={metrics.oneDayChange?.percentageChange.toFixed(2) ?? '0.00'}
-          suffix="%"
+          value={`${isPositiveOneDayChange ? '+' : ''}₹${(metrics.oneDayChange?.absoluteChange.toFixed(4) ?? 0)}`}
           colorKey={isPositiveOneDayChange ? 'success' : 'error'}
-          subtext={`${isPositiveOneDayChange ? '+' : ''}₹${(metrics.oneDayChange?.absoluteChange ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          subtext={`${(metrics.oneDayChange?.percentageChange.toFixed(2) ?? '0.00')}%`}
         />
-
-
+        
         <MetricCard
           label="XIRR"
           value={metrics.xirr?.toFixed(2) || '0.00'}

@@ -112,7 +112,10 @@ const getSipScheduleDates = (investment: UserInvestment): moment.Moment[] => {
     nextDate = nextDate.add(1, "month").date(sipMonthlyDate);
   }
 
-  return dates;
+  return dates.filter(
+    (date) =>
+      !investment.skippedInstallments?.includes(date.format("DD-MM-YYYY")),
+  );
 };
 
 /**
@@ -607,6 +610,7 @@ export const generateInvestmentInstallments = async (
           nav: parseFloat(navValue.nav),
           units,
           stampDuty,
+          investmentId: investment.id,
         });
       }
     } else {
@@ -628,6 +632,7 @@ export const generateInvestmentInstallments = async (
 
         installments.push({
           id: `inst-${installmentId++}`,
+          investmentId: investment.id,
           type: "sip-installment",
           originalStartDate: investment.startDate,
           installmentDate: sipDateStr,

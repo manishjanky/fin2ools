@@ -67,6 +67,7 @@ export interface UserInvestment {
   sipMonthlyDate?: number; // For SIP: day of month (1-31) when SIP is deducted
   sipEndDate?: string; // For SIP: end date (if cancelled) - if not provided, SIP is active
   sipAmountModifications?: SIPAmountModification[]; // Track all SIP amount changes with effective dates
+  skippedInstallments?: string[]; // dates for which the user has skipped an investment. Once marked this will also not show in the installments
 }
 
 export interface UserInvestmentData {
@@ -101,6 +102,7 @@ export interface InvestmentInstallment {
   stampDuty: number;
   isCancelled?: boolean;
   cancelledOn?: string;
+  investmentId: string;
 }
 
 export interface FundInvestmentDetails {
