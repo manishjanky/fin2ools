@@ -1,12 +1,13 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense, type ChangeEvent } from 'react';
 import { useInvestmentStore } from '../store';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
 import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentData } from '../types/mutual-funds';
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
 import { useNavigate } from 'react-router';
-import { exportUserInevestments, getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils/mutualFundsService';
+import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale, exportUserInevestments, importInvestments } from '../utils';
 import moment from 'moment';
+import { } from '../utils';
 
 const MyFundsCard = lazy(() => import('./MyFundsCard'));
 const MyFundsSummary = lazy(() => import('./MyFundsSummary'));
@@ -38,6 +39,8 @@ export default function MyFunds() {
   const [userInvestments, setUserInvestments] = useState<UserInvestmentData[]>(getAllInvestments());
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
   const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | undefined>();
+  const [key, setKey] = useState(0);
 
   const loadNavHistories = async () => {
     const historyData = await Promise.all(
@@ -60,8 +63,20 @@ export default function MyFunds() {
     setNavHistoryData(historyData);
   }
 
+  const importFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(event.target.files?.['0']);
+  }
+
   const handleExportInvestments = () => {
     exportUserInevestments(userInvestments);
+  }
+
+  const handleImportInvestments = async () => {
+    if (selectedFile) {
+      const investmentData = await importInvestments(selectedFile);
+      setUserInvestments(investmentData);
+      setKey(key + 1);
+    }
   }
 
   useEffect(() => {
@@ -166,6 +181,7 @@ export default function MyFunds() {
 
   return (
     <div
+      key={key}
       className="min-h-screen bg-bg-primary"
     >
       <header
@@ -231,19 +247,35 @@ export default function MyFunds() {
             <p className="text-lg mb-6 text-text-secondary">
               You haven't added any mutual funds yet.
             </p>
-            <div className='flex gap-3 justify-center'>
+            <div className='grid grid-cols-1 gap-3 justify-center items-center'>
               <button
                 onClick={() => navigate('/mutual-funds/explore-funds')}
-                className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
+                className="max-w-64 m-auto rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
               >
                 Explore Mutual Funds
               </button>
-              <button
-                onClick={() => navigate('/mutual-funds/explore-funds')}
-                className="px-6 py-3 rounded-lg transition font-medium bg-primary-main text-text-inverse hover:bg-primary-dark"
-              >
-                Import Investments
-              </button>
+
+              <p className='text-2xl'>OR</p>
+
+              <div className="flex items-center justify-center w-full">
+                <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-2xl cursor-pointer hover:bg-neutral-tertiary-medium">
+                  <div className="flex flex-col items-center justify-center text-body pt-3 pb-3">
+                    {selectedFile ?
+                      <>
+                        <p>{selectedFile.name.split('\\').pop()}</p>
+                        <button
+                          className='px-6 py-2 mt-3 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary'
+                          onClick={handleImportInvestments}
+                        >Import</button>
+                      </> : <>
+                        <svg className="w-8 h-8 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2" /></svg>
+                        <p className="mb-2 text-sm"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs">JSON Files only</p></>
+                    }
+                  </div>
+                  <input onChange={importFileChange} id="dropzone-file" type="file" className="hidden" accept=".json" />
+                </label>
+              </div>
             </div>
 
 

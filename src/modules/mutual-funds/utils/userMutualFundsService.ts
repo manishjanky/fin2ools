@@ -232,3 +232,55 @@ export const userWatchlistService = {
     }
   },
 };
+
+export function exportUserInevestments(userInvestments: UserInvestmentData[]) {
+  const jsonString = JSON.stringify(userInvestments, null, 2); // Convert object to a readable JSON string
+  const blob = new Blob([jsonString], { type: "application/json" }); // Create a Blob object
+  const url = URL.createObjectURL(blob); // Create a URL for the blob
+
+  const link = document.createElement("a"); // Create an anchor element
+  link.href = url; // Set the link's href to the blob URL
+  link.download = "fin2ools_investments.json"; // Set the download attribute with the filename
+  link.style.display = "none"; // Hide the element
+
+  document.body.appendChild(link); // Append the link to the body
+  link.click(); // Programmatically click the link to trigger the download
+
+  document.body.removeChild(link); // Clean up the DOM
+  URL.revokeObjectURL(url);
+}
+
+export async function importInvestments(
+  file: File,
+): Promise<UserInvestmentData[]> {
+  const reader = new FileReader();
+  const prom = new Promise<UserInvestmentData[]>((resolve, reject) => {
+    reader.onload = function (e: ProgressEvent<FileReader>) {
+      try {
+        if (e.target?.result) {
+          const userInvestments: UserInvestmentData[] = JSON.parse(
+            e.target.result as string,
+          );
+
+          userInvestments.forEach(({ schemeCode, investments }) => {
+            investments.forEach((inv) => {
+              userInvestmentService.addInvestment(schemeCode, inv);
+            });
+          });
+          resolve(userInvestments);
+        }
+      } catch (error) {
+        console.error("Error parsing JSON file:", error);
+        reject();
+      }
+    };
+    reader.onerror = function () {
+      console.error("Error reading file:");
+      reject();
+    };
+  });
+
+  // Read the file content as a text string
+  reader.readAsText(file);
+  return prom;
+}
