@@ -4,12 +4,10 @@ import type {
   MutualFundScheme,
   UserInvestmentData,
   NAVData,
-  InvestmentInstallment,
   UserInvestment,
   InvestmentMetrics,
 } from '../types/mutual-funds';
 import {
-  generateInvestmentInstallments,
   calculateInvestmentDuration,
 } from '../utils/investmentCalculations';
 import { useMutualFundsStore } from '../store/mutualFundsStore';
@@ -35,7 +33,6 @@ export default function FundInvestmentDetails() {
   const [scheme, setScheme] = useState<MutualFundScheme | null>(null);
   const [navHistory, setNavHistory] = useState<NAVData[]>([]);
   const [investmentData, setInvestmentData] = useState<UserInvestmentData | null>(null);
-  const [installments, setInstallments] = useState<InvestmentInstallment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
@@ -44,11 +41,7 @@ export default function FundInvestmentDetails() {
 
   getAllInvestments();
 
-  const getInstallments = async (invData: UserInvestmentData, history: NAVData[]) => {
-    // Generate installments
-    const installs = await generateInvestmentInstallments(invData, history);
-    setInstallments(installs);
-  }
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -82,7 +75,6 @@ export default function FundInvestmentDetails() {
             nav: latestNav?.nav,
             date: latestNav?.date,
           });
-          getInstallments(invData, history.data)
         }
       } catch (error) {
         console.error('Error loading investment details:', error);
@@ -127,12 +119,6 @@ export default function FundInvestmentDetails() {
     setShowAddModal(false);
     setEditingSIP(null);
   };
-
-  useEffect(() => {
-    if (investmentData) {
-      getInstallments(investmentData, navHistory)
-    }
-  }, [investmentData])
 
   useEffect(() => {
     const getFundMetrics = async () => {
@@ -244,8 +230,9 @@ export default function FundInvestmentDetails() {
               </button>
             )}
           </section>
-          <Suspense fallback={<Loader message='Loading investment history...' />}>
-            <FundInvestmentHistory installments={installments} investmentData={investmentData}/>
+          <Suspense fallback={<Loader message='Loading investment history...' />}>{
+            schemeCode && <FundInvestmentHistory schemeCode={schemeCode} navHistory={navHistory} />
+          }
           </Suspense>
         </main>
       }
