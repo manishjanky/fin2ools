@@ -7,6 +7,7 @@ import type {
   NAVData,
   UserInvestment,
   InvestmentMetrics,
+  UserInvestmentData,
 } from "../types/mutual-funds";
 import { IndexedDBService } from "./indexedDBService";
 import { ReturnCalculationService } from "./returnCalculationService";
@@ -434,4 +435,21 @@ export function getEarliestInvestmentDate(investments: UserInvestment[]): {
   const diff = Math.abs(moment(earliest, "DD-MM-YYYY").diff(moment(), "days"));
 
   return { date: earliest, diff };
+}
+
+export function exportUserInevestments(userInvestments: UserInvestmentData[]) {
+  const jsonString = JSON.stringify(userInvestments, null, 2); // Convert object to a readable JSON string
+  const blob = new Blob([jsonString], { type: "application/json" }); // Create a Blob object
+  const url = URL.createObjectURL(blob); // Create a URL for the blob
+
+  const link = document.createElement("a"); // Create an anchor element
+  link.href = url; // Set the link's href to the blob URL
+  link.download = "fin2ools_investments.json"; // Set the download attribute with the filename
+  link.style.display = "none"; // Hide the element
+
+  document.body.appendChild(link); // Append the link to the body
+  link.click(); // Programmatically click the link to trigger the download
+
+  document.body.removeChild(link); // Clean up the DOM
+  URL.revokeObjectURL(url);
 }

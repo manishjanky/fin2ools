@@ -322,7 +322,13 @@ export class IndexedDBService {
       request.onsuccess = () => {
         const navs = request.result as Array<NAVData & { schemeCode: number }>;
         // Remove schemeCode before returning
-        resolve(navs.map(({ schemeCode: _, ...nav }) => nav));
+        resolve(
+          navs
+            .map(({ schemeCode: _, ...nav }) => nav)
+            .sort((a, b) =>
+              moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+            ),
+        );
       };
     });
   }
