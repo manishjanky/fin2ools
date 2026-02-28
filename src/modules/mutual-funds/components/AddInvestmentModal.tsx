@@ -112,9 +112,13 @@ export default function AddInvestmentModal({
       amount: investmentType === 'lumpsum' ? parseFloat(amount) : 0,
       sipAmount: investmentType === 'sip' ? parseFloat(sipAmount) : undefined,
       sipMonthlyDate: investmentType === 'sip' ? parseInt(sipMonthlyDate) : undefined,
-      sipEndDate: investmentType === 'sip' && sipCancelled ? formatDateForStorage(sipEndDate) : undefined,
     };
 
+    investment = {
+      ...investment,
+      sipEndDate: investmentType === 'sip' && sipCancelled ? formatDateForStorage(sipEndDate) : undefined,
+
+    }
     // Handle SIP amount modification with effective date (past or future)
     if (isEditMode && investmentType === 'sip' && isChangingAmount && editingInvestment) {
       const newAmount = parseFloat(sipAmount);
