@@ -181,19 +181,18 @@ export const userInvestmentService = {
   async importInvestments(file: File): Promise<UserInvestmentData[]> {
     const reader = new FileReader();
     const prom = new Promise<UserInvestmentData[]>((resolve, reject) => {
-      reader.onload = function (e: ProgressEvent<FileReader>) {
+      reader.onload = async function (e: ProgressEvent<FileReader>) {
         try {
           if (e.target?.result) {
             const userInvestments: UserInvestmentData[] = JSON.parse(
               e.target.result as string,
             );
 
-            userInvestments.forEach(async ({ schemeCode, investments }) => {
-              await userInvestmentService.addInvestment(
-                schemeCode,
-                investments,
-              );
-            });
+            await Promise.all(
+              userInvestments.map(async ({ schemeCode, investments }) =>
+                userInvestmentService.addInvestment(schemeCode, investments),
+              ),
+            );
             resolve(userInvestments);
           }
         } catch (error) {

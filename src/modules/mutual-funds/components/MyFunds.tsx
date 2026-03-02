@@ -67,6 +67,14 @@ export default function MyFunds() {
     setNavHistoryData(historyData);
   }
 
+  const refreshReturnCalculations = async () => {
+    await calculatePortfolioReturns();
+    const freshReturns = await getCalculatedReturns(0, true);
+    if (freshReturns) {
+      setMetrics({ ...freshReturns.overallReturns });
+    }
+  }
+
   const importFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSelectedFile(event.target.files?.['0']);
   }
@@ -81,11 +89,11 @@ export default function MyFunds() {
       if (selectedFile) {
         const investmentData = await importInvestments(selectedFile);
         setUserInvestments(investmentData);
-        const promises = Promise.all(investmentData.map(async ({ schemeCode }) =>
+        const promises = Promise.all([...investmentData.map(async ({ schemeCode }) =>
           calculateSchemeReturns(schemeCode)
-        ));
+        ), calculatePortfolioReturns()]);
         await promises;
-        await calculatePortfolioReturns();
+        await refreshReturnCalculations();
         setKey(key + 1);
         setLoading(false);
         showAlert(`Investments in ${investmentData.length} schemes successfully imported!`, 'success');
@@ -106,16 +114,6 @@ export default function MyFunds() {
       loadUserInvestments();
     }
   }, []);
-
-
-
-  const refreshReturnCalculations = async () => {
-    await calculatePortfolioReturns();
-    const freshReturns = await getCalculatedReturns(0, true);
-    if (freshReturns) {
-      setMetrics({ ...freshReturns.overallReturns });
-    }
-  }
 
 
 
