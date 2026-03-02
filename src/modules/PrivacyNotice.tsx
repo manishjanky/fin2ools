@@ -29,7 +29,7 @@ export default function PrivacyNotice() {
                             <ul className="space-y-3 text-text-secondary leading-relaxed">
                                 <li className="flex items-start">
                                     <span className="text-green-500 mr-3 mt-1">✓</span>
-                                    <span>Any info you enter related to FD, PPF is not stored anywhere. Info you add related to Mutual Funds is stored exclusively in your browser's local storage</span>
+                                    <span>Any info you enter related to FD, PPF is not stored anywhere. Info you add related to Mutual Funds is stored exclusively in your browser's storage</span>
                                 </li>
                                 <li className="flex items-start">
                                     <span className="text-green-500 mr-3 mt-1">✓</span>
@@ -37,11 +37,11 @@ export default function PrivacyNotice() {
                                 </li>
                                 <li className="flex items-start">
                                     <span className="text-green-500 mr-3 mt-1">✓</span>
-                                    <span>Your data is never shared with third parties</span>
+                                    <span>Since there is not data collected. The question of sharing the data does not exist.</span>
                                 </li>
                                 <li className="flex items-start">
                                     <span className="text-green-500 mr-3 mt-1">✓</span>
-                                    <span>Clearing your browser cache will delete all stored data</span>
+                                    <span>Clearing your browser data will delete all stored data</span>
                                 </li>
                             </ul>
                         </section>
@@ -50,12 +50,12 @@ export default function PrivacyNotice() {
                         <section>
                             <h2 className="text-2xl font-semibold mb-4 text-text-primary">What We Do Collect</h2>
                             <p className="text-text-secondary leading-relaxed mb-4">
-                                The application does not collect any personal information:
+                                The application does not collect any information:
                             </p>
                             <ul className="space-y-2 text-text-secondary leading-relaxed">
                                 <li className="flex items-start">
                                     <span className="text-blue-500 mr-3 mt-1">•</span>
-                                    <span>The Mutual fund you add to My-Funds is stored in your browser's local storage. The same is in no way shared with any other service or a server.</span>
+                                    <span>The Mutual fund you add to My-Funds is stored in your browser's local storage(indexedDB to be specific). The same is in no way shared with any other service or a server.</span>
                                 </li>
                             </ul>
                         </section>
