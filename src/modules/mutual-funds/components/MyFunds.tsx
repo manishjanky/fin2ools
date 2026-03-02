@@ -45,6 +45,11 @@ export default function MyFunds() {
   const { exportUserInevestments, importInvestments, calculateSchemeReturns } = useInvestmentStore();
 
   const [key, setKey] = useState(0);
+  const loadUserInvestments = async () => {
+    await loadInvestments();
+    const invs = getAllInvestments();
+    setUserInvestments(invs);
+  }
 
   const loadNavHistories = async () => {
     const historyData = await Promise.all(
@@ -88,14 +93,16 @@ export default function MyFunds() {
     try {
       if (selectedFile) {
         const investmentData = await importInvestments(selectedFile);
-        setUserInvestments(investmentData);
         const promises = Promise.all([...investmentData.map(async ({ schemeCode }) =>
           calculateSchemeReturns(schemeCode)
         ), calculatePortfolioReturns()]);
+        setMetricsLoading(true);
         await promises;
+        await loadUserInvestments();
         await refreshReturnCalculations();
         setKey(key + 1);
         setLoading(false);
+        setMetricsLoading(false);
         showAlert(`Investments in ${investmentData.length} schemes successfully imported!`, 'success');
       }
     } catch (_) {
@@ -105,11 +112,7 @@ export default function MyFunds() {
   }
 
   useEffect(() => {
-    const loadUserInvestments = async () => {
-      await loadInvestments();
-      const invs = getAllInvestments();
-      setUserInvestments(invs);
-    }
+
     if (!userInvestments || userInvestments.length === 0) {
       loadUserInvestments();
     }
