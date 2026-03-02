@@ -185,6 +185,7 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
   },
   importInvestments: async (file: File)=>{
     const investments = await userInvestmentService.importInvestments(file);
+    await get().loadInvestments();
     return investments;
   }
 }));
