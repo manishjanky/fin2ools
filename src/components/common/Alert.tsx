@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 interface AlertProps {
     message: string;
-    type: 'success' | 'alert' | 'warning';
+    type: 'success' | 'alert' | 'warning' | 'error';
     onClose?: () => void;
     autoCloseDuration?: number; // in milliseconds, 0 = manual close only
     showCloseIcon?: boolean
@@ -40,11 +40,18 @@ const Alert = ({ message, type, onClose, autoCloseDuration = 10000, showCloseIco
                     textColor: 'var(--color-text-inverse)',
                     iconColor: 'var(--color-text-inverse)',
                 };
+            case 'error':
+                return {
+                    backgroundColor: 'var(--color-warning)',
+                    borderColor: 'var(--color-warning)',
+                    textColor: 'var(--color-text-inverse)',
+                    iconColor: 'var(--color-text-inverse)',
+                }
             case 'alert':
             default:
                 return {
-                    backgroundColor: 'var(--color-error)',
-                    borderColor: 'var(--color-error)',
+                    backgroundColor: 'var(--color-info)',
+                    borderColor: 'var(--color-info)',
                     textColor: 'var(--color-text-inverse)',
                     iconColor: 'var(--color-text-inverse)',
                 };
@@ -56,6 +63,7 @@ const Alert = ({ message, type, onClose, autoCloseDuration = 10000, showCloseIco
             case 'success':
                 return '✓';
             case 'warning':
+            case 'error':
                 return '⚠';
             case 'alert':
             default:

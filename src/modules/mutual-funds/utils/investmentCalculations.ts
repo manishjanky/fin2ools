@@ -70,7 +70,9 @@ export const findClosestNav = (
  */
 const getNavValueOnDate = (navHistory: NAVData[], dateStr: string): NAVData => {
   const nav = findClosestNav(navHistory, dateStr);
-  return nav && nav.nav ? nav : { nav: "0", date: "" };
+  return nav && nav.nav
+    ? { ...nav, nav: parseFloat(nav.nav).toFixed(4) }
+    : { nav: "0", date: "" };
 };
 
 /**
@@ -84,7 +86,9 @@ const calculateUnitsFromAmount = (
 ): { units: number; stampDuty: number } => {
   const stampDuty = amount * STAMP_DUTY_RATE;
   const effectiveAmount = amount - stampDuty;
-  const units = navValue > 0 ? effectiveAmount / navValue : 0;
+  const units = parseFloat(
+    (navValue > 0 ? effectiveAmount / navValue : 0).toFixed(4),
+  );
   return { units, stampDuty };
 };
 

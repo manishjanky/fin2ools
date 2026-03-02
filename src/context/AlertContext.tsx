@@ -3,12 +3,12 @@ import { createContext, useContext, useState, useCallback } from 'react';
 export interface AlertMessage {
   id: string;
   message: string;
-  type: 'success' | 'alert' | 'warning';
+  type: 'success' | 'alert' | 'warning' | 'error';
 }
 
 interface AlertContextType {
   alerts: AlertMessage[];
-  showAlert: (message: string, type: 'success' | 'alert' | 'warning', duration?: number) => void;
+  showAlert: (message: string, type: 'success' | 'alert' | 'warning' | 'error', duration?: number) => void;
   removeAlert: (id: string) => void;
 }
 
@@ -18,7 +18,7 @@ export const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   const [alerts, setAlerts] = useState<AlertMessage[]>([]);
 
   const showAlert = useCallback(
-    (message: string, type: 'success' | 'alert' | 'warning' = 'alert', duration = 5000) => {
+    (message: string, type: 'success' | 'alert' | 'warning' | 'error' = 'alert', duration = 5000) => {
       const id = `alert-${Date.now()}-${Math.random()}`;
       
       setAlerts(prev => [...prev, { id, message, type }]);

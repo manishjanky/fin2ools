@@ -5,7 +5,10 @@ import type {
   UserInvestmentData,
 } from "../types/mutual-funds";
 import { userInvestmentService } from "../utils/userMutualFundsService";
-import { getEarliestInvestmentDate, getOrFetchSchemeHistoryWithCache } from "../utils/mutualFundsService";
+import {
+  getEarliestInvestmentDate,
+  getOrFetchSchemeHistoryWithCache,
+} from "../utils/mutualFundsService";
 import { ReturnCalculationService } from "../utils/returnCalculationService";
 
 interface InvestmentStore {
@@ -25,6 +28,8 @@ interface InvestmentStore {
   ) => Promise<void>;
   calculateSchemeReturns: (schemeCode: number) => Promise<void>;
   calculatePortFolioRetruns: () => Promise<void>;
+  importInvestments: (file: File) => Promise<UserInvestmentData[]>;
+  exportUserInevestments: (userInvestments: UserInvestmentData[]) => void;
 }
 
 export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
@@ -175,4 +180,11 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
       // console.error("Error calculating portfolio returns:", error);
     }
   },
+  exportUserInevestments: (userInvestments: UserInvestmentData[])=>{
+    userInvestmentService.exportUserInevestments(userInvestments)
+  },
+  importInvestments: async (file: File)=>{
+    const investments = await userInvestmentService.importInvestments(file);
+    return investments;
+  }
 }));

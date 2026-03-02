@@ -177,10 +177,10 @@ export async function getOrFetchSchemeHistoryWithCache(
     days || moment().diff(moment(startDate, "DD-MM-YYYY"), "days"); // Request a large range
 
   try {
+    let cachedNav = await IndexedDBService.getNavHistory(schemeCode);
     // If forceFresh is true, skip cache and fetch from API
     if (!forceFresh) {
       // First, try to get from IndexedDB
-      let cachedNav = await IndexedDBService.getNavHistory(schemeCode);
       cachedNav = cachedNav.sort((a, b) =>
         moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
       );
@@ -212,8 +212,11 @@ export async function getOrFetchSchemeHistoryWithCache(
       }
     }
 
-    // Fetch latest data from API with all available history
-    const schemeHistory = await fetchSchemeHistory(schemeCode, apiDays + 1);
+    // Fetch latest data from API with all available history that is not available in indexedDB
+    const schemeHistory = await fetchSchemeHistory(
+      schemeCode,
+      apiDays - cachedNav.length - 1 + 1,
+    );
 
     if (schemeHistory && schemeHistory.data && schemeHistory.data.length > 0) {
       // Store in IndexedDB
