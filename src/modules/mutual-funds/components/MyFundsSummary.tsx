@@ -29,7 +29,7 @@ export default function MyFundsSummary({
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
+    <>    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
       <Suspense>
         <MetricCard
           label="Total Invested"
@@ -79,7 +79,8 @@ export default function MyFundsSummary({
           subtext="Compound Annual Growth Rate"
         />
       </Suspense>
-      <div className='p-2 col-span-4 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
+    </div>
+      <div className='p-2 mt-2 col-span-4 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
         <div className='text-3xl p-3'>
           ⚠
         </div>
@@ -90,7 +91,6 @@ export default function MyFundsSummary({
           </p>
         </div>
       </div>
-
-    </div>
+    </>
   );
 }
