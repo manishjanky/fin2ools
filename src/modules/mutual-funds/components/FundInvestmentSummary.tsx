@@ -24,25 +24,25 @@ export default function FundInvestmentSummary({
       <Suspense>
         <MetricCard
           label="Total Invested"
-          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
           colorKey="cyan"
         />
 
         <MetricCard
           label="Current Value"
-          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
           colorKey="primary"
         />
 
         <MetricCard
           label={isPositive ? 'Gain' : 'Loss'}
-          value={`₹${(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+          value={`₹${(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
           colorKey={isPositive ? 'success' : 'error'}
         />
 
         <MetricCard
           label="Returns"
-          value={metrics.percentageReturn.toFixed(2)}
+          value={metrics.percentageReturn.toFixed(4)}
           suffix="%"
           colorKey={isPositive ? 'success' : 'error'}
         />
@@ -51,12 +51,12 @@ export default function FundInvestmentSummary({
           label="Total Units"
           value={metrics.units?.toFixed(4) || '0'}
           colorKey="secondary"
-          subtext={`@ ₹${currentNav.toFixed(2)} current NAV`}
+          subtext={`@ ₹${currentNav.toFixed(4)} current NAV`}
         />
 
         <MetricCard
           label="XIRR"
-          value={metrics.xirr?.toFixed(2) || '0'}
+          value={metrics.xirr?.toFixed(4) || '0'}
           suffix="%"
           colorKey="warning"
           subtext="Extended Internal Rate of Return"
@@ -66,7 +66,7 @@ export default function FundInvestmentSummary({
           label="1D Change"
           value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
           colorKey={isOneDayPositive ? 'success' : 'error'}
-          subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(2)}%`}
+          subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(4)}%`}
         />
 
         <MetricCard
@@ -76,14 +76,14 @@ export default function FundInvestmentSummary({
 
         />
       </Suspense>
-      <div className='p-2 col-span-4 flex border border-secondary-light rounded-xl bg-red-400 text-primary-darker opacity-50'>
+      <div className='p-2 col-span-4 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
         <div className='text-3xl p-3'>
           ⚠
         </div>
         <div>
           <h6 className='font-extrabold'>Disclaimer:</h6>
-          <p>
-            All calculations are performed and rounded to four decimal places only. As a result, the calculations may not be completely accurate, and there may be a tracking error due to rounding limitations. Users should consider these factors when interpreting the results.
+          <p className=''>
+            All calculations are performed by rouding the NAV to four decimal places only. As a result, the calculations may not be completely accurate, and there may be a tracking error due to rounding limitations. Users should consider these factors when interpreting the results.
           </p>
         </div>
       </div>
