@@ -44,16 +44,19 @@ export const userInvestmentService = {
    */
   async addInvestment(
     schemeCode: number,
-    investment: UserInvestment,
+    investment: UserInvestment | UserInvestment[],
   ): Promise<void> {
     try {
       const existing = await IndexedDBService.getSchemeInvestments(schemeCode);
-
+      let updatedInvs = existing ? [...existing.investments] : [];
+      if (Array.isArray(investment)) {
+        updatedInvs = [...updatedInvs, ...investment];
+      } else {
+        updatedInvs.push(investment);
+      }
       const data: UserInvestmentData = {
         schemeCode,
-        investments: existing
-          ? [...existing.investments, investment]
-          : [investment],
+        investments: updatedInvs,
       };
 
       await IndexedDBService.setInvestments(data);
@@ -185,10 +188,11 @@ export const userInvestmentService = {
               e.target.result as string,
             );
 
-            userInvestments.forEach(({ schemeCode, investments }) => {
-              investments.forEach(async (inv) => {
-                await userInvestmentService.addInvestment(schemeCode, inv);
-              });
+            userInvestments.forEach(async ({ schemeCode, investments }) => {
+              await userInvestmentService.addInvestment(
+                schemeCode,
+                investments,
+              );
             });
             resolve(userInvestments);
           }
