@@ -153,7 +153,7 @@ export function isNavDataStale(navHistory: NAVData[]): boolean {
   const latestNav = history[history.length - 1];
   const latestNavDate = moment(latestNav.date, "DD-MM-YYYY");
   const today = moment();
-  const yesterday = today.clone().subtract(3, "days");
+  const yesterday = today.clone().subtract(4, "days");
 
   // If latest NAV is not from at least last 3 days, it's stale
   // (considering trading days, most likely stale if before yesterday)
@@ -215,7 +215,7 @@ export async function getOrFetchSchemeHistoryWithCache(
     // Fetch latest data from API with all available history that is not available in indexedDB
     const schemeHistory = await fetchSchemeHistory(
       schemeCode,
-      apiDays - cachedNav.length - 1 + 1,
+      apiDays - cachedNav.length,
     );
 
     if (schemeHistory && schemeHistory.data && schemeHistory.data.length > 0) {
