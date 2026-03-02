@@ -99,6 +99,7 @@ export default function MyFunds() {
         setMetricsLoading(true);
         await promises;
         await loadUserInvestments();
+        await loadNavHistories();
         await refreshReturnCalculations();
         setKey(key + 1);
         setLoading(false);
