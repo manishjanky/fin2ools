@@ -224,7 +224,7 @@ export async function getOrFetchSchemeHistoryWithCache(
       await IndexedDBService.setSyncMetadata(schemeCode, "nav");
       return {
         meta: convertToCamelCase(schemeHistory.meta),
-        data: schemeHistory.data,
+        data: [...cachedNav, ...schemeHistory.data],
       };
     }
 
