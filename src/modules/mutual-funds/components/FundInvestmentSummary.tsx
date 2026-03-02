@@ -20,63 +20,66 @@ export default function FundInvestmentSummary({
   const isOneDayPositive = (oneDayChange.absoluteChange || 0) >= 0;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
-      <Suspense>
-        <MetricCard
-          label="Total Invested"
-          value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
-          colorKey="cyan"
-        />
+    <>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-1.5">
+        <Suspense>
+          <MetricCard
+            label="Total Invested"
+            value={`₹${metrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
+            colorKey="cyan"
+          />
 
-        <MetricCard
-          label="Current Value"
-          value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
-          colorKey="primary"
-        />
+          <MetricCard
+            label="Current Value"
+            value={`₹${metrics.totalCurrentValue.toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
+            colorKey="primary"
+          />
 
-        <MetricCard
-          label={isPositive ? 'Gain' : 'Loss'}
-          value={`₹${(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
-          colorKey={isPositive ? 'success' : 'error'}
-        />
+          <MetricCard
+            label={isPositive ? 'Gain' : 'Loss'}
+            value={`₹${(metrics.absoluteGain).toLocaleString('en-IN', { maximumFractionDigits: 4 })}`}
+            colorKey={isPositive ? 'success' : 'error'}
+          />
 
-        <MetricCard
-          label="Returns"
-          value={metrics.percentageReturn.toFixed(4)}
-          suffix="%"
-          colorKey={isPositive ? 'success' : 'error'}
-        />
+          <MetricCard
+            label="Returns"
+            value={metrics.percentageReturn.toFixed(4)}
+            suffix="%"
+            colorKey={isPositive ? 'success' : 'error'}
+          />
 
-        <MetricCard
-          label="Total Units"
-          value={metrics.units?.toFixed(4) || '0'}
-          colorKey="secondary"
-          subtext={`@ ₹${currentNav.toFixed(4)} current NAV`}
-        />
+          <MetricCard
+            label="Total Units"
+            value={metrics.units?.toFixed(4) || '0'}
+            colorKey="secondary"
+            subtext={`@ ₹${currentNav.toFixed(4)} current NAV`}
+          />
 
-        <MetricCard
-          label="XIRR"
-          value={metrics.xirr?.toFixed(4) || '0'}
-          suffix="%"
-          colorKey="warning"
-          subtext="Extended Internal Rate of Return"
-        />
+          <MetricCard
+            label="XIRR"
+            value={metrics.xirr?.toFixed(4) || '0'}
+            suffix="%"
+            colorKey="warning"
+            subtext="Extended Internal Rate of Return"
+          />
 
-        <MetricCard
-          label="1D Change"
-          value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
-          colorKey={isOneDayPositive ? 'success' : 'error'}
-          subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(4)}%`}
-        />
+          <MetricCard
+            label="1D Change"
+            value={`₹${oneDayChange.absoluteChange.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+            colorKey={isOneDayPositive ? 'success' : 'error'}
+            subtext={`${isOneDayPositive ? '+' : ''}${oneDayChange.percentageChange.toFixed(4)}%`}
+          />
 
-        <MetricCard
-          label='Invested since'
-          value={duration}
-          colorKey='primary'
+          <MetricCard
+            label='Invested since'
+            value={duration}
+            colorKey='primary'
 
-        />
-      </Suspense>
-      <div className='p-2 col-span-4 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
+          />
+        </Suspense>
+
+      </div>
+      <div className='p-2 mt-2 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
         <div className='text-3xl p-3'>
           ⚠
         </div>
@@ -87,6 +90,6 @@ export default function FundInvestmentSummary({
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }
