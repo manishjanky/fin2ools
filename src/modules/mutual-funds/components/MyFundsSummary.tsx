@@ -62,7 +62,7 @@ export default function MyFundsSummary({
           colorKey={isPositiveOneDayChange ? 'success' : 'error'}
           subtext={`${(metrics.oneDayChange?.percentageChange.toFixed(2) ?? '0.00')}%`}
         />
-        
+
         <MetricCard
           label="XIRR"
           value={metrics.xirr?.toFixed(2) || '0.00'}
@@ -79,6 +79,17 @@ export default function MyFundsSummary({
           subtext="Compound Annual Growth Rate"
         />
       </Suspense>
+      <div className='p-2 col-span-4 flex border border-secondary-light rounded-xl bg-red-400 text-primary-darker opacity-50'>
+        <div className='text-3xl p-3'>
+          ⚠
+        </div>
+        <div>
+          <h6 className='font-extrabold'>Disclaimer:</h6>
+          <p>
+            All calculations are performed by rouding the NAV to four decimal places only. As a result, the calculations may not be completely accurate, and there may be a tracking error due to rounding limitations. Users should consider these factors when interpreting the results.
+          </p>
+        </div>
+      </div>
 
     </div>
   );

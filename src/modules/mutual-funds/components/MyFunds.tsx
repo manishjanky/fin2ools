@@ -5,9 +5,10 @@ import type { FundWithInvestments, InvestmentMetrics, NAVData, UserInvestmentDat
 import Accordion from '../../../components/common/Accordion';
 import Loader from '../../../components/common/Loader';
 import { useNavigate } from 'react-router';
-import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale, exportUserInevestments, importInvestments } from '../utils';
+import { getCalculatedReturns, getEarliestInvestmentDate, isNavDataStale } from '../utils';
 import moment from 'moment';
 import { } from '../utils';
+import { useAlert } from '../../../context/AlertContext';
 
 const MyFundsCard = lazy(() => import('./MyFundsCard'));
 const MyFundsSummary = lazy(() => import('./MyFundsSummary'));
@@ -22,6 +23,7 @@ export default function MyFunds() {
   const getOrFetchSchemeDetails = useMutualFundsStore((state) => state.getOrFetchSchemeDetails);
   const getOrFetchSchemeHistory = useMutualFundsStore((state) => state.getOrFetchSchemeHistory);
   const calculatePortfolioReturns = useInvestmentStore((state) => state.calculatePortFolioRetruns);
+  const { showAlert } = useAlert();
 
   const [fundsWithDetails, setFundsWithDetails] = useState<FundWithInvestments[]>([]);
 
@@ -40,6 +42,8 @@ export default function MyFunds() {
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
   const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
+  const { exportUserInevestments, importInvestments, calculateSchemeReturns } = useInvestmentStore();
+
   const [key, setKey] = useState(0);
 
   const loadNavHistories = async () => {
@@ -72,11 +76,23 @@ export default function MyFunds() {
   }
 
   const handleImportInvestments = async () => {
-    if (selectedFile) {
-      const investmentData = await importInvestments(selectedFile);
-      setUserInvestments(investmentData);
-      setKey(key + 1);
+    setLoading(true);
+    try {
+      if (selectedFile) {
+        const investmentData = await importInvestments(selectedFile);
+        setUserInvestments(investmentData);
+        await calculatePortfolioReturns();
+        investmentData.forEach(async ({ schemeCode }) => {
+          await calculateSchemeReturns(schemeCode)
+        });
+        setKey(key + 1);
+        setLoading(false);
+        showAlert(`Investments in ${investmentData.length} schemes successfully imported!`, 'success');
+      }
+    } catch (_) {
+      showAlert('Error occured while importing investments. Make sure they are correct format!', 'error')
     }
+
   }
 
   useEffect(() => {
