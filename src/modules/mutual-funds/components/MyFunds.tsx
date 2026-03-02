@@ -81,10 +81,11 @@ export default function MyFunds() {
       if (selectedFile) {
         const investmentData = await importInvestments(selectedFile);
         setUserInvestments(investmentData);
+        const promises = Promise.all(investmentData.map(async ({ schemeCode }) =>
+          calculateSchemeReturns(schemeCode)
+        ));
+        await promises;
         await calculatePortfolioReturns();
-        investmentData.forEach(async ({ schemeCode }) => {
-          await calculateSchemeReturns(schemeCode)
-        });
         setKey(key + 1);
         setLoading(false);
         showAlert(`Investments in ${investmentData.length} schemes successfully imported!`, 'success');

@@ -79,10 +79,10 @@ export class IndexedDBService {
     // NAV History store
     if (!db.objectStoreNames.contains(STORES.NAV_HISTORY)) {
       const navStore = db.createObjectStore(STORES.NAV_HISTORY, {
-        keyPath: ["schemeCode", "date"],
+        keyPath: "id",
+        autoIncrement: true,
       });
       navStore.createIndex("schemeCode", "schemeCode", { unique: false });
-      navStore.createIndex("date", "date", { unique: false });
     }
 
     // Calculated Returns store
