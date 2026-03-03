@@ -400,11 +400,12 @@ export class IndexedDBService {
 
   /**
    * Get NAV history for a date range
+   * Returns NAV data sorted by date for the specified date range (DD-MM-YYYY format)
    */
   static async getNavHistoryInRange(
     schemeCode: number,
-    startDate: string,
-    endDate: string,
+    startDate: string, // DD-MM-YYYY format
+    endDate: string,   // DD-MM-YYYY format
   ): Promise<NAVData[]> {
     const db = this.getDB();
     return new Promise((resolve, reject) => {
@@ -417,10 +418,18 @@ export class IndexedDBService {
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         const navs = request.result as Array<NAVData & { schemeCode: number }>;
+        const startMoment = moment(startDate, "DD-MM-YYYY");
+        const endMoment = moment(endDate, "DD-MM-YYYY");
+        
         const filtered = navs
           .map(({ schemeCode: _, ...nav }) => nav)
-          .filter((nav) => nav.date >= startDate && nav.date <= endDate)
-          .sort((a, b) => a.date.localeCompare(b.date));
+          .filter((nav) => {
+            const navMoment = moment(nav.date, "DD-MM-YYYY");
+            return navMoment.isSameOrAfter(startMoment) && navMoment.isSameOrBefore(endMoment);
+          })
+          .sort((a, b) =>
+            moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+          );
         resolve(filtered);
       };
     });
