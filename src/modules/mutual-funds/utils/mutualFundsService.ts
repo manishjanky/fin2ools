@@ -161,70 +161,144 @@ export function isNavDataStale(navHistory: NAVData[]): boolean {
 }
 
 /**
- * Get or fetch scheme history with IndexedDB caching
- * - First checks IndexedDB
- * - If not available or outdated (>1 day), fetches from API and caches
- * - Returns full scheme info with camelCase properties
- * - Only stores NAV data from investment start date onwards
+ * Merge cached and fetched NAV data, removing duplicates
+ */
+function mergeNavData(cached: NAVData[], fetched: NAVData[]): NAVData[] {
+  const dataMap = new Map<string, NAVData>();
+
+  // Add cached data first
+  for (const nav of cached) {
+    dataMap.set(nav.date, nav);
+  }
+
+  // Add/update with fetched data (overwrites if duplicate date exists)
+  for (const nav of fetched) {
+    dataMap.set(nav.date, nav);
+  }
+
+  // Convert back to array and sort by date
+  return Array.from(dataMap.values()).sort((a, b) =>
+    moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
+  );
+}
+
+/**
+ * Get or fetch scheme history with smart IndexedDB caching
+ *
+ * Strategy:
+ * 1. Check IndexedDB for existing NAV data for the requested date range
+ * 2. Identify any gaps in the cached data
+ * 3. Fetch only the missing date ranges from the API
+ * 4. Merge cached and newly fetched data (avoiding duplicates)
+ * 5. Store newly fetched data in IndexedDB
+ * 6. Return complete merged data
+ *
+ * @param schemeCode - The mutual fund scheme code
+ * @param startDate - Requested start date (DD-MM-YYYY format)
+ * @param days - Number of days to fetch (optional, defaults to days since start date)
+ * @param forceFresh - Force fresh fetch from API, bypass cache (default: false)
  */
 export async function getOrFetchSchemeHistoryWithCache(
   schemeCode: number,
   startDate: string, // DD-MM-YYYY format
   days?: number,
-  forceFresh: boolean = false, // Force fresh fetch from API
+  forceFresh: boolean = false,
 ): Promise<SchemeHistoryResponse | null> {
+  const endDate = moment().format("DD-MM-YYYY");
   const apiDays =
-    days || moment().diff(moment(startDate, "DD-MM-YYYY"), "days"); // Request a large range
+    days ||
+    moment(endDate, "DD-MM-YYYY").diff(moment(startDate, "DD-MM-YYYY"), "days");
 
   try {
-    let cachedNav = await IndexedDBService.getNavHistory(schemeCode);
-    // If forceFresh is true, skip cache and fetch from API
+    let allMergedNav: NAVData[] = [];
+    let schemeMetaData = null;
+
     if (!forceFresh) {
-      // First, try to get from IndexedDB
-      cachedNav = cachedNav.sort((a, b) =>
-        moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
-      );
+      // Step 1: Get Stored NAV data
+      const storedNavHistory = await IndexedDBService.getNavHistory(schemeCode);
 
-      if (cachedNav && cachedNav.length >= apiDays - 3) {
-        // Filter cached data from start date onwards
-        const filteredNav = filterNavFromDate(cachedNav, startDate);
+      // Step 2: Identify missing date ranges
+      const latestAvailableDate = storedNavHistory.pop();
+      const lastestNavMoment = moment(
+        latestAvailableDate?.date,
+        "DD-MM-YYYY",
+      ).startOf("day");
+      const yesterdaysNavAvailbale =
+        moment().startOf("day").diff(lastestNavMoment,'days') === 1;
 
-        if (filteredNav.length > 0) {
-          // Check if cached NAV data is stale
-          const navIsStale = isNavDataStale(filteredNav);
+      if (yesterdaysNavAvailbale && storedNavHistory.length > 0) {
+        // All data available in cache
+        const filteredNav = filterNavFromDate(storedNavHistory, startDate);
 
-          // If data is not stale and we have metadata, use it
-          const needsUpdate = await IndexedDBService.needsUpdate(
-            schemeCode,
-            "nav",
-          );
+        // Check if cached NAV data is stale
+        const navIsStale = isNavDataStale(filteredNav);
+        const needsUpdate = await IndexedDBService.needsUpdate(
+          schemeCode,
+          "nav",
+        );
 
-          if (!needsUpdate && !navIsStale) {
-            // Cache is fresh enough - get scheme info from IndexedDB
-            const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
-
-            return {
-              meta: convertToCamelCase(schemeInfo),
-              data: filteredNav,
-            };
-          }
+        if (!needsUpdate && !navIsStale) {
+          // Cache is fresh and complete - return it
+          const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
+          return {
+            meta: convertToCamelCase(schemeInfo),
+            data: filteredNav,
+          };
         }
+      }
+
+      // Step 3: Fetch missing data from API
+      let fetchedNav: NAVData[] = [];
+
+      try {
+        const missingDays = moment().diff(lastestNavMoment, "days");
+        const historyResponse = await fetchSchemeHistory(
+          schemeCode,
+          missingDays,
+        );
+
+        if (historyResponse?.data && historyResponse.data.length > 0) {
+          fetchedNav = [...fetchedNav, ...historyResponse.data];
+          schemeMetaData = historyResponse.meta;
+        }
+      } catch (error) {
+        console.error(`Error fetching NAV for scheme ${schemeCode}`, error);
+        // Continue with remaining ranges
+      }
+
+      // Step 4 & 5: Merge cached and fetched data, then store the new data
+      allMergedNav = mergeNavData(storedNavHistory, fetchedNav);
+
+      if (fetchedNav.length > 0) {
+        // Store newly fetched data in IndexedDB
+        await IndexedDBService.setNavHistoryBatch(schemeCode, fetchedNav);
+        await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+      }
+    } else {
+      // forceFresh: Fetch entire history from API
+      const fullHistory = await fetchSchemeHistory(schemeCode, apiDays);
+
+      if (fullHistory?.data && fullHistory.data.length > 0) {
+        // Store in IndexedDB
+        await IndexedDBService.setNavHistoryBatch(schemeCode, fullHistory.data);
+        await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        allMergedNav = fullHistory.data;
+        schemeMetaData = fullHistory.meta;
       }
     }
 
-    // Fetch latest data from API with all available history that is not available in indexedDB
-    const schemeHistory = await fetchSchemeHistory(
-      schemeCode,
-      apiDays - cachedNav.length,
-    );
+    if (allMergedNav.length > 0) {
+      // Get scheme info from IndexedDB, or use fetched metadata
+      let schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
+      if (!schemeInfo && schemeMetaData) {
+        schemeInfo = schemeMetaData;
+      }
 
-    if (schemeHistory && schemeHistory.data && schemeHistory.data.length > 0) {
-      // Store in IndexedDB
-      await IndexedDBService.setNavHistoryBatch(schemeCode, schemeHistory.data);
-      await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+      const filteredNav = filterNavFromDate(allMergedNav, startDate);
+
       return {
-        meta: convertToCamelCase(schemeHistory.meta),
-        data: [...cachedNav, ...schemeHistory.data],
+        meta: convertToCamelCase(schemeInfo),
+        data: filteredNav,
       };
     }
 
@@ -232,18 +306,20 @@ export async function getOrFetchSchemeHistoryWithCache(
   } catch (error) {
     console.error(`Error fetching scheme history for ${schemeCode}:`, error);
 
-    // Try to return cached data even if API fails
-    const cachedNav = await IndexedDBService.getNavHistory(schemeCode);
-    if (cachedNav && cachedNav.length > 0) {
-      const filteredNav = filterNavFromDate(cachedNav, startDate);
+    // Fallback: Return cached data even if API fails
+    try {
+      const cachedNav = await IndexedDBService.getNavHistory(schemeCode);
+      if (cachedNav && cachedNav.length > 0) {
+        const filteredNav = filterNavFromDate(cachedNav, startDate);
+        const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
 
-      // Try to get scheme info from IndexedDB on failure
-      const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
-
-      return {
-        meta: convertToCamelCase(schemeInfo),
-        data: filteredNav,
-      };
+        return {
+          meta: convertToCamelCase(schemeInfo),
+          data: filteredNav,
+        };
+      }
+    } catch (cacheError) {
+      console.error("Error retrieving cached data:", cacheError);
     }
 
     return null;

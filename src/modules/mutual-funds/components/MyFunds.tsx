@@ -42,6 +42,7 @@ export default function MyFunds() {
   const [navHistoryData, setNavHistoryData] = useState<{ schemeCode: number; data: NAVData[] }[]>([]);
   const [staleNavSchemes, setStaleNavSchemes] = useState<number[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const { exportUserInevestments, importInvestments, calculateSchemeReturns } = useInvestmentStore();
 
   const [key, setKey] = useState(0);
@@ -52,6 +53,8 @@ export default function MyFunds() {
   }
 
   const loadNavHistories = async () => {
+    if (loadingHistory || fundsWithDetails.length === navHistoryData.length) return;
+    setLoadingHistory(true);
     const historyData = await Promise.all(
       fundsWithDetails.map(async ({ scheme, investmentData }) => {
         const date = getEarliestInvestmentDate(investmentData.investments);
@@ -69,6 +72,7 @@ export default function MyFunds() {
         };
       })
     );
+    setLoadingHistory(false);
     setNavHistoryData(historyData);
   }
 

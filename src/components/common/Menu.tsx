@@ -1,9 +1,13 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 
 export default function Menu() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+    const location = useLocation()
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [location]);
+    
     return (
         <>
             <nav className={
