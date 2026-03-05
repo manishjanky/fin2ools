@@ -52,7 +52,7 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
     await userInvestmentService.addInvestment(schemeCode, investment);
     await get().loadInvestments();
     // Calculate returns for this scheme after adding
-    get().calculateSchemeReturns(schemeCode);
+    await get().calculateSchemeReturns(schemeCode);
     await get().calculatePortFolioRetruns();
   },
 
@@ -123,7 +123,7 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
         navHistory.data,
       );
 
-      console.log(`✅ Returns calculated and stored for scheme ${schemeCode}`);
+      console.log(`Returns calculated and stored for scheme ${schemeCode}`);
     } catch (error) {
       console.error(
         `Error calculating returns for scheme ${schemeCode}:`,

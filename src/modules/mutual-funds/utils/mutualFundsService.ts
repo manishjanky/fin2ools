@@ -218,13 +218,13 @@ export async function getOrFetchSchemeHistoryWithCache(
       const storedNavHistory = await IndexedDBService.getNavHistory(schemeCode);
 
       // Step 2: Identify missing date ranges
-      const latestAvailableDate = storedNavHistory.pop();
+      const latestAvailableDate = storedNavHistory[storedNavHistory.length - 1];
       const lastestNavMoment = moment(
         latestAvailableDate?.date,
         "DD-MM-YYYY",
       ).startOf("day");
       const yesterdaysNavAvailbale =
-        moment().startOf("day").diff(lastestNavMoment,'days') === 1;
+        moment().startOf("day").diff(lastestNavMoment, "days") === 1;
 
       if (yesterdaysNavAvailbale && storedNavHistory.length > 0) {
         // All data available in cache
@@ -381,9 +381,11 @@ export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
 
     // Check and update each scheme
     for (const schemeCode of schemeCodes) {
+      let schemeInvestments;
+      let navHistory;
       if (await IndexedDBService.needsUpdate(schemeCode, "nav")) {
         // Get earliest investment date for this scheme
-        const schemeInvestments =
+        schemeInvestments =
           await IndexedDBService.getSchemeInvestments(schemeCode);
 
         if (schemeInvestments && schemeInvestments.investments.length > 0) {
@@ -400,19 +402,13 @@ export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
           if (historyData?.data) {
             allSchemesNavHistories.set(schemeCode, historyData.data);
             allInvestmentsMap.set(schemeCode, schemeInvestments.investments);
-
-            // Calculate and store scheme-level returns
-            await ReturnCalculationService.calculateAndStoreSchemeReturns(
-              schemeCode,
-              schemeInvestments.investments,
-              historyData.data,
-            );
+            navHistory = historyData.data;
           }
         }
       } else {
         // Even if NAV doesn't need update, load the stored data for portfolio calculation
-        const navHistory = await IndexedDBService.getNavHistory(schemeCode);
-        const schemeInvestments =
+        navHistory = await IndexedDBService.getNavHistory(schemeCode);
+        schemeInvestments =
           await IndexedDBService.getSchemeInvestments(schemeCode);
 
         if (navHistory && navHistory.length > 0 && schemeInvestments) {
@@ -420,6 +416,12 @@ export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
           allInvestmentsMap.set(schemeCode, schemeInvestments.investments);
         }
       }
+      // Calculate and store scheme-level returns
+      await ReturnCalculationService.calculateAndStoreSchemeReturns(
+        schemeCode,
+        schemeInvestments!.investments,
+        navHistory!,
+      );
     }
 
     // Recalculate and store portfolio-level returns if we have at least one scheme with updated data
