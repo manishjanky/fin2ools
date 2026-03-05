@@ -107,7 +107,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
         className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-2 pt-2 border-t border-border-light"
       >
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             Amount Invested
           </p>
           <p className="text-md font-semibold text-text-primary">
@@ -115,7 +115,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             Current Value
           </p>
           <p className="text-md font-semibold text-text-primary">
@@ -123,7 +123,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             Gain / Loss
           </p>
           <p
@@ -134,7 +134,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             Return %
           </p>
           <p
@@ -145,7 +145,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             1D Change
           </p>
           <p
@@ -156,7 +156,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1 text-text-tertiary">
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
             Units Held
           </p>
           <p

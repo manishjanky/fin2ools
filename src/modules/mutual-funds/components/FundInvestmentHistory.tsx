@@ -7,7 +7,7 @@ import { useAlert } from "../../../context/AlertContext";
 import { generateInvestmentInstallments } from "../utils/investmentCalculations";
 
 export default function FundInvestmentHistory({ schemeCode, navHistory }: { schemeCode: string; navHistory: NAVData[] }) {
-    const PAGE_SIZE = 20;
+    const PAGE_SIZE = 12;
     const [currentPage, setCurrentPage] = useState(1);
     const [installments, setInstallments] = useState<InvestmentInstallment[]>([]);
     const [investmentData, setInvestmentData] = useState<UserInvestmentData | null>(null);
