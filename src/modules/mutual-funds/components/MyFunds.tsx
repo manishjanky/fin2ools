@@ -227,14 +227,15 @@ export default function MyFunds() {
             )}
           </div>
           <div className='flex gap-2 justify-end'>
-            <button
-              title='Export your investment(s) info'
-              onClick={handleExportInvestments}
-              className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
-            >
-              Export
-            </button>
-
+            {
+              fundsWithDetails?.length > 0 && <button
+                title='Export your investment(s) info'
+                onClick={handleExportInvestments}
+                className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
+              >
+                Export
+              </button>
+            }
             <button
               onClick={() => navigate('/mutual-funds/explore-funds')}
               className="px-6 py-2 rounded-lg font-medium transition  w-auto justify-self-end bg-bg-secondary text-text-secondary border border-border-main hover:bg-bg-tertiary"
