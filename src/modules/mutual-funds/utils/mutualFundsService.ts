@@ -145,7 +145,7 @@ export async function initIndexedDB(): Promise<void> {
  * Check if NAV data is stale (older than expected)
  * Returns true if the latest NAV is more than 1 trading day old
  */
-export function isNavDataStale(navHistory: NAVData[]): boolean {
+export function isNavDataStale(navHistory: NAVData[], days = 4): boolean {
   if (!navHistory || navHistory.length === 0) return true;
   const history = navHistory.sort((a, b) =>
     moment(a.date, "DD-MM-YYYY").diff(moment(b.date, "DD-MM-YYYY")),
@@ -153,11 +153,11 @@ export function isNavDataStale(navHistory: NAVData[]): boolean {
   const latestNav = history[history.length - 1];
   const latestNavDate = moment(latestNav.date, "DD-MM-YYYY");
   const today = moment();
-  const yesterday = today.clone().subtract(4, "days");
+  const staleNavDay = today.clone().subtract(days, "days");
 
   // If latest NAV is not from at least last 3 days, it's stale
   // (considering trading days, most likely stale if before yesterday)
-  return latestNavDate.isBefore(yesterday);
+  return latestNavDate.isBefore(staleNavDay);
 }
 
 /**
@@ -272,7 +272,9 @@ export async function getOrFetchSchemeHistoryWithCache(
       if (fetchedNav.length > 0) {
         // Store newly fetched data in IndexedDB
         await IndexedDBService.setNavHistoryBatch(schemeCode, fetchedNav);
-        await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        if (!isNavDataStale(fetchedNav, 1)) {
+          await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        }
       }
     } else {
       // forceFresh: Fetch entire history from API
@@ -281,7 +283,9 @@ export async function getOrFetchSchemeHistoryWithCache(
       if (fullHistory?.data && fullHistory.data.length > 0) {
         // Store in IndexedDB
         await IndexedDBService.setNavHistoryBatch(schemeCode, fullHistory.data);
-        await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        if (!isNavDataStale(fullHistory.data, 1)) {
+          await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        }
         allMergedNav = fullHistory.data;
         schemeMetaData = fullHistory.meta;
       }
@@ -370,6 +374,12 @@ export async function getOrFetchSchemeDetailsWithCache(
  * Update NAV for all invested schemes (daily check on app load)
  */
 export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
+  const yesterDay = moment().subtract(1, 'days');
+  const yesterdayDayOfWeek = yesterDay.day();
+  if(yesterdayDayOfWeek === 0 || yesterdayDayOfWeek === 6){
+    // Skip sync if yesterday was either sunday or saturday since market is closed
+    return;
+  }
   try {
     const investments = await IndexedDBService.getInvestments();
 
