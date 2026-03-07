@@ -1,6 +1,6 @@
-import moment from 'moment';
-import type { UserInvestment, NAVData } from '../types/mutual-funds';
-import { calculateInvestmentValue } from './investmentCalculations';
+import moment from "moment";
+import type { UserInvestment, NAVData } from "../types/mutual-funds";
+import { calculateInvestmentValue } from "./investmentCalculations";
 
 export interface PortfolioValueSnapshot {
   date: string;
@@ -10,6 +10,18 @@ export interface PortfolioValueSnapshot {
   returnPercentage: number;
 }
 
+export interface GraphData {
+  sampledSnapshots: PortfolioValueSnapshot[];
+  labels: string[];
+  currentValues: number[];
+  investedAmounts: number[];
+  gains: number[];
+  investmentPeriodDays: number | null;
+  totalReturn: number;
+  highestGain: number;
+  avgGain: number;
+}
+
 /**
  * Calculate the portfolio value at each point in time based on investments
  * This creates a comprehensive timeline showing portfolio growth
@@ -17,10 +29,15 @@ export interface PortfolioValueSnapshot {
  */
 export const calculatePortfolioPerformanceTimeline = (
   investments: UserInvestment[],
-  navHistories: Map<number, NAVData[]>
+  navHistories: Map<number, NAVData[]>,
 ): PortfolioValueSnapshot[] => {
   try {
-    if (!investments || investments.length === 0 || !navHistories || navHistories.size === 0) {
+    if (
+      !investments ||
+      investments.length === 0 ||
+      !navHistories ||
+      navHistories.size === 0
+    ) {
       return [];
     }
 
@@ -39,29 +56,30 @@ export const calculatePortfolioPerformanceTimeline = (
     });
 
     if (dateSet.size === 0) {
-      console.warn('No valid dates found in NAV histories');
+      console.warn("No valid dates found in NAV histories");
       return [];
     }
 
     // Convert to sorted array and reduce excessive dates by sampling
-    let allDates = Array.from(dateSet)
-      .sort((a, b) => {
-        const dateA = moment(a, 'DD-MM-YYYY', true);
-        const dateB = moment(b, 'DD-MM-YYYY', true);
-        return dateA.diff(dateB);
-      });
+    let allDates = Array.from(dateSet).sort((a, b) => {
+      const dateA = moment(a, "DD-MM-YYYY", true);
+      const dateB = moment(b, "DD-MM-YYYY", true);
+      return dateA.diff(dateB);
+    });
 
     // If we have too many dates, sample them to reduce computation
     const MAX_DATES = 500;
     if (allDates.length > MAX_DATES) {
       const interval = Math.ceil(allDates.length / MAX_DATES);
-      allDates = allDates.filter((_, i) => i % interval === 0 || i === allDates.length - 1);
+      allDates = allDates.filter(
+        (_, i) => i % interval === 0 || i === allDates.length - 1,
+      );
     }
 
     // Pre-create moment objects for investments for reuse
     const investmentMoments = investments.map((inv) => ({
       investment: inv,
-      startMoment: moment(inv.startDate, 'DD-MM-YYYY', true),
+      startMoment: moment(inv.startDate, "DD-MM-YYYY", true),
     }));
 
     const snapshots: PortfolioValueSnapshot[] = [];
@@ -69,7 +87,7 @@ export const calculatePortfolioPerformanceTimeline = (
     allDates.forEach((date) => {
       let totalInvested = 0;
       let totalCurrentValue = 0;
-      const snapshotMoment = moment(date, 'DD-MM-YYYY', true);
+      const snapshotMoment = moment(date, "DD-MM-YYYY", true);
 
       investmentMoments.forEach(({ investment, startMoment }) => {
         try {
@@ -77,12 +95,17 @@ export const calculatePortfolioPerformanceTimeline = (
           if (snapshotMoment.isBefore(startMoment)) return;
 
           const navHistory = navHistories.get(investment.schemeCode);
-          if (!navHistory || !Array.isArray(navHistory) || navHistory.length === 0) return;
+          if (
+            !navHistory ||
+            !Array.isArray(navHistory) ||
+            navHistory.length === 0
+          )
+            return;
 
           // Create a filtered NAV history up to the snapshot date
           const filteredNavHistory = navHistory.filter((nav) => {
             if (!nav || !nav.date) return false;
-            const navDate = moment(nav.date, 'DD-MM-YYYY', true);
+            const navDate = moment(nav.date, "DD-MM-YYYY", true);
             return navDate.isValid() && navDate.isSameOrBefore(snapshotMoment);
           });
 
@@ -94,24 +117,33 @@ export const calculatePortfolioPerformanceTimeline = (
             ...investment,
             // Ensure sipEndDate doesn't exceed snapshot date for accurate calculation
             sipEndDate: investment.sipEndDate
-              ? moment(investment.sipEndDate, 'DD-MM-YYYY').isBefore(snapshotMoment)
+              ? moment(investment.sipEndDate, "DD-MM-YYYY").isBefore(
+                  snapshotMoment,
+                )
                 ? investment.sipEndDate
                 : date
               : date,
           };
 
-          const value = calculateInvestmentValue(tempInvestment, filteredNavHistory);
+          const value = calculateInvestmentValue(
+            tempInvestment,
+            filteredNavHistory,
+          );
           totalInvested += value.investedAmount;
           totalCurrentValue += value.currentValue;
         } catch (err) {
-          console.warn(`Error calculating value for investment on date ${date}:`, err);
+          console.warn(
+            `Error calculating value for investment on date ${date}:`,
+            err,
+          );
           // Continue with next investment instead of breaking
         }
       });
 
       if (totalInvested > 0) {
         const gain = totalCurrentValue - totalInvested;
-        const returnPercentage = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
+        const returnPercentage =
+          totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
 
         snapshots.push({
           date,
@@ -124,12 +156,14 @@ export const calculatePortfolioPerformanceTimeline = (
     });
 
     if (snapshots.length === 0) {
-      console.warn('No portfolio snapshots generated from timeline calculation');
+      console.warn(
+        "No portfolio snapshots generated from timeline calculation",
+      );
     }
 
     return snapshots;
   } catch (error) {
-    console.error('Error in calculatePortfolioPerformanceTimeline:', error);
+    console.error("Error in calculatePortfolioPerformanceTimeline:", error);
     return [];
   }
 };
@@ -140,7 +174,7 @@ export const calculatePortfolioPerformanceTimeline = (
  */
 export const resamplePortfolioData = (
   snapshots: PortfolioValueSnapshot[],
-  targetPoints: number = 50
+  targetPoints: number = 50,
 ): PortfolioValueSnapshot[] => {
   try {
     if (!Array.isArray(snapshots) || snapshots.length === 0) {
@@ -153,12 +187,12 @@ export const resamplePortfolioData = (
 
     const sampleInterval = Math.ceil(snapshots.length / targetPoints);
     const sampled = snapshots.filter(
-      (_, i) => i % sampleInterval === 0 || i === snapshots.length - 1
+      (_, i) => i % sampleInterval === 0 || i === snapshots.length - 1,
     );
 
     return sampled.length > 0 ? sampled : snapshots;
   } catch (error) {
-    console.error('Error in resamplePortfolioData:', error);
+    console.error("Error in resamplePortfolioData:", error);
     return snapshots || [];
   }
 };
@@ -181,8 +215,10 @@ export const getPerformanceMetrics = (snapshots: PortfolioValueSnapshot[]) => {
       };
     }
 
-    const gains = snapshots.map((s) => s?.gain ?? 0).filter(g => !isNaN(g));
-    const returns = snapshots.map((s) => s?.returnPercentage ?? 0).filter(r => !isNaN(r));
+    const gains = snapshots.map((s) => s?.gain ?? 0).filter((g) => !isNaN(g));
+    const returns = snapshots
+      .map((s) => s?.returnPercentage ?? 0)
+      .filter((r) => !isNaN(r));
 
     if (gains.length === 0 || returns.length === 0) {
       return {
@@ -208,7 +244,7 @@ export const getPerformanceMetrics = (snapshots: PortfolioValueSnapshot[]) => {
       lowestReturn: Math.min(...returns),
     };
   } catch (error) {
-    console.error('Error in getPerformanceMetrics:', error);
+    console.error("Error in getPerformanceMetrics:", error);
     return {
       startDate: null,
       endDate: null,

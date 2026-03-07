@@ -4,8 +4,8 @@ export default function Loader({ message, fullHeight }: { message?: string, full
     <div
       className={`${fullHeight ? 'min-h-screen' : ''} flex items-center justify-center`}
     >
-      <div className="text-center">
-        <svg width="200" height="200" viewBox="0 0 65 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div className="text-center max-w-fit">
+        <svg width="200" height="200" viewBox="0 0 65 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="m-auto">
           <circle cx="30" cy="30" r="25" fill="url(#iconGradient1)" opacity="0.2" >
             <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2.5s" repeatCount="indefinite" />
             <animate attributeName="r" values="25;29;25" dur="2.5s" repeatCount="indefinite" />

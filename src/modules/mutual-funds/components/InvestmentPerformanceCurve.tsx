@@ -1,7 +1,6 @@
 // million-ignore
 import { useState, useEffect, Suspense } from 'react';
 import { Line } from 'react-chartjs-2';
-import moment from 'moment';
 import type { ChartOptions } from 'chart.js';
 import {
   Chart as ChartJS,
@@ -14,11 +13,18 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import type { PortfolioValueSnapshot } from '../utils/portfolioPerformanceCalculations';
-import { resamplePortfolioData, getPerformanceMetrics, calculatePortfolioPerformanceTimeline } from '../utils/portfolioPerformanceCalculations';
+import type { GraphData } from '../utils/portfolioPerformanceCalculations';
 import type { MutualFundScheme, NAVData, UserInvestmentData } from '../types/mutual-funds';
 import Loader from '../../../components/common/Loader';
 import Worker from '../workers/graph.worker?worker';
+// Format currency
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
+};
 
 ChartJS.register(
   CategoryScale,
@@ -49,11 +55,9 @@ export default function InvestmentPerformanceCurve(
   }: InvestmentPerformanceCurveProps,
 ) {
 
-  const [snapshots, setSnapshots] = useState<PortfolioValueSnapshot[]>([]);
+  const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRendered, setIsRendered] = useState(false);
-  // const [options, setOptions] = useState<ChartOptions>()
 
   // Start the data preparation for plotting the graph
   const runWorker = () => {
@@ -71,110 +75,51 @@ export default function InvestmentPerformanceCurve(
 
   // Fetch and calculate portfolio data
   useEffect(() => {
-    const calculatePortfolioData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        if (investments.length === 0 || navHistoryData?.length === 0) {
-          console.warn('No investments or NAV history found for portfolio calculation');
-          setSnapshots([]);
-          setIsRendered(true);
-          setIsLoading(false);
-          return;
-        }
-        const allInvestments = fundDetails.flatMap((f) => f.investmentData.investments);
-        if (allInvestments.length === 0) {
-          console.warn('No investments found for portfolio calculation');
-          setSnapshots([]);
-          setIsRendered(true);
-          setIsLoading(false);
-          return;
-        }
-
-        const navHistories = new Map();
-
-        navHistoryData.forEach(({ schemeCode, data }) => {
-          if (data) {
-            navHistories.set(schemeCode, data);
-          }
-        });
-
-        if (navHistories.size === 0) {
-          console.warn('No NAV histories available for any scheme');
-          setSnapshots([]);
-          setError('Unable to fetch NAV history. Please try again later.');
-          setIsRendered(true);
-          setIsLoading(false);
-          return;
-        }
-
-        // Calculate performance snapshots
-        const calculatedSnapshots = calculatePortfolioPerformanceTimeline(allInvestments, navHistories);
-
-        if (!Array.isArray(calculatedSnapshots) || calculatedSnapshots.length === 0) {
-          console.warn('Portfolio calculation returned empty snapshots');
-          setSnapshots([]);
-          setIsRendered(true);
-          setIsLoading(false);
-          return;
-        }
-
-        setSnapshots(calculatedSnapshots);
-        setIsRendered(true);
-        setError(null);
-      } catch (calcErr) {
-        console.error('Error calculating portfolio performance:', calcErr);
-        setSnapshots([]);
-        setError(
-          `Error calculating portfolio performance: ${calcErr instanceof Error ? calcErr.message : 'Unknown error'}`
-        );
-        setIsRendered(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    calculatePortfolioData();
-  }, [investments, navHistoryData]);
-
-  // Validate snapshots after they're calculated
-  useEffect(() => {
-    if (isLoading || !isRendered) return;
-    try {
-      if (!Array.isArray(snapshots)) {
-        console.warn('Invalid snapshots: not an array', snapshots);
-        setError('Portfolio data is invalid');
-        return;
-      }
-
-      if (snapshots.length === 0) {
-        console.warn('Empty snapshots array');
-        return;
-      }
-
-      // Validate snapshot structure
-      const hasValidData = snapshots.some(
-        (s) =>
-          s &&
-          typeof s.date === 'string' &&
-          typeof s.investedAmount === 'number' &&
-          typeof s.currentValue === 'number' &&
-          typeof s.gain === 'number' &&
-          typeof s.returnPercentage === 'number'
-      );
-
-      if (!hasValidData) {
-        console.error('No valid snapshots found in data');
-        setError('Portfolio performance data is incomplete or invalid');
-        return;
-      }
-
-      setError(null);
-    } catch (err) {
-      console.error('Error validating snapshots:', err);
-      setError(`Error processing portfolio data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    setIsLoading(true);
+    setError(null);
+    setGraphData(null);
+    if (investments.length === 0 || navHistoryData?.length === 0) {
+      setIsLoading(false);
+      return;
     }
-  }, [snapshots, isLoading, isRendered]);
+
+    const allInvestments = fundDetails.flatMap((f) => f.investmentData.investments);
+    if (allInvestments.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    const hasValidNav = navHistoryData.some(({ data }) => data && data.length > 0);
+    if (!hasValidNav) {
+      setError('Unable to fetch NAV history. Please try again later!');
+      setIsLoading(false);
+      return;
+    }
+
+    const worker = new Worker();
+    worker.onmessage = (event: MessageEvent<GraphData>) => {
+      if (event.data) {
+        setGraphData(event.data);
+      } else {
+        setError('Unable to plot a graph. Please try again later!');
+      }
+
+      setIsLoading(false);
+      worker.terminate();
+    }
+
+    worker.onerror = (err) => {
+      setError(`Error evaluation data for representation: ${err.message}`)
+      setIsLoading(false);
+      worker.terminate();
+    }
+
+    worker.postMessage({ fundDetails, navHistoryData });
+    return () => {
+      worker.terminate()
+    }
+  }, [investments, navHistoryData, fundDetails]);
+
 
   if (error) {
     return (
@@ -194,14 +139,13 @@ export default function InvestmentPerformanceCurve(
     );
   }
 
-  if (isLoading || !isRendered || !Array.isArray(snapshots) || snapshots.length === 0) {
+  if (isLoading || !graphData || !Array.isArray(graphData.sampledSnapshots)) {
     return (
-      <div className="rounded-lg p-12 bg-bg-secondary border border-border-main text-center">
-        <p className="text-text-secondary bg-bg-secondary">
-          {isLoading || !isRendered ? 'Evaluating portfolio performance data...' : 'No portfolio performance data available'}
-        </p>
+      <div className="rounded-lg p-12 bg-bg-secondary border border-border-main text-center flex flex-col items-center">
+        <Loader message={isLoading || !graphData ? 'Preparing portfolio performance data for visualization...' : 'No portfolio performance data available'}
+        />
         <p className="text-sm text-text-secondary mt-2">
-          {isLoading || !isRendered
+          {isLoading || !graphData
             ? 'This may take a moment...'
             : 'Start investing to see your portfolio performance graph'}
         </p>
@@ -210,33 +154,19 @@ export default function InvestmentPerformanceCurve(
   }
 
   try {
-    // Resample data for better chart performance
-    const sampledSnapshots = resamplePortfolioData(snapshots);
-    const metrics = getPerformanceMetrics(snapshots);
+    const {
+      sampledSnapshots,
+      labels,
+      currentValues,
+      investedAmounts,
+      gains,
+      investmentPeriodDays,
+      totalReturn,
+      highestGain,
+      avgGain
+    } = graphData
 
-    // Additional validation before rendering
-    if (!sampledSnapshots || sampledSnapshots.length === 0) {
-      return (
-        <div className="rounded-lg p-12 bg-bg-secondary border border-border-main text-center">
-          <p className="text-text-secondary">Unable to process portfolio performance data</p>
-        </div>
-      );
-    }
 
-    // Prepare chart data
-    const labels = sampledSnapshots.map((s) => s?.date || '').filter(Boolean);
-    const currentValues = sampledSnapshots.map((s) => s?.currentValue ?? 0);
-    const investedAmounts = sampledSnapshots.map((s) => s?.investedAmount ?? 0);
-    const gains = sampledSnapshots.map((s) => s?.gain ?? 0);
-
-    // Format currency
-    const formatCurrency = (value: number) => {
-      return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: 0,
-      }).format(value);
-    };
 
     const chartData = {
       labels,
@@ -439,7 +369,7 @@ export default function InvestmentPerformanceCurve(
 
         <div className="mb-6 h-96 relative">
           {
-            snapshots?.length > 0 && (
+            sampledSnapshots?.length > 0 && (
               <Suspense fallback={<Loader />}>
                 <div className='absolute top-0 left-0 right-0 bottom-0'>
                   <Line data={chartData} options={options} />
@@ -456,12 +386,7 @@ export default function InvestmentPerformanceCurve(
               Investment Period
             </p>
             <p className="text-sm font-semibold text-text-primary">
-              {metrics.startDate && metrics.endDate
-                ? moment(metrics.endDate, 'DD-MM-YYYY').diff(
-                  moment(metrics.startDate, 'DD-MM-YYYY'),
-                  'days'
-                ) + ' days'
-                : 'N/A'}
+              {investmentPeriodDays ? `${investmentPeriodDays} days` : 'N/A'}
             </p>
           </div>
 
@@ -470,12 +395,12 @@ export default function InvestmentPerformanceCurve(
               Total Return
             </p>
             <p
-              className={`text-sm font-semibold ${metrics.totalReturn >= 0
+              className={`text-sm font-semibold ${totalReturn >= 0
                 ? 'text-green-400'
                 : 'text-red-400'
                 }`}
             >
-              {isFinite(metrics.totalReturn) ? metrics.totalReturn.toFixed(2) : 'N/A'}%
+              {isFinite(totalReturn) ? totalReturn.toFixed(4) : 'N/A'}%
             </p>
           </div>
 
@@ -484,7 +409,7 @@ export default function InvestmentPerformanceCurve(
               Highest Gain
             </p>
             <p className="text-sm font-semibold text-text-primary">
-              {formatCurrency(metrics.highestGain)}
+              {formatCurrency(highestGain)}
             </p>
           </div>
 
@@ -493,7 +418,7 @@ export default function InvestmentPerformanceCurve(
               Average Gain
             </p>
             <p className="text-sm font-semibold text-text-primary">
-              {formatCurrency(metrics.avgGain)}
+              {formatCurrency(avgGain)}
             </p>
           </div>
         </div>
