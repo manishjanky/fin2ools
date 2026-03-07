@@ -51,11 +51,11 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
     // Fill years with 0 contributions and missing years with last captured values
     const filled = contributions.map((contrib) => {
       const hasActualContribution = contrib.contributions.some(c => c.amount > 0);
-      
+
       if (hasActualContribution) {
         return contrib;
       }
-      
+
       // Year has no actual contributions, fill it with last captured values
       return {
         ...contrib,
@@ -173,14 +173,14 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
     if (variablePastContributions) {
       // Reorganize contributions to their correct fiscal years based on dates
       const normalizedContributions = normalizeContributionsByFiscalYear(yearlyContributions);
-      
+
       // Validate that contributions start from the correct FY
       const minYear = Math.min(...normalizedContributions.map(c => c.year));
       if (minYear < startYear) {
         showAlert(`Some contributions fall in FY ${minYear}-${minYear + 1}, which is before the selected start year (FY ${startYear}-${startYear + 1}). Please adjust the dates or start year.`, 'warning');
         return;
       }
-      
+
       // Fill missing years with last captured contribution
       contributions = fillMissingYears(normalizedContributions);
     } else {
@@ -339,7 +339,7 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
 
             {/* Variable Contributions Summary - Show when variable is ON */}
             {variablePastContributions && yearlyContributions.length > 0 && (
-              <PPFContributionsSummary 
+              <PPFContributionsSummary
                 yearlyContributions={yearlyContributions}
                 onEdit={handleOpenModal}
               />
@@ -365,11 +365,10 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
             type="button"
             onClick={handleCalculate}
             disabled={!startYear}
-            className={`my-2 font-bold py-3 px-6 bg-primary-main rounded-lg transition transform hover:scale-105 text-lg text-text-inverse ${
-              startYear
-                ? 'bg-linear-to-r from-primary-main to-secondary-main cursor-pointer opacity-100'
+            className={`my-2 font-bold py-3 px-6 bg-primary-main rounded-lg transition transform hover:scale-105 text-lg text-text-inverse ${startYear
+                ? ' cursor-pointer opacity-100'
                 : 'bg-border-main cursor-not-allowed opacity-50'
-            }`}
+              }`}
           >
             Calculate
           </button>
