@@ -18,6 +18,7 @@ import type { PortfolioValueSnapshot } from '../utils/portfolioPerformanceCalcul
 import { resamplePortfolioData, getPerformanceMetrics, calculatePortfolioPerformanceTimeline } from '../utils/portfolioPerformanceCalculations';
 import type { MutualFundScheme, NAVData, UserInvestmentData } from '../types/mutual-funds';
 import Loader from '../../../components/common/Loader';
+import Worker from '../workers/graph.worker?worker';
 
 ChartJS.register(
   CategoryScale,
@@ -52,6 +53,21 @@ export default function InvestmentPerformanceCurve(
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRendered, setIsRendered] = useState(false);
+  // const [options, setOptions] = useState<ChartOptions>()
+
+  // Start the data preparation for plotting the graph
+  const runWorker = () => {
+    const worker = new Worker(); // Instantiate
+    worker.postMessage({
+      fundDetails,
+      navHistoryData
+    });
+
+    worker.onmessage = (e) => {
+      console.log(e.data);
+    };
+  };
+  runWorker();
 
   // Fetch and calculate portfolio data
   useEffect(() => {
