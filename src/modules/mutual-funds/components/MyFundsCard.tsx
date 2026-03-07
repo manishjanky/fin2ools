@@ -69,19 +69,34 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
     }
   }
 
+  const getIndicator = () => {
+    return (
+      <span className='flex'>
+        <svg viewBox="0 0 200 100" width="32" height="32">
+          {
+            isPositive ? <polyline fill="none" stroke="#2ecc71" strokeWidth="16" points="0,90 50,60 100,70 150,30 200,10" />
+              :
+              <polyline fill="none" stroke="#e74c3c" strokeWidth="16" points="0,10 50,40 100,30 150,70 200,90" />
+          }
+        </svg>
+      </span>
+
+    )
+  }
+
 
   return (
     <div
-      className="rounded-lg p-2.5 hover:shadow-lg transition border cursor-pointer bg-bg-primary border-primary-lighter hover:border-primary-main"
+      className={`rounded-lg p-2.5 hover:shadow-lg transition border-2 cursor-pointer bg-bg-primary ${isPositive ? 'border-success' : 'border-warning'}`}
       onClick={handleCardClick}
     >
       <div className="grid md:grid-cols-3 gap-4 items-start">
         {/* Scheme Info */}
         <div className="md:col-span-2">
           <h4
-            className="text-lg font-bold mb-1 line-clamp-2 text-text-primary"
+            className="text-lg font-bold mb-1 line-clamp-2 text-text-primary flex gap-2"
           >
-            {scheme.schemeName}
+            {scheme.schemeName}{getIndicator()}
           </h4>
           {scheme.schemeCategory && (
             <p className="text-sm text-text-secondary">
