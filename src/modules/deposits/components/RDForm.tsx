@@ -175,7 +175,7 @@ export default function RDForm() {
 
                 </div>
                 <button
-                    className="w-full font-bold py-3 px-6 rounded-lg transition text-lg bg-linear-to-r from-primary-main to-secondary-main text-text-inverse hover:opacity-90"
+                    className="w-full font-bold py-3 px-6 rounded-lg transition text-lg bg-primary-dark text-text-inverse hover:opacity-90"
                 >
                     Calculate
                 </button>
