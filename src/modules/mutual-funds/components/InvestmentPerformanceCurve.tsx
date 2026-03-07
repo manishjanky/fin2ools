@@ -78,7 +78,7 @@ export default function InvestmentPerformanceCurve(
     setIsLoading(true);
     setError(null);
     setGraphData(null);
-    if (investments.length === 0 || navHistoryData?.length === 0) {
+    if (investments.length === 0 || navHistoryData?.length === 0 || fundDetails.length === 0) {
       setIsLoading(false);
       return;
     }

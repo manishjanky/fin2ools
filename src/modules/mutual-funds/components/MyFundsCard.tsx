@@ -93,7 +93,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
 
   return (
     <div
-      className={`rounded-lg p-2.5 hover:shadow-lg transition border-2 cursor-pointer bg-bg-primary ${isPositive ? 'border-success' : 'border-warning'}`}
+      className={`rounded-lg p-2.5 hover:shadow-lg transition border-2 border-b-5 cursor-pointer bg-bg-primary ${isPositive ? 'border-success' : 'border-warning'}`}
       onClick={handleCardClick}
     >
       <div className="grid md:grid-cols-3 gap-4 items-start">
