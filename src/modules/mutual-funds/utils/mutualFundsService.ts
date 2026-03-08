@@ -251,7 +251,9 @@ export async function getOrFetchSchemeHistoryWithCache(
       let fetchedNav: NAVData[] = [];
 
       try {
-        const missingDays = moment().diff(lastestNavMoment, "days");
+        const missingDays = latestAvailableDate?.date
+          ? moment().diff(lastestNavMoment, "days")
+          : apiDays;
         const historyResponse = await fetchSchemeHistory(
           schemeCode,
           missingDays,
@@ -374,9 +376,9 @@ export async function getOrFetchSchemeDetailsWithCache(
  * Update NAV for all invested schemes (daily check on app load)
  */
 export async function syncLatestNAVForInvestedSchemes(): Promise<void> {
-  const yesterDay = moment().subtract(1, 'days');
+  const yesterDay = moment().subtract(1, "days");
   const yesterdayDayOfWeek = yesterDay.day();
-  if(yesterdayDayOfWeek === 0 || yesterdayDayOfWeek === 6){
+  if (yesterdayDayOfWeek === 0 || yesterdayDayOfWeek === 6) {
     // Skip sync if yesterday was either sunday or saturday since market is closed
     return;
   }
