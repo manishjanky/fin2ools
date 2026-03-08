@@ -208,6 +208,10 @@ export async function getOrFetchSchemeHistoryWithCache(
   const apiDays =
     days ||
     moment(endDate, "DD-MM-YYYY").diff(moment(startDate, "DD-MM-YYYY"), "days");
+  const investments = await IndexedDBService.getInvestments();
+  const isUserInvested = investments.some(
+    (inv) => inv.schemeCode === schemeCode,
+  );
 
   try {
     let allMergedNav: NAVData[] = [];
@@ -271,7 +275,7 @@ export async function getOrFetchSchemeHistoryWithCache(
       // Step 4 & 5: Merge cached and fetched data, then store the new data
       allMergedNav = mergeNavData(storedNavHistory, fetchedNav);
 
-      if (fetchedNav.length > 0) {
+      if (fetchedNav.length > 0 && isUserInvested) {
         // Store newly fetched data in IndexedDB
         await IndexedDBService.setNavHistoryBatch(schemeCode, fetchedNav);
         if (!isNavDataStale(fetchedNav, 1)) {
@@ -284,10 +288,16 @@ export async function getOrFetchSchemeHistoryWithCache(
 
       if (fullHistory?.data && fullHistory.data.length > 0) {
         // Store in IndexedDB
-        await IndexedDBService.setNavHistoryBatch(schemeCode, fullHistory.data);
-        if (!isNavDataStale(fullHistory.data, 1)) {
-          await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+        if (isUserInvested) {
+          await IndexedDBService.setNavHistoryBatch(
+            schemeCode,
+            fullHistory.data,
+          );
+          if (!isNavDataStale(fullHistory.data, 1)) {
+            await IndexedDBService.setSyncMetadata(schemeCode, "nav");
+          }
         }
+
         allMergedNav = fullHistory.data;
         schemeMetaData = fullHistory.meta;
       }
