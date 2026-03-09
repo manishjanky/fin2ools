@@ -25,7 +25,7 @@ export default function RDForm() {
         setFormData((prev) => ({
             ...prev,
             [key]:
-                Object.keys(formData).includes(key)
+                Object.keys(formData).includes(key) && key !== 'startDate'
                     ? parseFloat(value) || 0
                     : value,
         }));

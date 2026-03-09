@@ -26,10 +26,11 @@ export default function FDForm() {
     const { name, value } = e.target;
     const key = name as keyof FDInput;
 
+
     setFormData((prev) => ({
       ...prev,
       [key]:
-        Object.keys(formData).includes(key)
+        Object.keys(formData).includes(key) && key !== 'startDate'
           ? parseFloat(value) || 0
           : value,
     }));
