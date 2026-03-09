@@ -86,7 +86,7 @@ export default function FDForm() {
             </label>
             <input
               type="number"
-              name="principal"
+              name="investedAmount"
               value={formData.investedAmount}
               onChange={handleChange}
               min="1000"
