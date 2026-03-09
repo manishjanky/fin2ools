@@ -93,6 +93,7 @@ export function calculateFDReturns(input: FDInput): DepositSummary {
     totalInterestEarned,
     maturityAmount,
     fyData,
+    principal
   };
 }
 

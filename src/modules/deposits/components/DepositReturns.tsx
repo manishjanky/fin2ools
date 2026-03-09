@@ -5,7 +5,7 @@ interface DepositSummaryProps {
 }
 
 export default function DepositReturns({ summary }: DepositSummaryProps) {
-  const principal = summary.maturityAmount - summary.totalInterestEarned;
+  const principal = summary.principal;
 
   return (
     <div className="grid md:grid-cols-3 gap-6">
@@ -19,7 +19,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
           <span className="text-2xl">💰</span>
         </div>
         <p className="text-2xlfont-bold text-text-primary">
-          ₹{principal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+          ₹{principal?.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
         </p>
       </div>
 
