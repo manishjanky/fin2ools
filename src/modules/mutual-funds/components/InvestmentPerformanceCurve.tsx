@@ -59,20 +59,6 @@ export default function InvestmentPerformanceCurve(
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Start the data preparation for plotting the graph
-  const runWorker = () => {
-    const worker = new Worker(); // Instantiate
-    worker.postMessage({
-      fundDetails,
-      navHistoryData
-    });
-
-    worker.onmessage = (e) => {
-      console.log(e.data);
-    };
-  };
-  runWorker();
-
   // Fetch and calculate portfolio data
   useEffect(() => {
     setIsLoading(true);
