@@ -1,19 +1,37 @@
 import moment from "moment";
-import type { MutualFundScheme } from "../types/mutual-funds";
+import { type MutualFundScheme, type NAVData } from "../types/mutual-funds";
 import Alert from "../../../components/common/Alert";
+import { useEffect, useState } from "react";
+import { useMutualFundsStore } from "../store";
 
 export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
-    const navValue = scheme.nav ? parseFloat(scheme.nav).toFixed(2) : 'N/A';
-    const latestNavDate = moment(scheme.date, 'DD-MM-YYYY')
+    const { getOrFetchSchemeHistory } = useMutualFundsStore();
+    const [schemeNAV, setSchemeNAV] = useState<NAVData>();
+    const [isClosed, setIsClosed] = useState<boolean>();
+    const [lastNavTimePeriod, setLastNavTimePeriod] = useState<number>(0);
+    useEffect(() => {
+        const getHistory = async () => {
+            const history = await getOrFetchSchemeHistory(scheme.schemeCode, 5);
+            if (history && history.data) {
+                const latestNAV = history.data[history.data.length - 1];
+                const latestNavDate = moment(latestNAV.date, 'DD-MM-YYYY');
+                const isClosed = latestNavDate.isBefore(moment().subtract(1, 'week'));
+                const lastNavTimePeriod = latestNavDate.diff(moment(), 'weeks');
+                setIsClosed(isClosed);
+                setSchemeNAV(latestNAV);
+                setLastNavTimePeriod(lastNavTimePeriod);
+            }
+        }
+        getHistory();
+    }, [scheme])
 
-    const isClosed = latestNavDate.isBefore(moment().subtract(1, 'week'))
-    const lastNavTimePeriod = latestNavDate.diff(moment(), 'weeks')
+
     return (
         <div className="flex flex-col items-end lg:mt-0 border bg-linear-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/50 rounded-lg p-1  md:min-w-48">
             <label
                 className="text-lg font-bold text-secondary-main flex items-center gap-2"
             >
-                ₹{navValue} {
+                ₹{schemeNAV?.nav} {
                     isClosed && (
                         <label className='text-accent-red relative group'>
                             <svg fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
