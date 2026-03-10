@@ -6,9 +6,10 @@ import { useMutualFundsStore } from "../store";
 
 export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
     const { getOrFetchSchemeHistory } = useMutualFundsStore();
-    const [schemeNAV, setSchemeNAV] = useState<NAVData>();
+    const [schemeNAV, setSchemeNAV] = useState<NAVData | undefined>(undefined);
     const [isClosed, setIsClosed] = useState<boolean>();
     const [lastNavTimePeriod, setLastNavTimePeriod] = useState<number>(0);
+
     useEffect(() => {
         const getHistory = async () => {
             const history = await getOrFetchSchemeHistory(scheme.schemeCode, 5);
@@ -22,7 +23,9 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
                 setLastNavTimePeriod(lastNavTimePeriod);
             }
         }
-        getHistory();
+        if (scheme && scheme.schemeCode) {
+            getHistory();
+        }
     }, [scheme])
 
 
@@ -49,11 +52,11 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
                     )
                 }
             </label>
-            {scheme.date && (
+            {schemeNAV?.date && (
                 <p
                     className="text-xs font-bold text-secondary-main"
                 >
-                    As of {scheme.date}
+                    As of {schemeNAV.date}
 
                 </p>
             )}
