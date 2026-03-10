@@ -231,24 +231,13 @@ export async function getOrFetchSchemeHistoryWithCache(
         moment().startOf("day").diff(lastestNavMoment, "days") === 1;
 
       if (yesterdaysNavAvailbale && storedNavHistory.length > 0) {
-        // All data available in cache
+        // All data available in cache util yesterday
         const filteredNav = filterNavFromDate(storedNavHistory, startDate);
-
-        // Check if cached NAV data is stale
-        const navIsStale = isNavDataStale(filteredNav);
-        const needsUpdate = await IndexedDBService.needsUpdate(
-          schemeCode,
-          "nav",
-        );
-
-        if (!needsUpdate && !navIsStale) {
-          // Cache is fresh and complete - return it
-          const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
-          return {
-            meta: convertToCamelCase(schemeInfo),
-            data: filteredNav,
-          };
-        }
+        const schemeInfo = await IndexedDBService.getSchemeInfo(schemeCode);
+        return {
+          meta: convertToCamelCase(schemeInfo),
+          data: filteredNav,
+        };
       }
 
       // Step 3: Fetch missing data from API
