@@ -30,7 +30,7 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
 
 
     return (
-        <div className="flex flex-col items-end lg:mt-0 border bg-linear-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/50 rounded-lg p-1  md:min-w-48">
+        <div className="flex flex-col items-end lg:mt-0 border bg-linear-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/50 rounded-lg p-1  md:min-w-32 max-w-fit">
             <label
                 className="text-lg font-bold text-secondary-main flex items-center gap-2"
             >

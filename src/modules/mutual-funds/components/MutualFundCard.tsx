@@ -120,7 +120,7 @@ export default function MutualFundCard({ scheme }: MutualFundCardProps) {
                                         </div>
                                     )}
                                 </div>
-                                <div>
+                                <div className='flex flex-col items-ends'>
                                     <SchemeNAV scheme={scheme} />
                                     <AddToMyFunds scheme={scheme} />
                                 </div>

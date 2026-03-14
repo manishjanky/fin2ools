@@ -117,7 +117,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
         </div>
 
         {/* Current NAV */}
-        <div className="text-right max-w-sm md:ml-auto z-50">
+        <div className="text-right flex flex-col items-end justify-end">
           <SchemeNAV scheme={scheme} />
           <AddToMyFunds label="+ Add More Investments" scheme={scheme} onClose={handleAddInvestment} />
         </div>
