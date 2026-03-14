@@ -22,7 +22,7 @@ export default function FundHeader({ scheme }: { scheme: MutualFundScheme; }) {
                         </p>
                     )}
                 </div>
-                <div className="flex flex-col items-ends">
+                <div className="flex flex-col items-end">
                     <SchemeNAV scheme={scheme} />
                     <AddToMyFunds scheme={scheme} />
                 </div>
