@@ -17,6 +17,7 @@ import type { GraphData } from '../utils/portfolioPerformanceCalculations';
 import type { MutualFundScheme, NAVData, UserInvestmentData } from '../types/mutual-funds';
 import Loader from '../../../components/common/Loader';
 import Worker from '../workers/graph.worker?worker';
+import { getDeviceType } from '../../../utils/utils';
 // Format currency
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -59,6 +60,7 @@ export default function InvestmentPerformanceCurve(
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const device = getDeviceType();
   // Fetch and calculate portfolio data
   useEffect(() => {
     setIsLoading(true);
@@ -146,11 +148,11 @@ export default function InvestmentPerformanceCurve(
       currentValues,
       investedAmounts,
       gains,
-      investmentPeriodDays,
       totalReturn,
       highestGain,
       avgGain
-    } = graphData
+    } = graphData;
+    const investmentPeriodDays = Math.abs(graphData.investmentPeriodDays || 0);
 
 
 
@@ -270,7 +272,7 @@ export default function InvestmentPerformanceCurve(
       scales: {
         y: {
           type: 'linear' as const,
-          display: true,
+          display: device !== 'mobile',
           position: 'left' as const,
           grid: {
             color: 'rgba(71, 85, 105, 0.1)',
@@ -296,7 +298,7 @@ export default function InvestmentPerformanceCurve(
         },
         y1: {
           type: 'linear' as const,
-          display: true,
+          display: device !== 'mobile',
           position: 'right' as const,
           grid: {
             drawOnChartArea: false,
@@ -321,6 +323,7 @@ export default function InvestmentPerformanceCurve(
           },
         },
         x: {
+          display: device !== 'mobile',
           grid: {
             color: 'rgba(71, 85, 105, 0.1)',
           },

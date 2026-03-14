@@ -1,3 +1,5 @@
+import type { DeviceType } from "../types/types";
+
 /**
  * Convert a whole object (or array of objects) whose property names are in
  * snake_case to a new structure whose keys are camelCase.
@@ -31,4 +33,14 @@ export function convertToCamelCase<T = unknown>(input: unknown): T {
   }
 
   return result as T;
+}
+
+export function getDeviceType(): DeviceType {
+  if (window.matchMedia("(max-width: 767px)").matches) {
+    return 'mobile';
+  } else if (window.matchMedia("(min-width: 768px) and (max-width: 1024px)").matches) {
+    return 'tablet';
+  } else {
+    return 'desktop';
+  }
 }
