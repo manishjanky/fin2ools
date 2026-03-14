@@ -5,6 +5,7 @@ import { AlertProvider } from './context/AlertContext';
 import { useEffect } from 'react';
 import { useMutualFundsStore } from './modules/mutual-funds/store/mutualFundsStore';
 import { useInvestmentStore } from './modules/mutual-funds/store';
+import ErrorBoundary from './components/common/ErrorBoundry';
 
 function App() {
   const initIndexedDB = useMutualFundsStore((state) => state.initIndexedDB);
@@ -16,10 +17,10 @@ function App() {
       try {
         // Initialize IndexedDB for mutual funds and load investments/watchlist
         await initIndexedDB();
-        
+
         // Load existing investments
         await loadInvestments();
-        
+
         // Sync latest NAV for invested schemes
         await syncLatestNAV();
       } catch (error) {
@@ -31,9 +32,12 @@ function App() {
   }, []);
 
   return (
-    <AlertProvider>
-      <RouterProvider router={router} />
-    </AlertProvider>
+    <ErrorBoundary>
+      <AlertProvider>
+        <RouterProvider router={router} />
+      </AlertProvider>
+    </ErrorBoundary>
+
   );
 }
 
