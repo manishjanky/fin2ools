@@ -1,5 +1,5 @@
 import type { FDInput, DepositSummary, RDInput } from "../types/deposits";
-import type { FYData } from "../../../types/fy-data";
+import type { FYData } from "../../../types/types";
 import moment from "moment";
 import type { Moment } from "moment";
 

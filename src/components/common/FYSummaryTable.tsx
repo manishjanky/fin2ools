@@ -1,4 +1,4 @@
-import type { FYData } from "../../types/fy-data";
+import type { FYData } from "../../types/types";
 
 interface FYSummaryTableProps {
   data: FYData[];
