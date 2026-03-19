@@ -316,7 +316,6 @@ export default function InvestmentPerformanceCurve(
             color: 'rgba(71, 85, 105, 0.1)',
           },
           ticks: {
-            display: false,
             color: '#cbd5e1',
             font: {
               size: 10,
