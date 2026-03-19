@@ -148,13 +148,7 @@ export default function InvestmentPerformanceCurve(
       currentValues,
       investedAmounts,
       gains,
-      totalReturn,
-      highestGain,
-      avgGain
     } = graphData;
-    const investmentPeriodDays = Math.abs(graphData.investmentPeriodDays || 0);
-
-
 
     const chartData = {
       labels,
@@ -366,50 +360,6 @@ export default function InvestmentPerformanceCurve(
               </Suspense>
             )
           }
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="rounded-lg bg-bg-primary p-4 border border-border-main">
-            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-              Investment Period
-            </p>
-            <p className="text-sm font-semibold text-text-primary">
-              {investmentPeriodDays ? `${investmentPeriodDays} days` : 'N/A'}
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-bg-primary p-4 border border-border-main">
-            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-              Total Return
-            </p>
-            <p
-              className={`text-sm font-semibold ${totalReturn >= 0
-                ? 'text-green-400'
-                : 'text-red-400'
-                }`}
-            >
-              {isFinite(totalReturn) ? totalReturn.toFixed(4) : 'N/A'}%
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-bg-primary p-4 border border-border-main">
-            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-              Highest Gain
-            </p>
-            <p className="text-sm font-semibold text-text-primary">
-              {formatCurrency(highestGain)}
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-bg-primary p-4 border border-border-main">
-            <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-              Average Gain
-            </p>
-            <p className="text-sm font-semibold text-text-primary">
-              {formatCurrency(avgGain)}
-            </p>
-          </div>
         </div>
       </div>
     );
