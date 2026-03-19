@@ -162,9 +162,7 @@ export default function InvestmentPerformanceCurve(
           tension: 0.4,
           pointBackgroundColor: '#10b981',
           pointBorderColor: '#e0f2fe',
-          pointBorderWidth: 1,
-          pointRadius: 3,
-          pointHoverRadius: 5,
+          pointRadius: 0,
           borderWidth: 2,
           spanGaps: true,
           yAxisID: 'y',
@@ -178,9 +176,7 @@ export default function InvestmentPerformanceCurve(
           tension: 0.4,
           pointBackgroundColor: '#f59e0b',
           pointBorderColor: '#fef3c7',
-          pointBorderWidth: 1,
-          pointRadius: 3,
-          pointHoverRadius: 5,
+          pointRadius: 0,
           borderWidth: 2,
           borderDash: [5, 5],
           spanGaps: true,
@@ -199,9 +195,7 @@ export default function InvestmentPerformanceCurve(
           pointBackgroundColor:
             gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
           pointBorderColor: gains[gains.length - 1] >= 0 ? '#cffafe' : '#fee2e2',
-          pointBorderWidth: 1,
-          pointRadius: 3,
-          pointHoverRadius: 5,
+          pointRadius: 0,
           borderWidth: 2,
           borderDash: [2, 2],
           spanGaps: true,
@@ -228,7 +222,7 @@ export default function InvestmentPerformanceCurve(
               weight: 600,
             },
             padding: 15,
-            usePointStyle: true,
+            usePointStyle: false,
             pointStyle: 'circle',
           },
         },
@@ -322,6 +316,7 @@ export default function InvestmentPerformanceCurve(
             color: 'rgba(71, 85, 105, 0.1)',
           },
           ticks: {
+            display: false,
             color: '#cbd5e1',
             font: {
               size: 10,
@@ -343,14 +338,14 @@ export default function InvestmentPerformanceCurve(
     };
 
     return (
-      <div className="rounded-lg p-6 bg-bg-secondary border border-border-main">
+      <div className="rounded-lg p-4 bg-bg-secondary border border-border-main">
         <div className="mb-6">
           <h3 className="text-xl font-semibold text-text-primary mb-2">
             Investment Overview
           </h3>
         </div>
 
-        <div className="mb-6 h-96 relative">
+        <div className="h-120 relative">
           {
             sampledSnapshots?.length > 0 && (
               <Suspense fallback={<Loader />}>
