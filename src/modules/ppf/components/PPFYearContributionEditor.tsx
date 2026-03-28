@@ -83,13 +83,13 @@ const PPFYearContributionEditor = ({
                     <>
                         <div
                             key={index}
-                            className="p-3 rounded-lg flex gap-3 items-center bg-bg-primary"
+                            className="p-3 rounded-lg flex flex-col lg:flex-row gap-3 items-center bg-bg-primary"
                         >
-                            <div className="flex-1">
+                            <div className="flex flex-col w-full">
                                 <label
                                     className="block text-xs font-medium mb-1 text-text-secondary"
                                 >
-                                    Contribution {index + 1} - Amount (₹)
+                                    Amount (₹)
                                 </label>
                                 <input
                                     type="number"
@@ -110,7 +110,7 @@ const PPFYearContributionEditor = ({
                                 />
                             </div>
 
-                            <div className="flex-1">
+                            <div className="flex flex-col w-full">
                                 <label
                                     className="block text-xs font-medium mb-1 text-text-secondary"
                                 >
@@ -120,7 +120,7 @@ const PPFYearContributionEditor = ({
                                     type="date"
                                     value={contrib.date || ''}
                                     onChange={(e) => onContributionChange(index, contrib.amount, e.target.value)}
-                                    className="w-full rounded px-3 py-1 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                                    className="w-full max-w-full rounded px-3 py-1 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                                     onFocus={(e) => {
                                         e.currentTarget.classList.add('border-primary-main');
                                     }}

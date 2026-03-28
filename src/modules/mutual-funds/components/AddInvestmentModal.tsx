@@ -249,7 +249,7 @@ export default function AddInvestmentModal({
           )}
 
           {/* Start Date - Read-only in edit mode */}
-          <div>
+          <div className="w-full">
             <label className="block font-medium mb-2 text-text-secondary">
               {investmentType === 'lumpsum' ? 'Investment' : 'SIP Start'} Date
             </label>
@@ -258,7 +258,7 @@ export default function AddInvestmentModal({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               disabled={isEditMode}
-              className={`w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main ${isEditMode ? 'opacity-60 cursor-not-allowed' : 'cursor-auto'}`}
+              className={`w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main ${isEditMode ? 'opacity-60 cursor-not-allowed' : 'cursor-auto'}`}
             />
           </div>
 
@@ -327,7 +327,7 @@ export default function AddInvestmentModal({
 
               {/* Effective Date for Amount Change - Only show when checkbox is checked */}
               {isEditMode && (
-                <div>
+                <div className="w-full">
                   <label className="block font-medium mb-2 text-text-secondary">
                     Effective Date for New Amount
                   </label>
@@ -335,7 +335,7 @@ export default function AddInvestmentModal({
                     type="date"
                     value={sipAmountChangeDate}
                     onChange={(e) => setSipAmountChangeDate(e.target.value)}
-                    className="w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                    className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                   />
                   <p className="text-xs mt-2 text-text-secondary">
                     Select a date from the past or future when this amount change takes effect
@@ -367,7 +367,7 @@ export default function AddInvestmentModal({
                 </label>
               </div>
               {sipCancelled && (
-                <div>
+                <div className="w-full">
                   <label className="block font-medium mb-2 text-text-secondary">
                     {isEditMode ? 'Cancellation Date' : 'SIP End Date'}
                   </label>
@@ -375,7 +375,7 @@ export default function AddInvestmentModal({
                     type="date"
                     value={sipEndDate}
                     onChange={(e) => setSipEndDate(e.target.value)}
-                    className="w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                    className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                   />
                 </div>
               )}

@@ -30,14 +30,14 @@ const PPFVariableContributionsModal = ({
   return (
     <Modal onClose={onClose}>
       <h3
-        className="font-bold text-xl mb-4 text-text-secondary"
+        className="font-bold text-md  mb-4 text-text-secondary"
       >
         Annual Contributions (15-Year Maturity Period - FY {startYear}-{startYear + 1} to FY{' '}
         {startYear + 14}-{startYear + 15})
       </h3>
 
       <div
-        className="grid md:grid-cols-1 gap-4 max-h-96 overflow-y-auto p-4 rounded-lg bg-bg-secondary"
+        className="grid md:grid-cols-1 gap-4 lg:max-h-96 overflow-y-auto p-4 rounded-lg bg-bg-secondary"
       >
         {yearlyContributions.map((contrib, index) => (
           <PPFYearContributionEditor
