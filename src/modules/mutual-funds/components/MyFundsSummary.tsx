@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Loader from '../../../components/common/Loader';
 import MetricCard from './MetricCard';
 import type { InvestmentMetrics } from '../types/mutual-funds';
+import { useInvestmentStore } from '../store';
 
 interface MyFundsSummaryProps {
   metrics: InvestmentMetrics;
@@ -13,10 +14,18 @@ export default function MyFundsSummary({
 }: MyFundsSummaryProps) {
 
   const [loading, setLoading] = useState(true);
+  const { getPortfolioAge } = useInvestmentStore();
+
+  const [duration, setDuration] = useState<{
+    years: number;
+    months: number;
+    totalMonths: number;
+  }>()
 
   useEffect(() => {
     if (metrics && metrics.totalInvested !== undefined)
       setLoading(false);
+    setDuration(getPortfolioAge());
   }, [metrics])
 
   const isPositiveGain = metrics.absoluteGain >= 0;
@@ -78,6 +87,14 @@ export default function MyFundsSummary({
           colorKey="info"
           subtext="Compound Annual Growth Rate"
         />
+        {duration &&
+          <MetricCard
+            label="Portfolio Age"
+            value={duration?.years > 0 ? `${duration.years} years ${duration.months} months` : `${duration?.totalMonths} months`}
+            colorKey="info"
+          />
+        }
+
       </Suspense>
     </div>
       <div className='p-2 mt-2 col-span-4 flex border border-secondary-lighter rounded-xl text-text-secondary opacity-50'>
