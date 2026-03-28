@@ -10,6 +10,7 @@ import {
   getOrFetchSchemeHistoryWithCache,
 } from "../utils/mutualFundsService";
 import { ReturnCalculationService } from "../utils/returnCalculationService";
+import { calculatePortfolioAge } from "../utils/investmentCalculations";
 
 interface InvestmentStore {
   investments: UserInvestmentData[];
@@ -30,6 +31,7 @@ interface InvestmentStore {
   calculatePortFolioRetruns: () => Promise<void>;
   importInvestments: (file: File) => Promise<UserInvestmentData[]>;
   exportUserInevestments: (userInvestments: UserInvestmentData[]) => void;
+  getPortfolioAge: () => { years: number; months: number; totalMonths: number };
 }
 
 export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
@@ -180,12 +182,16 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
       // console.error("Error calculating portfolio returns:", error);
     }
   },
-  exportUserInevestments: (userInvestments: UserInvestmentData[])=>{
-    userInvestmentService.exportUserInevestments(userInvestments)
+  exportUserInevestments: (userInvestments: UserInvestmentData[]) => {
+    userInvestmentService.exportUserInevestments(userInvestments);
   },
-  importInvestments: async (file: File)=>{
+  importInvestments: async (file: File) => {
     const investments = await userInvestmentService.importInvestments(file);
     await get().loadInvestments();
     return investments;
-  }
+  },
+  getPortfolioAge: () => {
+    const investments = get().getAllInvestments();
+    return calculatePortfolioAge(investments);
+  },
 }));

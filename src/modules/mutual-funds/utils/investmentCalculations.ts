@@ -848,3 +848,36 @@ export function calculatePortfolioCagr(
 
   return (Math.pow(totalCurrentValue / totalInvested, 1 / years) - 1) * 100;
 }
+
+export function calculatePortfolioAge(investments: UserInvestmentData[]) {
+  if (investments.length === 0) {
+    return { years: 0, months: 0, totalMonths: 0 };
+  }
+
+  // Get all investments and find the earliest date
+  const allInvestments = investments.flatMap((inv) => inv.investments);
+
+  if (allInvestments.length === 0) {
+    return { years: 0, months: 0, totalMonths: 0 };
+  }
+
+  // Find earliest investment date
+  let earliestDate = allInvestments[0].startDate;
+  for (const inv of allInvestments) {
+    const invDate = moment(inv.startDate, "DD-MM-YYYY");
+    const earlyDate = moment(earliestDate, "DD-MM-YYYY");
+    if (invDate.isBefore(earlyDate)) {
+      earliestDate = inv.startDate;
+    }
+  }
+
+  // Calculate difference from earliest date to now
+  const earliestMoment = moment(earliestDate, "DD-MM-YYYY");
+  const now = moment();
+  const diffMonths = Math.abs(earliestMoment.diff(now, "months"));
+
+  const years = Math.floor(diffMonths / 12);
+  const months = diffMonths % 12;
+
+  return { years, months, totalMonths: diffMonths };
+}
