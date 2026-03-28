@@ -161,12 +161,6 @@ export default function MyFunds() {
   }, [userInvestments]);
 
   useEffect(() => {
-    if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
-      loadNavHistories();
-    }
-  }, [fundsWithDetails]);
-
-  useEffect(() => {
     const loadMetrics = async () => {
       if (fundsWithDetails.length === 0) {
         setMetrics({
@@ -198,6 +192,9 @@ export default function MyFunds() {
       } finally {
         setMetricsLoading(false);
       }
+    }
+    if (fundsWithDetails.length > 0 && navHistoryData.length === 0) {
+      loadNavHistories();
     }
     loadMetrics();
   }, [fundsWithDetails]);

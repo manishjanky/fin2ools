@@ -47,7 +47,7 @@ export default function RDForm() {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-3 gap-6">
-                    <div className="">
+                    <div className="w-full">
                         <label
                             className="block font-medium mb-2 text-text-secondary"
 
@@ -59,7 +59,7 @@ export default function RDForm() {
                             name="startDate"
                             value={formData.startDate}
                             onChange={handleChange}
-                            className="w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                            className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                             onFocus={(e) => {
                                 e.currentTarget.classList.add('border-primary-main');
                             }}

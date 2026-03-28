@@ -80,7 +80,7 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
             </polyline>
               :
               <polyline fill="none" stroke="#e74c3c" strokeWidth="24" points="0,10 50,40 100,30 150,70 200,90" strokeDasharray={400}
-              strokeDashoffset={400}>
+                strokeDashoffset={400}>
                 <animate attributeName='stroke-dashoffset' from={400} to={0} dur='2s' begin='0s' repeatCount='indefinite' calcMode='linear' />
               </polyline>
           }
@@ -117,19 +117,19 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
         </div>
 
         {/* Current NAV */}
-        <div className="text-right flex flex-col items-end justify-end">
+        <div className="text-right flex flex-row-reverse lg:flex-col items-center lg:items-end lg:justify-end justify-between">
           <SchemeNAV scheme={scheme} />
-          <AddToMyFunds label="+ Add More Investments" scheme={scheme} onClose={handleAddInvestment} />
+          <AddToMyFunds label="+ Add More" scheme={scheme} onClose={handleAddInvestment} />
         </div>
       </div>
 
       {/* Investment Metrics */}
       <div
-        className="grid grid-cols-3 md:grid-cols-6 gap-4 mt-2 pt-2 border-t border-border-light"
+        className="grid grid-cols-3 md:grid-cols-7 gap-4 mt-2 pt-2 border-t border-border-light"
       >
         <div>
           <p className="text-xs mb-1 text-text-tertiary font-extrabold">
-            Amount Invested
+            Investment
           </p>
           <p className="text-md font-semibold text-text-primary">
             ₹{investmentMetrics.totalInvested.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
@@ -163,6 +163,16 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
           >
             {investmentMetrics.percentageReturn >= 0 ? '+' : ''}
             {investmentMetrics.percentageReturn.toFixed(2)}%
+          </p>
+        </div>
+        <div>
+          <p className="text-xs mb-1 text-text-tertiary font-extrabold">
+            XIRR
+          </p>
+          <p
+            className={`text-md font-semibold ${isPositive ? 'text-success' : 'text-error'}`}
+          >
+            {investmentMetrics.xirr?.toFixed(2) || 0.0}%
           </p>
         </div>
         <div>

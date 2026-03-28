@@ -311,7 +311,7 @@ const PPFForm = ({ onCalculate }: PPFFormProps) => {
                     type="date"
                     value={firstYearContributionDate}
                     onChange={(e) => setFirstYearContributionDate(e.target.value)}
-                    className="w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                    className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                   />
                   <p className="text-xs mt-2 text-text-secondary">
                     For pro-rata interest calculation
