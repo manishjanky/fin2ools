@@ -132,6 +132,20 @@ export const userInvestmentService = {
   },
 
   /**
+   * Remove entire scheme and all its investments
+   */
+  async removeScheme(schemeCode: number): Promise<void> {
+    try {
+      await IndexedDBService.deleteInvestment(schemeCode);
+      await IndexedDBService.clearNavHistoryForScheme(schemeCode);
+      await IndexedDBService.clearCalculatedReturnsForScheme(schemeCode);
+    } catch (error) {
+      console.error("Error removing scheme from IndexedDB:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Check if user has any investments
    */
   async hasInvestments(): Promise<boolean> {

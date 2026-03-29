@@ -623,6 +623,29 @@ export class IndexedDBService {
   }
 
   /**
+   * Clear NAV history for a specific scheme
+   */
+  static async clearNavHistoryForScheme(schemeCode: number): Promise<void> {
+    const db = this.getDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORES.NAV_HISTORY, "readwrite");
+      const store = transaction.objectStore(STORES.NAV_HISTORY);
+      const index = store.index("schemeCode");
+
+      const request = index.getAll(IDBKeyRange.only(schemeCode));
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const results = request.result as Array<NAVData & { id: number }>;
+        for (const result of results) {
+          store.delete(result.id);
+        }
+        resolve();
+      };
+      transaction.onerror = () => reject(transaction.error);
+    });
+  }
+
+  /**
    * Clear all data
    */
   static async clearAll(): Promise<void> {

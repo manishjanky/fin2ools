@@ -7,20 +7,13 @@ export default function RemoveFund({ scheme, label, onClose }: { scheme: MutualF
 
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { removeInvestment, getSchemeInvestments, calculatePortFolioRetruns } = useInvestmentStore();
+    const { removeScheme } = useInvestmentStore();
 
     const remove = async () => {
-        const investmentData = getSchemeInvestments(scheme.schemeCode);
-        if (!investmentData) return;
-
         setLoading(true);
         try {
-            // Remove all investments for this scheme in reverse order (to avoid index shifts)
-            for (let i = investmentData.investments.length - 1; i >= 0; i--) {
-                await removeInvestment(scheme.schemeCode, i);
-            }
-            // Recalculate portfolio returns after removal
-            await calculatePortFolioRetruns();
+            // Remove the entire scheme and all its investments in one operation
+            await removeScheme(scheme.schemeCode);
             setShowModal(false);
             onClose?.();
         } catch (error) {
