@@ -55,7 +55,7 @@ export default function FundActionMenu({
             </button>
 
             {showMenu && (
-                <div className="absolute bg-bg-primary mt-1 min-w-48 border border-border-light rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 right-0">
+                <div className={` absolute bg-bg-primary mt-1 min-w-48 border border-border-light rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 lg:right-0`}>
                     <AddToMyFunds scheme={scheme}
                         label={
                             <span className="text-left w-full px-3 py-1.5 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-colors duration-150 text-primary-main font-semibold flex items-center gap-3 group"
