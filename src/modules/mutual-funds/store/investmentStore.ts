@@ -22,6 +22,7 @@ interface InvestmentStore {
     schemeCode: number,
     investmentIndex: number,
   ) => Promise<void>;
+  removeScheme: (schemeCode: number) => Promise<void>;
   getSchemeInvestments: (schemeCode: number) => UserInvestmentData;
   updateInvestment: (
     schemeCode: number,
@@ -62,6 +63,12 @@ export const useInvestmentStore = create<InvestmentStore>((set, get) => ({
     await userInvestmentService.removeInvestment(schemeCode, investmentIndex);
     await get().loadInvestments();
     await get().calculateSchemeReturns(schemeCode);
+    await get().calculatePortFolioRetruns();
+  },
+
+  removeScheme: async (schemeCode: number) => {
+    await userInvestmentService.removeScheme(schemeCode);
+    await get().loadInvestments();
     await get().calculatePortFolioRetruns();
   },
 
