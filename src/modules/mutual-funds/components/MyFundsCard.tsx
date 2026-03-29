@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { MutualFundScheme, UserInvestmentData, NAVData, InvestmentMetrics } from '../types/mutual-funds';
 import { investmentMetricSingleFund } from '../utils/investmentCalculations';
-import { useInvestmentStore } from '../store';
 import SchemeNAV from './SchemeNAV';
-import AddToMyFunds from './AddToMyFunds';
 import { useNavigate } from 'react-router';
 import moment from 'moment';
 import { getCalculatedReturns } from '../utils';
+import FundActionMenu from './FundActionMenu';
 
 interface MyFundsCardProps {
   scheme: MutualFundScheme;
@@ -16,8 +15,7 @@ interface MyFundsCardProps {
 
 export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFundsCardProps) {
   const navigate = useNavigate();
-  const { getSchemeInvestments } = useInvestmentStore();
-  const [investmentDataState, setInvestmentData] = useState<UserInvestmentData>(investmentData);
+  const [investmentDataState] = useState<UserInvestmentData>(investmentData);
   const [investmentMetrics, setInvestmentMetrics] = useState<InvestmentMetrics>({
     totalInvested: 0,
     totalCurrentValue: 0,
@@ -56,11 +54,11 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
     getFundMetrics();
   }, [investmentData, navHistory, scheme.schemeCode]);
 
-  const handleAddInvestment = () => {
-    if (scheme.schemeCode) {
-      setInvestmentData(getSchemeInvestments(scheme.schemeCode));
-    }
-  };
+  // const handleAddInvestment = () => {
+  //   if (scheme.schemeCode) {
+  //     setInvestmentData(getSchemeInvestments(scheme.schemeCode));
+  //   }
+  // };
 
   const handleCardClick = () => {
     if (scheme.schemeCode) {
@@ -119,7 +117,9 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
         {/* Current NAV */}
         <div className="text-right flex flex-row-reverse lg:flex-col items-center lg:items-end lg:justify-end justify-between">
           <SchemeNAV scheme={scheme} />
-          <AddToMyFunds label="+ Add More" scheme={scheme} onClose={handleAddInvestment} />
+          <FundActionMenu
+            scheme={scheme}
+          />
         </div>
       </div>
 

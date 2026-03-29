@@ -3,7 +3,7 @@ import { useInvestmentStore } from "../store";
 import type { MutualFundScheme } from "../types/mutual-funds";
 import AddInvestmentModal from "./AddInvestmentModal";
 
-export default function AddToMyFunds({ scheme, label, onClose }: { scheme: MutualFundScheme, label?: string, onClose?: () => void }) {
+export default function AddToMyFunds({ scheme, label, onClose }: { scheme: MutualFundScheme, label?: React.ReactNode, onClose?: () => void }) {
 
     const [showModal, setShowModal] = useState(false);
 
@@ -25,11 +25,11 @@ export default function AddToMyFunds({ scheme, label, onClose }: { scheme: Mutua
     }
 
     return (
-        <div className='flex justify-end'>
+        <div className='flex'>
             <label
                 role='button'
                 onClick={add}
-                className="w-full md:w-auto p-1 text-md text-primary hover:text-primary-dark cursor-pointer transition text-center font-bold"
+                className="w-full text-md text-primary hover:text-primary-dark cursor-pointer transition text-center font-bold"
             >
                 {label || "+ Add to My Funds"}
             </label>
