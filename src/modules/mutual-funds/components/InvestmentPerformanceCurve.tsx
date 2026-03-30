@@ -159,7 +159,7 @@ export default function InvestmentPerformanceCurve(
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           fill: true,
-          tension: 0.4,
+          tension: 0,
           pointBackgroundColor: '#10b981',
           pointBorderColor: '#e0f2fe',
           pointRadius: 0,
@@ -173,7 +173,7 @@ export default function InvestmentPerformanceCurve(
           borderColor: '#f59e0b',
           backgroundColor: 'rgba(245, 158, 11, 0.05)',
           fill: true,
-          tension: 0.4,
+          tension: 0,
           pointBackgroundColor: '#f59e0b',
           pointBorderColor: '#fef3c7',
           pointRadius: 0,
@@ -191,7 +191,7 @@ export default function InvestmentPerformanceCurve(
               ? 'rgba(6, 182, 212, 0.1)'
               : 'rgba(239, 68, 68, 0.1)',
           fill: true,
-          tension: 0.4,
+          tension: 0,
           pointBackgroundColor:
             gains[gains.length - 1] >= 0 ? '#06b6d4' : '#ef4444',
           pointBorderColor: gains[gains.length - 1] >= 0 ? '#cffafe' : '#fee2e2',

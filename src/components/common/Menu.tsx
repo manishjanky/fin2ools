@@ -5,14 +5,14 @@ export default function Menu() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
     const location = useLocation()
-    
+
     useEffect(() => {
         setIsMenuOpen(false);
         setOpenDropdown(null);
     }, [location]);
 
     const isActive = (path: string) => location.pathname.startsWith(path);
-    
+
     const navLinkClass = `
         transition-all duration-200 py-2 rounded-md text-sm font-medium
         text-text-secondary hover:text-text-primary hover:bg-bg-secondary
@@ -26,24 +26,20 @@ export default function Menu() {
         }
     `;
 
-    const submenuItemClass = (path: string) => `
-        transition-all duration-200 px-4 py-2 rounded-md text-sm
-        ${isActive(path)
-            ? 'text-white font-medium'
-            : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
-        }
+    const submenuItemClass = () => `
+        transition-all duration-200 px-4 py-2 rounded-md text-sm text-text-secondary hover:text-text-primary hover:bg-bg-secondary
     `;
-    
+
     return (
         <>
             <nav className={
-                isMenuOpen 
-                    ? "grid grid-cols-1 mt-4 py-4 gap-2 border-t border-border-light absolute px-2 top-0 left-0 w-dvw bg-bg-primary" 
+                isMenuOpen
+                    ? "grid grid-cols-1 mt-4 py-4 gap-2 border-t border-border-light absolute px-2 top-0 left-0 w-dvw bg-bg-primary"
                     : "hidden lg:flex space-x-2 items-center"
             }>
                 {/* Deposits Dropdown */}
                 <div className="transition-all duration-200 text-text-secondary relative group lg:group-hover:text-text-primary">
-                    <button 
+                    <button
                         className={navLinkClass}
                         onClick={() => setOpenDropdown(openDropdown === 'deposits' ? null : 'deposits')}
                     >
@@ -54,13 +50,13 @@ export default function Menu() {
                             </svg>
                         </span>
                     </button>
-                    
+
                     {/* Desktop Dropdown */}
                     <div className='hidden lg:grid lg:group-hover:grid grid-cols-1 absolute top-full left-0 bg-bg-primary lg:border lg:border-border-main rounded-lg lg:shadow-lg p-1 gap-1 min-w-max z-40 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 pointer-events-none lg:group-hover:pointer-events-auto'>
-                        <Link to="/deposits/fd" className={submenuItemClass('/deposits/fd')}>
+                        <Link to="/deposits/fd" className={submenuItemClass()}>
                             Fixed Deposit
                         </Link>
-                        <Link to="/deposits/rd" className={submenuItemClass('/deposits/rd')}>
+                        <Link to="/deposits/rd" className={submenuItemClass()}>
                             Recurring Deposit
                         </Link>
                     </div>
@@ -80,7 +76,7 @@ export default function Menu() {
 
                 {/* Mutual Funds Dropdown */}
                 <div className="transition-all duration-200 text-text-secondary relative group lg:group-hover:text-text-primary">
-                    <button 
+                    <button
                         className={navLinkClass}
                         onClick={() => setOpenDropdown(openDropdown === 'mutual-funds' ? null : 'mutual-funds')}
                     >
@@ -91,16 +87,16 @@ export default function Menu() {
                             </svg>
                         </span>
                     </button>
-                    
+
                     {/* Desktop Dropdown */}
                     <div className='hidden lg:grid lg:group-hover:grid grid-cols-1 absolute top-full left-0 bg-bg-primary lg:border lg:border-border-main rounded-lg lg:shadow-lg p-1 gap-1 min-w-max z-40 opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 pointer-events-none lg:group-hover:pointer-events-auto'>
-                        <Link to="/mutual-funds" className={submenuItemClass('/mutual-funds')}>
+                        <Link to="/mutual-funds" className={submenuItemClass()}>
                             Explore Funds
                         </Link>
-                        <Link to="/mutual-funds/my-funds" className={submenuItemClass('/mutual-funds/my-funds')}>
+                        <Link to="/mutual-funds/my-funds" className={submenuItemClass()}>
                             My Funds
                         </Link>
-                        <Link to="/mutual-funds/watchlist" className={submenuItemClass('/mutual-funds/watchlist')}>
+                        <Link to="/mutual-funds/watchlist" className={submenuItemClass()}>
                             Watchlist
                         </Link>
                     </div>
@@ -124,7 +120,7 @@ export default function Menu() {
                 {/* PPF Link */}
                 <Link
                     to="/ppf"
-                    className={`${navLinkClass} px-4` }
+                    className={`${navLinkClass} px-4`}
                 >
                     PPF
                 </Link>
@@ -132,7 +128,7 @@ export default function Menu() {
                 {/* Privacy & Terms Link */}
                 <Link
                     to="/privacy"
-                    className={`${navLinkClass} px-4` }
+                    className={`${navLinkClass} px-4`}
                 >
                     Privacy & Terms
                 </Link>
@@ -141,11 +137,10 @@ export default function Menu() {
             {/* Mobile Menu Button */}
             <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`lg:hidden flex flex-col justify-center gap-1.5 p-2.5 rounded-lg transition-all duration-300 ${
-                    isMenuOpen 
-                        ? 'bg-bg-secondary' 
+                className={`lg:hidden flex flex-col justify-center gap-1.5 p-2.5 rounded-lg transition-all duration-300 ${isMenuOpen
+                        ? 'bg-bg-secondary'
                         : 'bg-transparent hover:bg-bg-secondary'
-                }`}
+                    }`}
                 aria-label="Toggle menu"
             >
                 <span
