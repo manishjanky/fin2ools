@@ -29,7 +29,7 @@ export default function FundHeader({
                         </p>
                     )}
                 </div>
-                <div className="flex flex-col items-end">
+                <div className="flex flex-row-reverse justify-between items-center lg:flex-col lg:items-end">
                     <SchemeNAV scheme={scheme} />
                     <FundActionMenu
                         scheme={scheme}
