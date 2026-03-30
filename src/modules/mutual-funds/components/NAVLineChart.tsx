@@ -52,6 +52,7 @@ export default function LineChart({ navData, timeframeLabel }: LineChartProps) {
                 pointRadius: 0,
                 pointHoverRadius: 0,
                 spanGaps: false,
+                tension: 0
             },
         ],
     };
