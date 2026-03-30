@@ -4,6 +4,7 @@ import type { UserInvestment } from '../types/mutual-funds';
 import Modal from '../../../components/common/Modal';
 import { useAlert } from '../../../context/AlertContext';
 import { useInvestmentStore } from '../store';
+import { createPortal } from 'react-dom';
 
 /**
  * Convert HTML date input format (YYYY-MM-DD) to DD-MM-YYYY format
@@ -191,9 +192,10 @@ export default function AddInvestmentModal({
   const onBackDropClick = (event: React.MouseEvent) => {
     event.stopPropagation();
   }
-  return (
+  return createPortal(
     <div
       onClick={onBackDropClick}
+      onMouseDown={onBackDropClick}
     >
       <Modal onClose={onClose}>
         <div className="flex items-center justify-between mb-6">
@@ -216,7 +218,7 @@ export default function AddInvestmentModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()} className="space-y-6">
           {/* Investment Type - Only show in add mode */}
           {!isEditMode && (
             <div className="space-y-3">
@@ -400,6 +402,6 @@ export default function AddInvestmentModal({
           </div>
         </form>
       </Modal>
-    </div>
+    </div>, document.body
   );
 }
