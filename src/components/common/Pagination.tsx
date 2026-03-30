@@ -15,7 +15,7 @@ export default function Pagination({ items, itemsPerPage, pageChange }: { items:
         <>
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-8">
+                <div className="flex justify-center items-center gap-2 mt-1 py-4">
                     <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
@@ -61,7 +61,7 @@ export default function Pagination({ items, itemsPerPage, pageChange }: { items:
             )}
 
             {/* Results Summary */}
-            <div className="text-center mt-6 text-purple-200 text-sm">
+            <div className="text-center  pb-3 text-purple-200 text-sm">
                 <p>
                     Showing {startIndex + 1} to{' '}
                     {Math.min(startIndex + ITEMS_PER_PAGE, items.length)} of{' '}
