@@ -46,7 +46,7 @@ export default function Accordion({ title, isOpen, onToggle, children }: Accordi
             {/* Accordion Content */}
             {isAccordionOpen && (
                 <div
-                  className="p-2 border-t border-border-light bg-bg-primary"
+                  className="p-1 border-t border-border-light bg-bg-primary"
                 >
                     {children}
                 </div>

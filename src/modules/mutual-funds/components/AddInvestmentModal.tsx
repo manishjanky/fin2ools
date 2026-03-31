@@ -260,7 +260,7 @@ export default function AddInvestmentModal({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               disabled={isEditMode}
-              className={`w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main ${isEditMode ? 'opacity-60 cursor-not-allowed' : 'cursor-auto'}`}
+              className={`w-full min-w-0 max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main ${isEditMode ? 'opacity-60 cursor-not-allowed' : 'cursor-auto'}`}
             />
           </div>
 
@@ -337,7 +337,7 @@ export default function AddInvestmentModal({
                     type="date"
                     value={sipAmountChangeDate}
                     onChange={(e) => setSipAmountChangeDate(e.target.value)}
-                    className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                    className="w-full min-w-0 max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                   />
                   <p className="text-xs mt-2 text-text-secondary">
                     Select a date from the past or future when this amount change takes effect
@@ -377,7 +377,7 @@ export default function AddInvestmentModal({
                     type="date"
                     value={sipEndDate}
                     onChange={(e) => setSipEndDate(e.target.value)}
-                    className="w-full max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                    className="w-full min-w-0 max-w-full rounded-lg px-4 py-2 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                   />
                 </div>
               )}
