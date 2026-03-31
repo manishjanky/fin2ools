@@ -120,7 +120,7 @@ const PPFYearContributionEditor = ({
                                     type="date"
                                     value={contrib.date || ''}
                                     onChange={(e) => onContributionChange(index, contrib.amount, e.target.value)}
-                                    className="w-full max-w-full rounded px-3 py-1 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
+                                    className="w-full min-w-0 max-w-full rounded px-3 py-1 transition border bg-bg-secondary border-border-main text-text-primary focus:border-primary-main"
                                     onFocus={(e) => {
                                         e.currentTarget.classList.add('border-primary-main');
                                     }}
