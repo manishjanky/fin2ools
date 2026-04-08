@@ -26,8 +26,11 @@ export default function MutualFundList() {
 
   // Load schemes on component mount
   useEffect(() => {
+    const fetchSchemes = async () => {
+      await loadSchemes();
+    };
     if (!hasLoaded) {
-      loadSchemes();
+      fetchSchemes();
     }
   }, [hasLoaded, loadSchemes]);
 

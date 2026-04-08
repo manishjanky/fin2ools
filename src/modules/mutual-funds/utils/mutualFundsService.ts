@@ -15,20 +15,85 @@ import moment from "moment";
 const API_BASE = "https://api.mfapi.in";
 const NEMO_API_BASE = "https://mf.captnemo.in/kuvera/";
 
+/**
+ * Retry helper with exponential backoff
+ */
+async function fetchWithRetry<T>(
+  url: string,
+  maxRetries: number = 3,
+  timeout: number = 10000,
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "Accept": "application/json",
+        },
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      // Validate content-type
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error(
+          `Invalid content-type: ${contentType}. Expected application/json`,
+        );
+      }
+
+      // Try to parse response
+      const data = await response.json();
+      return data as T;
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry for client errors (4xx)
+      if (
+        error instanceof Error &&
+        error.message.includes("API Error: 4")
+      ) {
+        throw error;
+      }
+
+      // If this is not the last attempt, retry with exponential backoff
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        console.warn(
+          `Fetch attempt ${attempt + 1} failed, retrying in ${delay}ms:`,
+          error,
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw new Error(
+    `Failed to fetch after ${maxRetries + 1} attempts: ${lastError?.message}`,
+  );
+}
+
 export async function fetchMutualFunds(
-  limit: number = 100,
+  limit: number = 500,
   offset: number = 0,
 ): Promise<MutualFundScheme[]> {
   try {
-    const response = await fetch(
-      `${API_BASE}/mf/latest?limit=${limit}&offset=${offset}`,
-    );
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    return await response.json();
+    const url = `${API_BASE}/mf/latest?limit=${limit}&offset=${offset}`;
+    return await fetchWithRetry<MutualFundScheme[]>(url);
   } catch (error) {
-    console.error("Error fetching mutual funds:", error);
+    console.error(
+      `Error fetching mutual funds (limit: ${limit}, offset: ${offset}):`,
+      error,
+    );
     throw error;
   }
 }
@@ -37,15 +102,10 @@ export async function searchMutualFunds(
   query: string,
 ): Promise<SearchResult[]> {
   try {
-    const response = await fetch(
-      `${API_BASE}/mf/search?q=${encodeURIComponent(query)}`,
-    );
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    return await response.json();
+    const url = `${API_BASE}/mf/search?q=${encodeURIComponent(query)}`;
+    return await fetchWithRetry<SearchResult[]>(url);
   } catch (error) {
-    console.error("Error searching mutual funds:", error);
+    console.error(`Error searching mutual funds for "${query}":`, error);
     throw error;
   }
 }
@@ -54,11 +114,8 @@ export async function fetchSchemeDetails(
   schemeCode: number,
 ): Promise<MutualFundScheme | null> {
   try {
-    const response = await fetch(`${API_BASE}/mf/${schemeCode}/latest`);
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    const data = await response.json();
+    const url = `${API_BASE}/mf/${schemeCode}/latest`;
+    const data = await fetchWithRetry<any>(url);
     let schemeDetails: MutualFundScheme | null = null;
     if (data.data && data.data.length > 0 && data.meta) {
       schemeDetails = convertToCamelCase<MutualFundScheme>(data.meta);
@@ -76,7 +133,7 @@ export async function fetchSchemeDetails(
 
     return schemeDetails;
   } catch (error) {
-    console.error("Error fetching scheme details:", error);
+    console.error(`Error fetching scheme details for code ${schemeCode}:`, error);
     throw error;
   }
 }
@@ -98,38 +155,34 @@ export async function fetchSchemeHistory(
       return `${year}-${month}-${day}`;
     };
 
-    const response = await fetch(
-      `${API_BASE}/mf/${schemeCode}?startDate=${formatDate(
-        startDate,
-      )}&endDate=${formatDate(endDate)}`,
-    );
+    const url = `${API_BASE}/mf/${schemeCode}?startDate=${formatDate(
+      startDate,
+    )}&endDate=${formatDate(endDate)}`;
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    const navHistory = await response.json();
+    const navHistory = await fetchWithRetry<any>(url);
     return { ...navHistory, data: navHistory.data.reverse() };
   } catch (error) {
-    console.error("Error fetching scheme history:", error);
+    console.error(`Error fetching scheme history for code ${schemeCode}:`, error);
     throw error;
   }
 }
 
 export async function fetchSchemeDetailsNemo(
   scheme: MutualFundScheme,
-): Promise<MutualFundSchemeDetails> {
-  let schemeDetails = null;
+): Promise<MutualFundSchemeDetails | null> {
+  let schemeDetails: MutualFundSchemeDetails | null = null;
 
   try {
-    // Get A detailed info from CaptainNemo MF API
-    const nemoResponse = await fetch(`${NEMO_API_BASE}${scheme.isinGrowth}`);
-    schemeDetails = await nemoResponse.json();
-    schemeDetails = convertToCamelCase<MutualFundSchemeDetails>(
-      schemeDetails?.[0],
-    );
-    schemeDetails.aum = schemeDetails?.aum ? schemeDetails.aum / 10 : 0;
+    // Get detailed info from CaptainNemo MF API with retry
+    const url = `${NEMO_API_BASE}${scheme.isinGrowth}`;
+    const data = await fetchWithRetry<any>(url, 2, 5000); // Lower retry count and timeout for secondary API
+    schemeDetails = convertToCamelCase<MutualFundSchemeDetails>(data?.[0]);
+    if (schemeDetails) {
+      schemeDetails.aum = schemeDetails?.aum ? schemeDetails.aum / 10 : 0;
+    }
   } catch (error) {
-    // console.error("Error fetching scheme details from NEMO:", error);
+    // Gracefully handle errors for secondary API - don't throw
+    console.debug(`Optional NEMO data fetch failed for ${scheme.isinGrowth}:`, error);
   }
   return schemeDetails;
 }
