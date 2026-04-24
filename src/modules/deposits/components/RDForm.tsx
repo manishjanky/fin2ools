@@ -22,12 +22,15 @@ export default function RDForm() {
         const { name, value } = e.target;
         const key = name as keyof RDInput;
 
+        // String fields that should not be parsed as numbers
+        const stringFields = ['startDate'];
+
         setFormData((prev) => ({
             ...prev,
             [key]:
-                Object.keys(formData).includes(key) && key !== 'startDate'
-                    ? parseFloat(value) || 0
-                    : value,
+                stringFields.includes(key)
+                    ? value
+                    : parseFloat(value) || 0,
         }));
     };
 
