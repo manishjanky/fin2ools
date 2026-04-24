@@ -26,13 +26,15 @@ export default function FDForm() {
     const { name, value } = e.target;
     const key = name as keyof FDInput;
 
+    // String fields that should not be parsed as numbers
+    const stringFields = ['startDate', 'compounding', 'payoutType'];
 
     setFormData((prev) => ({
       ...prev,
       [key]:
-        Object.keys(formData).includes(key) && key !== 'startDate'
-          ? parseFloat(value) || 0
-          : value,
+        stringFields.includes(key)
+          ? value
+          : parseFloat(value) || 0,
     }));
   };
 
