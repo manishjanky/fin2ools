@@ -173,7 +173,7 @@ export default function FundInvestmentDetails() {
       {
         metrics && <main className="max-w-7xl mx-auto px-4 py-6">
 
-          <FundHeader scheme={scheme} />
+          <FundHeader scheme={scheme} clickableTitle={true} />
 
           <section className="mb-6">
             <Accordion title="Investment Summary" isOpen={true}>
