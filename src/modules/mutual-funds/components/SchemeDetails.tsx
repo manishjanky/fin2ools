@@ -62,7 +62,7 @@ export default function SchemeDetails() {
         };
 
         loadData();
-    }, [schemeCode, getOrFetchSchemeDetails, getOrFetchSchemeHistory]);
+    }, [schemeCode]);
 
     if (loading) {
         return (
