@@ -42,7 +42,8 @@ export default function SchemeDetails() {
                 }
 
                 // Fetch maximum history available (10 years)
-                const historyData = await getOrFetchSchemeHistory(parseInt(schemeCode), 3650); // 10 years of history
+                // Use forceFresh=true to ensure full history is fetched, not just from limited myFunds date range
+                const historyData = await getOrFetchSchemeHistory(parseInt(schemeCode), 3650, true); // 10 years of history
 
                 if (historyData) {
                     setHistory(historyData);
