@@ -34,7 +34,7 @@ export default function SchemeNAV({ scheme }: { scheme: MutualFundScheme }) {
             <label
                 className="text-lg font-bold text-secondary-main flex items-center gap-2"
             >
-                ₹{schemeNAV?.nav} {
+                ₹{parseFloat(schemeNAV?.nav || '0').toFixed(4)} {
                     isClosed && (
                         <label className='text-accent-red relative group'>
                             <svg fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
