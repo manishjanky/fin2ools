@@ -70,21 +70,8 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
   const getIndicator = () => {
     return (
       <span className='flex'>
-        <svg viewBox="0 0 200 100" width="24" height="24" className='border-l border-b'>
-          {
-            isPositive ? <polyline fill="none" stroke="#2ecc71" strokeWidth="24" points="0,90 50,60 100,70 150,30 200,10" strokeDasharray={400}
-              strokeDashoffset={400}>
-              <animate attributeName='stroke-dashoffset' from={400} to={0} dur='2s' begin='0s' repeatCount='indefinite' calcMode='linear' />
-            </polyline>
-              :
-              <polyline fill="none" stroke="#e74c3c" strokeWidth="24" points="0,10 50,40 100,30 150,70 200,90" strokeDasharray={400}
-                strokeDashoffset={400}>
-                <animate attributeName='stroke-dashoffset' from={400} to={0} dur='2s' begin='0s' repeatCount='indefinite' calcMode='linear' />
-              </polyline>
-          }
-        </svg>
+         {isPositive ? <strong className="text-success text-2xl">&#9650;</strong> : <strong className="text-danger">&#9660;</strong>}
       </span>
-
     )
   }
 
