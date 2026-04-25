@@ -38,8 +38,28 @@ export function calculateFDReturns(input: FDInput): DepositSummary {
   endDate.add(input.tenureMonths, "months");
   endDate.add(input.tenureDays, "days");
 
-  // Get compounding frequency details
-  const compoundingFrequency = getCompoundingFrequency(input.compounding);
+  // Use different calculation based on payout type
+  if (input.payoutType === "maturity") {
+    return calculateFDAtMaturity(startDate, endDate, principal, rate, input.compounding);
+  } else {
+    return calculateFDWithPeriodicPayout(
+      startDate,
+      endDate,
+      principal,
+      rate,
+      input.payoutType,
+    );
+  }
+}
+
+function calculateFDAtMaturity(
+  startDate: Moment,
+  endDate: Moment,
+  principal: number,
+  rate: number,
+  compounding: "monthly" | "quarterly" | "halfYearly" | "annually",
+): DepositSummary {
+  const compoundingFrequency = getCompoundingFrequency(compounding);
 
   const fyDataMap: { [key: string]: FYData } = {};
   let previousFYEndBalance = principal;
@@ -93,7 +113,76 @@ export function calculateFDReturns(input: FDInput): DepositSummary {
     totalInterestEarned,
     maturityAmount,
     fyData,
-    principal
+    principal,
+    payoutType: "maturity",
+  };
+}
+
+function calculateFDWithPeriodicPayout(
+  startDate: Moment,
+  endDate: Moment,
+  principal: number,
+  annualRate: number,
+  payoutType: "monthly" | "quarterly",
+): DepositSummary {
+  // For periodic payouts, principal remains constant
+  // Interest is calculated but NOT added back to principal
+  // Only principal earns interest each period
+
+  const payoutFrequency = payoutType === "monthly" ? 12 : 4; // months per year
+  const daysTotal = Math.floor(endDate.diff(startDate, "days", true));
+  const yearsTotal = daysTotal / 365;
+  // const periodsTotal = Math.ceil(yearsTotal * payoutFrequency);
+
+  // Total interest earned (simple calculation: total periods × period interest)
+  const periodInterestRate = annualRate / payoutFrequency;
+  const totalInterestEarned = principal * annualRate * yearsTotal;
+  const maturityAmount = principal; // Principal is returned as-is
+  
+  // Calculate periodic payout amount
+  const periodicPayoutAmount = principal * periodInterestRate;
+
+  // Build FY-wise breakdown
+  const startFYYear = getIndianFYYear(startDate);
+  const endFYYear = getIndianFYYear(endDate);
+  const fyDataMap: { [key: string]: FYData } = {};
+
+  for (let fyYear = startFYYear; fyYear <= endFYYear; fyYear++) {
+    const fyStart = getIndianFYStartDate(fyYear);
+    const fyEnd = getIndianFYEndDate(fyYear);
+
+    // Calculate actual dates within this FY that overlap with FD tenure
+    const periodStart = moment.max(startDate, fyStart);
+    const periodEnd = moment.min(endDate, fyEnd);
+
+    if (periodStart.isAfter(periodEnd)) continue;
+
+    const daysInFY = Math.floor(periodEnd.diff(periodStart, "days", true));
+    const yearsInFY = daysInFY / 365;
+    const interestInFY = principal * annualRate * yearsInFY;
+
+    const fyYearLabel =
+      fyYear > 2000
+        ? `FY ${fyYear}-${String(fyYear + 1).slice(-2)}`
+        : `FY ${fyYear}`;
+
+    fyDataMap[fyYearLabel] = {
+      fyYear: fyYearLabel,
+      startBalance: principal,
+      endBalance: principal,
+      interestEarned: Math.max(0, interestInFY),
+    };
+  }
+
+  const fyData = Object.values(fyDataMap);
+
+  return {
+    totalInterestEarned,
+    maturityAmount,
+    fyData,
+    principal,
+    payoutType,
+    periodicPayoutAmount,
   };
 }
 

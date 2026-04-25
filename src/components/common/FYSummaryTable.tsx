@@ -2,9 +2,11 @@ import type { FYData } from "../../types/types";
 
 interface FYSummaryTableProps {
   data: FYData[];
+  payoutType?: "maturity" | "monthly" | "quarterly";
 }
 
-export default function FYSummaryTable({ data }: FYSummaryTableProps) {
+export default function FYSummaryTable({ data, payoutType }: FYSummaryTableProps) {
+  const isPeriodicPayout = payoutType === "monthly" || payoutType === "quarterly";
   return (
     <div
       className="rounded-lg overflow-hidden bg-bg-secondary border border-border-light"
@@ -50,11 +52,13 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
               >
                 Interest Earned
               </th>
-              <th
-                className="px-6 py-4 text-right font-semibold text-text-secondary"
-              >
-                Closing Balance
-              </th>
+              {!isPeriodicPayout && (
+                <th
+                  className="px-6 py-4 text-right font-semibold text-text-secondary"
+                >
+                  Closing Balance
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -98,12 +102,14 @@ export default function FYSummaryTable({ data }: FYSummaryTableProps) {
                 >
                   ₹{row.interestEarned.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </td>
-                <td
-                  className="px-6 py-4 text-right font-semibold text-primary-main"
-                  style={{ color: 'var(--color-primary-main)' }}
-                >
-                  ₹{row.endBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </td>
+                {!isPeriodicPayout && (
+                  <td
+                    className="px-6 py-4 text-right font-semibold text-primary-main"
+                    style={{ color: 'var(--color-primary-main)' }}
+                  >
+                    ₹{row.endBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

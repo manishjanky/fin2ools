@@ -24,6 +24,8 @@ export interface DepositSummary {
   maturityAmount: number;
   principal?: number;
   fyData: FYData[];
+  payoutType?: "maturity" | "monthly" | "quarterly";
+  periodicPayoutAmount?: number;
 }
 
 export type DepositType = "FD" | "RD";
