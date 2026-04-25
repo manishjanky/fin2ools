@@ -178,7 +178,7 @@ export default function RDForm() {
 
                 </div>
                 <button
-                    className="w-full font-bold py-3 px-6 rounded-lg transition text-lg bg-primary-dark text-text-inverse hover:opacity-90"
+                    className="font-bold py-3 px-6 rounded-lg transition text-lg bg-primary-dark text-text-inverse hover:opacity-90"
                 >
                     Calculate
                 </button>
@@ -192,7 +192,7 @@ export default function RDForm() {
 
                     {/* Results Table */}
                     <section>
-                        <FYSummaryTable data={summary.fyData} />
+                        <FYSummaryTable data={summary.fyData} payoutType={summary.payoutType} />
                     </section>
                 </>
             )}
