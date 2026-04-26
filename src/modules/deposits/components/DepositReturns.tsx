@@ -9,9 +9,9 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
   const isPeriodicPayout = summary.payoutType === "monthly" || summary.payoutType === "quarterly";
 
   return (
-    <div className="grid md:grid-cols-3 gap-6">
+    <div className="grid md:grid-cols-3 gap-4">
       <div
-        className="rounded-lg p-6 transition bg-bg-secondary border border-border-light hover:border-primary-main"
+        className="rounded-lg p-3 transition bg-bg-secondary border border-border-light hover:border-primary-main"
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-text-secondary">
@@ -26,7 +26,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
 
       {/* Total Interest Card */}
       <div
-        className="rounded-lg p-6 transition bg-bg-secondary border border-border-light hover:border-success"
+        className="rounded-lg p-3 transition bg-bg-secondary border border-border-light hover:border-success"
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-success">
@@ -44,7 +44,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
 
       {isPeriodicPayout ? summary.periodicPayoutAmount && (
         <div
-          className="rounded-lg p-6 transition bg-bg-secondary border border-border-light hover:border-primary-main"
+          className="rounded-lg p-3 transition bg-bg-secondary border border-border-light hover:border-primary-main"
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-primary-main">
@@ -58,7 +58,7 @@ export default function DepositReturns({ summary }: DepositSummaryProps) {
         </div>
       ) : (
         <div
-          className="rounded-lg p-6 transition bg-bg-secondary border border-border-light hover:border-primary-main"
+          className="rounded-lg p-3 transition bg-bg-secondary border border-border-light hover:border-primary-main"
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-primary-main">

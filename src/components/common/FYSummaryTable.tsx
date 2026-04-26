@@ -12,7 +12,7 @@ export default function FYSummaryTable({ data, payoutType }: FYSummaryTableProps
       className="rounded-lg overflow-hidden bg-bg-secondary border border-border-light"
     >
       <div
-        className="px-6 py-4 border border-border-light"
+        className="px-6 py-3 border border-border-light"
       >
         <h2
           className="text-2xl font-bold text-text-primary"
