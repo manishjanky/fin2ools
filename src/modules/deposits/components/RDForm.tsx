@@ -186,7 +186,7 @@ export default function RDForm() {
             {summary && (
                 <>
                     {/* Summary Card */}
-                    <section className="mb-12 mt-12">
+                    <section className="mb-6 mt-6">
                         <DepositReturns summary={summary} />
                     </section>
 

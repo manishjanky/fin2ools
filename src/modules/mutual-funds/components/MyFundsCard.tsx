@@ -67,13 +67,6 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
     }
   }
 
-  const getIndicator = () => {
-    return (
-      <span className='flex'>
-         {isPositive ? <strong className="text-success text-2xl">&#9650;</strong> : <strong className="text-danger">&#9660;</strong>}
-      </span>
-    )
-  }
 
 
   return (
@@ -85,9 +78,9 @@ export default function MyFundsCard({ scheme, investmentData, navHistory }: MyFu
         {/* Scheme Info */}
         <div className="md:col-span-2">
           <h4
-            className="text-lg font-bold mb-1 line-clamp-2 text-text-primary flex gap-2 items-center"
+            className="text-lg font-bold line-clamp-2 text-text-primary flex gap-2 items-center"
           >
-            {scheme.schemeName}{getIndicator()}
+            {scheme.schemeName}
           </h4>
           {scheme.schemeCategory && (
             <p className="text-sm text-text-secondary">
